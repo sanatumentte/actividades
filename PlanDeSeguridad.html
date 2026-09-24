@@ -6,7 +6,6 @@
 <title>Mi plan de seguridad</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Serif+Display&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
@@ -298,6 +297,8 @@ textarea{min-height:84px; resize:vertical}
       <div><label class="t">Psicóloga</label><input type="text" data-k="firma_psico" value="Psi. Camila Salazar"></div>
     </div>
     <button class="btn" id="descargar">⬇️ Descargar mi plan en PDF</button>
+    <button class="btn" id="plataforma" style="background:var(--verde)">💾 Guardar en la plataforma</button>
+    <div class="nota" id="platAviso" style="display:none"></div>
     <button class="btn sec" id="imprimir">🖨️ Imprimir o guardar desde el navegador</button>
     <div class="nota">📱 Guarda el PDF en tu celular y tómale una captura a la página de líneas de crisis para tenerla siempre a mano. Lo que escribes aquí solo queda en este teléfono.</div>
     <button class="btn sec" id="borrar" style="margin-top:18px">Borrar todo y empezar de nuevo</button>
@@ -412,42 +413,83 @@ function armarDoc(){
 
 document.getElementById('descargar').onclick = async ()=>{
   const b = document.getElementById('descargar'); b.textContent='Preparando tu PDF…'; b.disabled=true;
-  try{ (await crearPDF()).save('Mi-plan-de-seguridad.pdf'); }
+  const nombre='Mi-plan-de-seguridad.pdf';
+  try{
+    const blob=(await crearPDF()).output('blob'), url=URL.createObjectURL(blob);
+    const file=new File([blob],nombre,{type:'application/pdf'});
+    let listo=false;
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],title:'Mi plan de seguridad'}); listo=true; }catch(err){ if(err&&err.name==='AbortError') listo=true; }
+    }
+    if(!listo){ const a=document.createElement('a'); a.href=url; a.download=nombre; document.body.appendChild(a); a.click(); a.remove(); }
+    let aviso=document.getElementById('pdfAviso');
+    if(!aviso){ aviso=document.createElement('div'); aviso.id='pdfAviso'; aviso.className='nota'; b.insertAdjacentElement('afterend',aviso); }
+    aviso.innerHTML=`✅ Tu PDF está listo. Si no se descargó, <a href="${url}" target="_blank" rel="noopener"><b>tócalo aquí para abrirlo</b></a> y guárdalo desde ahí.`;
+  }
   catch(e){ imprimir(); }
   b.textContent='⬇️ Descargar mi plan en PDF'; b.disabled=false;
 };
 /* Cada sección se dibuja por separado y se reparte en páginas sin cortarla */
+/* PDF dibujado directo con jsPDF (texto real, sin convertir la página en imagen):
+   no se traba con extensiones del navegador y cada sección pasa entera a la página siguiente si no cabe */
 async function crearPDF(){
-  if(!window.html2canvas || !window.jspdf) throw new Error('sin librerías');
-  const host = document.createElement('div');
-  host.style.cssText = 'position:fixed;left:-10000px;top:0';
-  host.innerHTML = armarDoc();
-  document.body.appendChild(host);
-  try{
-    if(document.fonts && document.fonts.ready) await document.fonts.ready;
-    const doc = host.firstElementChild;
-    const pdf = new jspdf.jsPDF({unit:'mm', format:'letter'});
-    const W = pdf.internal.pageSize.getWidth(), H = pdf.internal.pageSize.getHeight(), M = 12;
-    const bloques = [...doc.children];
-    const mmPorPx = (W - 2*M) / bloques[0].offsetWidth;
-    let y = M;
-    for(const b of bloques){
-      const lienzo = await html2canvas(b, {scale:2, backgroundColor:'#ffffff'});
-      let w = W - 2*M, h = b.offsetHeight * mmPorPx;
-      if(h > H - 2*M){ w *= (H - 2*M)/h; h = H - 2*M; }
-      if(y + h > H - M){ pdf.addPage(); y = M; }
-      pdf.addImage(lienzo.toDataURL('image/jpeg', .92), 'JPEG', M, y, w, h);
-      y += h + 12*mmPorPx;
-    }
-    return pdf;
-  } finally { host.remove(); }
+  if(!window.jspdf) throw new Error('sin librería');
+  const doc = new DOMParser().parseFromString(armarDoc(),'text/html').querySelector('.doc');
+  const limpio = s => String(s||'').replace(/[‐‑]/g,'-').replace(/→/g,'->').replace(/[\u{1F000}-\u{1FFFF}☀-➿️‍]/gu,'').replace(/\s+/g,' ').trim();
+  const pdf = new jspdf.jsPDF({unit:'mm', format:'letter'});
+  const W = pdf.internal.pageSize.getWidth(), H = pdf.internal.pageSize.getHeight(), M = 16, AN = W-2*M;
+  const PET=[22,90,108], TXT=[36,64,63], SUAVE=[93,116,114], ALERTA=[180,83,58];
+  let y = M;
+  try{ pdf.addImage(LOGO,'PNG',M,y,24,24); }catch(e){}
+  pdf.setFont('times','bold'); pdf.setFontSize(22); pdf.setTextColor(...PET); pdf.text('Mi plan de seguridad', M+30, y+11);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(...SUAVE); pdf.text(limpio(doc.querySelector('.fecha').textContent), M+30, y+18);
+  y += 28; pdf.setDrawColor(218,187,129); pdf.setLineWidth(.8); pdf.line(M,y,W-M,y); y += 6;
+  for(const s of doc.querySelectorAll('.sec')){
+    const cris = s.classList.contains('cris');
+    const items = [...s.querySelectorAll('li')].map(li=>limpio(li.textContent));
+    pdf.setFontSize(10.5);
+    const lineas = items.length ? items.map(t=>pdf.splitTextToSize(t, AN-12)) : [[limpio(s.querySelector('.vacio')?.textContent||'Sin completar')]];
+    const alto = 9 + lineas.reduce((a,l)=>a+l.length*4.8+1.2,0) + 3;
+    if(y + alto > H - M){ pdf.addPage(); y = M; }
+    pdf.setFillColor(...(cris?[251,239,235]:[247,243,236])); if(cris){ pdf.setDrawColor(...ALERTA); pdf.setLineWidth(.6); }
+    pdf.roundedRect(M, y, AN, alto, 3, 3, cris?'FD':'F');
+    pdf.setFont('times','bold'); pdf.setFontSize(13); pdf.setTextColor(...(cris?ALERTA:PET)); pdf.text(limpio(s.querySelector('h3').textContent), M+4, y+7);
+    let yy = y + 13; pdf.setFont('helvetica','normal'); pdf.setFontSize(10.5);
+    lineas.forEach(l=>{ pdf.setTextColor(...(items.length?TXT:SUAVE)); if(items.length) pdf.text('•', M+5, yy); pdf.text(l, M+9, yy); yy += l.length*4.8+1.2; });
+    y += alto + 4;
+  }
+  const comp = pdf.splitTextToSize(limpio([...doc.querySelectorAll('p')].find(p=>/Cuando note/.test(p.textContent))?.textContent||''), AN);
+  if(y + comp.length*5 + 30 > H - M){ pdf.addPage(); y = M; }
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(10.5); pdf.setTextColor(...TXT); pdf.text(comp, M, y+4); y += comp.length*5 + 18;
+  const f = [...doc.querySelectorAll('.firmas div')].map(d=>limpio(d.textContent));
+  pdf.setDrawColor(...TXT); pdf.setLineWidth(.3); pdf.setFontSize(9);
+  [[M, f[0]], [M+AN/2+6, f[1]]].forEach(([x,t])=>{ pdf.line(x, y, x+AN/2-6, y); pdf.text(t||'', x+(AN/2-6)/2, y+5, {align:'center'}); });
+  pdf.setFontSize(8); pdf.setTextColor(...SUAVE); pdf.text('Sana tu Mentte · Psi. Camila Salazar Ramírez · Documento personal y confidencial', W/2, H-8, {align:'center'});
+  return pdf;
 }
+/* Código SANA1 con el plan (secciones y respuestas) para pegarlo en el caso: Actividades o 📁 Recursos → 📥 Pegar respuestas */
+document.getElementById('plataforma').onclick = ()=>{
+  const doc = new DOMParser().parseFromString(armarDoc(),'text/html').querySelector('.doc');
+  const sec = [...doc.querySelectorAll('.sec')].map(s=>[s.querySelector('h3').textContent.trim(), [...s.querySelectorAll('li')].map(li=>li.textContent.replace(/\s+/g,' ').trim())]);
+  const json = JSON.stringify({v:1,k:'s',f:C('fecha')||new Date().toISOString().slice(0,10),sec});
+  const by = new TextEncoder().encode(json); let bin=''; by.forEach(x=>bin+=String.fromCharCode(x));
+  const msg = '🛟 Mi plan de seguridad\nSANA1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const av = document.getElementById('platAviso'); av.style.display='block';
+  const ok = ()=>{ av.innerHTML='✅ Copiado. En la app abre el caso → <b>📁 Recursos</b> o <b>Actividades</b> → <b>📥 Pegar respuestas</b>. Si lo llenaste en tu celular, pégalo en el chat de WhatsApp con tu psicóloga.'; };
+  try{ navigator.clipboard.writeText(msg).then(ok, ()=>{ av.innerHTML='Copia este texto y pégalo en la app:<textarea style="width:100%;min-height:90px;margin-top:6px" readonly>'+msg+'</textarea>'; }); }
+  catch(e){ av.innerHTML='Copia este texto y pégalo en la app:<textarea style="width:100%;min-height:90px;margin-top:6px" readonly>'+msg+'</textarea>'; }
+};
 function imprimir(){ document.getElementById('pdf').innerHTML = armarDoc(); setTimeout(()=>window.print(), 150); }
 document.getElementById('imprimir').onclick = imprimir;
 document.getElementById('borrar').onclick = ()=>{
-  if(!confirm('¿Borrar todo lo escrito en este plan?')) return;
+  const b = document.getElementById('borrar');
+  if(!b.dataset.ok){ b.dataset.ok='1'; b.textContent='¿Seguro? Toca otra vez para borrar todo'; setTimeout(()=>{ delete b.dataset.ok; b.textContent='Borrar todo y empezar de nuevo'; },5000); return; }
   try{ localStorage.removeItem(KEY); }catch(e){}
-  location.reload();
+  estado = {campos:{}, chips:{}, listas:{distraccion:[['',''],['','']], ayuda:[['Mamá',''],['Papá',''],['','']]}};
+  document.querySelectorAll('[data-k]').forEach(el=>{ el.value = el.dataset.k==='fecha' ? new Date().toISOString().slice(0,10) : (el.defaultValue||''); });
+  document.querySelectorAll('.chip.sel').forEach(c=>c.classList.remove('sel'));
+  Object.keys(estado.listas).forEach(pintarLista);
+  b.textContent='✓ Borrado'; setTimeout(()=>{ delete b.dataset.ok; b.textContent='Borrar todo y empezar de nuevo'; ir(0); },900);
 };
 </script>
 </body>
