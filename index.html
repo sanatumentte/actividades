@@ -405,6 +405,7 @@ const $=s=>document.querySelector(s);
 
 function def(){
   if(A.tipo==='e') return {titulo:'Mi registro de emociones',eyebrow:'Registro semanal',intro:RE_INSTR,escena:'emociones',especial:true,pasos:[]};
+  if(A.tipo==='d') return {titulo:'Mi chequeo diario',eyebrow:'Cada día',intro:'',escena:'faro',especial:true,pasos:[]};
   if(A.tipo==='i'&&INTERACTIVOS[A.clave]){ const it=INTERACTIVOS[A.clave]; return {titulo:it.titulo,eyebrow:it.enfoque,intro:it.intro,escena:it.escena,pasos:it.campos.map(c=>({k:'txt',q:c}))}; }
   if(A.tipo==='t'&&ESCALAS[A.clave]){ const E=ESCALAS[A.clave]; return {titulo:E.titulo,eyebrow:'Cuestionario',intro:'Responde con lo primero que sientas más cercano a tu experiencia. No hay respuestas buenas ni malas.',escena:'jardin',instr:E.instr,pasos:E.items.map(q=>({k:'opc',q,opciones:E.opciones}))}; }
   if(A.tipo==='r'&&RECURSOS[+A.clave]){ const r=RECURSOS[+A.clave]; return {titulo:r.titulo,eyebrow:'Para leer con calma',intro:'Lee cada tarjeta con calma. Al final puedes contarle a tu psicóloga qué te llevas.',escena:'papel',slides:r.slides,
@@ -474,6 +475,201 @@ function renderReg(){
   document.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{ if(x.dataset.ok){ RG.splice(+x.dataset.del,1); rgGuardar(); renderReg(); } else { x.dataset.ok='1'; x.textContent='¿Borrar? toca otra vez'; } });
 }
 
+/* =========================================================================
+   CHEQUEO DIARIO DE SEGURIDAD (tipo «d»; la clave es la región de las líneas de crisis)
+   Orientativo, no diagnóstico. Ánimo, disfrute y sentido + preguntas tipo screening
+   (ideación → pensó en actuar → plan → intención) + acceso a medios + cómo se cuidó.
+   Verde: seguir el plan · Amarillo: revisar el plan y buscar a su red · Rojo: llamar ya.
+   ========================================================================= */
+const DX_REG={
+  'us-perry':{n:'Pensilvania (Perry/Cumberland)',corto:'Llama al 988 y marca 2',lineas:[
+    {n:'988 · Línea de Prevención del Suicidio y Crisis',d:'Llama y marca 2 para español, o escribe AYUDA al 988. Gratis, confidencial, 24/7.',tel:'988',ver:'988 → 2',sms:'AYUDA'},
+    {n:'Línea de crisis Cumberland‑Perry',d:'24/7. Pueden enviar un equipo móvil hasta donde estés. Di «Spanish, please».',tel:'17177632222',ver:'717‑763‑2222'},
+    {n:'Centro de crisis Connections (sin cita)',d:'1100 S. Cameron St., Harrisburg. 24/7, te atienden aunque no tengas seguro.',tel:'17174081353',ver:'717‑408‑1353'}],
+    emerg:{n:'Peligro inmediato',tel:'911',ver:'911'}},
+  'us':{n:'Estados Unidos',corto:'Llama al 988 y marca 2',lineas:[
+    {n:'988 · Línea de Prevención del Suicidio y Crisis',d:'Llama y marca 2 para español, o escribe AYUDA al 988. Gratis, confidencial, 24/7.',tel:'988',ver:'988 → 2',sms:'AYUDA'}],
+    emerg:{n:'Peligro inmediato',tel:'911',ver:'911'}},
+  'co':{n:'Colombia',corto:'Llama al 123',lineas:[
+    {n:'Línea de emergencias',d:'Gratuita, 24/7. También puedes ir a Urgencias del hospital más cercano.',tel:'123',ver:'123'}],
+    emerg:{n:'Peligro inmediato',tel:'123',ver:'123 o Urgencias'}}
+};
+const DX_EST=['Oré','Canté o escuché música','Hablé con mi familia','Hablé con una amiga o amigo','Salí a caminar o me moví','Respiré lento o usé mis 5 sentidos','Leí mi plan de seguridad','Hice algo que me gusta','Descansé','Ninguna hoy'];
+const DX_CARA=['😣','😞','😔','🙁','😕','😐','🙂','😊','😄','😁','🤩'];
+const DX_COL={v:{c:'#4f8a64',bg:'#e3efe6',ic:'🟢',n:'Verde'},a:{c:'#c98a12',bg:'#fdf3d7',ic:'🟡',n:'Amarillo'},r:{c:'#c0483c',bg:'#fbe5de',ic:'🔴',n:'Rojo'}};
+const DX_AVISO='Este chequeo es para ti, para conocerte y cuidarte cada día. Tu psicóloga NO lo ve en tiempo real: solo lo verá cuando tú se lo envíes, y puede tardar en responder. Si estás en riesgo ahora, este chequeo no es suficiente: llama a una línea de crisis.';
+let DX=[], dxModo='home', dxE=null, dxPaso=0;
+try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&Array.isArray(d.dx)) DX=d.dx; }catch(_){}
+function dxGuardar(){ try{ localStorage.setItem(KEY,JSON.stringify({dx:DX})); }catch(_){} }
+function dxRegion(){ return DX_REG[A.clave]||DX_REG.us; }
+function dxNivel(e){
+  if(e.pl||e.int||(e.me&&e.id)) return 'r';
+  if(e.ac||e.me||e.an<=3||e.di<=3||e.se<=3||(e.id&&(!e.est.length||e.est.includes('Ninguna hoy')))) return 'a';
+  return 'v';
+}
+function dxPasos(E){ return ['an','di','se','id'].concat(E.id?['ac','pl','int']:[],['me','est']); }
+function dxHoyE(){ return DX.find(x=>x.f===reHoy()); }
+function dxTel(t){ return 'tel:'+(t.length>4?'+':'')+t; }
+function dxLineas(grande){
+  const R=dxRegion();
+  return R.lineas.map((l,i)=>`<div class="dx-linea${grande&&i===0?' big':''}"><div><b>${esc(l.n)}</b><small>${esc(l.d)}</small></div>
+      <div class="dx-lbtns"><a class="dx-call" href="${dxTel(l.tel)}">📞 ${esc(l.ver)}</a>${l.sms?`<a class="dx-call sec" href="sms:${l.tel}?&body=${encodeURIComponent(l.sms)}">💬 ${esc(l.sms)}</a>`:''}</div></div>`).join('')
+    +`<div class="dx-linea urg"><div><b>${esc(R.emerg.n)}</b><small>Si estás en peligro ahora mismo.</small></div><div class="dx-lbtns"><a class="dx-call" href="${dxTel(R.emerg.tel)}">🚨 ${esc(R.emerg.ver)}</a></div></div>`;
+}
+function dxCss(){ if(document.getElementById('dx-css')) return; const s=document.createElement('style'); s.id='dx-css'; s.textContent=`
+.dx-sos{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#c0483c;color:#fff;border-radius:16px;padding:10px 14px;font-weight:800;font-size:.92rem;margin-bottom:14px;box-shadow:0 8px 20px rgba(192,72,60,.25)}
+.dx-sos a{background:#fff;color:#c0483c;border-radius:999px;padding:7px 14px;text-decoration:none;white-space:nowrap}
+.dx-aviso{background:#fff;border:2px solid #e7decf;border-left:6px solid #81a9a7;border-radius:14px;padding:10px 14px;font-size:.9rem;color:#1f3d45;margin:10px 0}
+.dx-dias{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.dx-dia{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.7rem;color:#5d7a7f;font-weight:700;width:34px}
+.dx-dia i{width:28px;height:28px;border-radius:50%;display:block;border:2px dashed #e7decf}
+.dx-yn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.dx-yn button,.dx-op{border:2px solid #e7decf;background:#fff;border-radius:20px;padding:18px 12px;font:inherit;font-weight:800;font-size:1.1rem;color:#165a6c;cursor:pointer;transition:transform .12s,border-color .15s,background .15s}
+.dx-yn button:hover,.dx-op:hover{transform:translateY(-2px);border-color:#81a9a7}
+.dx-yn button.on,.dx-op.on{background:#047578;border-color:#047578;color:#fff}
+.dx-yn .e{display:block;font-size:2rem;line-height:1.2}
+.dx-ops{display:grid;gap:10px}
+.dx-op{text-align:left;font-size:1rem;display:flex;gap:12px;align-items:center}
+.dx-op .e{font-size:1.6rem}
+.dx-cara{font-size:4.2rem;text-align:center;line-height:1;margin:6px 0;transition:transform .2s}
+.dx-num{font-family:"DM Serif Display",serif;font-size:2.4rem;color:#165a6c;text-align:center;line-height:1}
+.dx-res{border-radius:24px;padding:20px 18px;margin:6px 0 12px;border:3px solid}
+.dx-res h2{margin:.1em 0 .3em}
+.dx-res p{margin:.4em 0}
+.dx-linea{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid #e7decf;border-left:6px solid #047578;border-radius:16px;padding:12px 14px;margin:8px 0}
+.dx-linea.big{border-width:2px;border-left-width:8px;border-color:#047578}
+.dx-linea.urg{border-left-color:#c0483c}
+.dx-linea b{color:#165a6c;display:block}
+.dx-linea small{color:#5d7a7f;display:block;font-size:.84rem}
+.dx-lbtns{display:flex;gap:6px;flex-wrap:wrap}
+.dx-call{background:#047578;color:#fff;border-radius:999px;padding:10px 16px;font-weight:800;text-decoration:none;white-space:nowrap}
+.dx-call.sec{background:#e3ecea;color:#165a6c}
+.dx-linea.urg .dx-call{background:#c0483c}
+.dx-hoy{display:flex;align-items:center;gap:12px;border-radius:18px;padding:12px 14px;margin:10px 0;border:2px solid}
+.dx-hoy .e{font-size:2rem}
+@keyframes dxpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.dx-pulse{animation:dxpulse 1.8s ease-in-out infinite}
+`; document.head.appendChild(s); }
+/* Escena: un faro en el mar; el cielo aclara con el ánimo y los últimos 7 días se ven como luces */
+function escenaFaro(animo){
+  const a=animo==null?5:animo, t=a/10;
+  const cielo1=t<.35?'#0e3440':t<.7?'#165a6c':'#6fa3b0', cielo2=t<.35?'#165a6c':t<.7?'#c9987c':'#f5e8da';
+  const sy=250-t*170;
+  const dias=[...Array(7)].map((_,i)=>{ const d=new Date(); d.setDate(d.getDate()-6+i); const f=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const e=DX.find(x=>x.f===f); return {l:RE_DIAS[d.getDay()].slice(0,1),c:e?DX_COL[e.n].c:null}; });
+  const V='viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"';
+  return `<svg ${V}><defs><linearGradient id="dxc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cielo1}"/><stop offset="1" stop-color="${cielo2}"/></linearGradient>
+    <linearGradient id="dxh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f5e8da" stop-opacity=".55"/><stop offset="1" stop-color="#f5e8da" stop-opacity="0"/></linearGradient></defs>
+    <rect width="400" height="400" fill="url(#dxc)"/>${t<.6?estrellas(22):''}
+    <circle cx="300" cy="${sy}" r="30" fill="#dabb81"/><circle cx="300" cy="${sy}" r="54" fill="#dabb81" opacity=".15"/>
+    <g style="transform-origin:150px 132px;animation:dxbeam 6s ease-in-out infinite"><path d="M150 132 L400 92 L400 172Z" fill="url(#dxh)"/></g>
+    <style>@keyframes dxbeam{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}</style>
+    <path d="M134 262 L141 142 H159 L166 262Z" fill="#f5e8da"/><path d="M137 210 H163 M135 238 H165 M139 182 H161" stroke="#c0483c" stroke-width="11"/>
+    <rect x="137" y="121" width="26" height="21" rx="3" fill="#dabb81"/><path d="M131 121 L150 104 L169 121Z" fill="#165a6c"/><circle cx="150" cy="131" r="6" fill="#fff"/>
+    <path d="M70 272 C100 254 190 254 230 272 V290 H70Z" fill="#2c4a44"/>
+    <path d="M0 276 C60 262 110 288 170 276 C230 264 290 288 400 272 V400 H0Z" fill="#165a6c"/>
+    <path d="M0 300 C70 288 130 312 200 300 C270 288 330 312 400 296 V400 H0Z" fill="#047578" opacity=".8"/>
+    <path d="M30 320 q15 -6 30 0 M250 330 q15 -6 30 0 M140 348 q15 -6 30 0" stroke="#81a9a7" stroke-width="2" fill="none"/>
+    ${dias.map((d,i)=>d.c?`<circle class="float" style="animation-delay:${i*.4}s" cx="${40+i*18}" cy="${290+(i%2)*8}" r="5" fill="${d.c}" stroke="#fff" stroke-width="1.5"/>`:'').join('')}</svg>`;
+}
+function dxSos(){ const R=dxRegion(), l=R.lineas[0];
+  return `<div class="dx-sos"><span>¿Estás en crisis ahora?</span><a href="${dxTel(l.tel)}">📞 ${esc(R.corto)}</a></div>`; }
+function dxResultado(e){
+  const n=e.n, C=DX_COL[n];
+  let h='';
+  if(n==='v') h=`<h2>Hoy vas en verde 🌿</h2><p>Sigue con lo que te está ayudando: tus personas, tu fe, tu música, tus rutinas. Cada día que te cuidas cuenta.</p>
+    ${e.id?'<p>Si esos pensamientos vuelven con más fuerza, abre tu plan de seguridad y sigue sus pasos.</p>':''}`;
+  else if(n==='a') h=`<h2>Hoy necesitas un poco más de cuidado 💛</h2><p><b>Abre tu plan de seguridad</b> y sigue sus pasos, uno por uno.</p>
+    <p><b>Busca hoy mismo a alguien de tu red</b> (familia, amistades, alguien de confianza) y dile cómo estás: no tienes que pasar el día a solas con esto.</p>
+    ${e.me?'<p>🔒 Pídele a alguien de confianza que guarde por ahora eso que podría hacerte daño, o sácalo de tu alcance.</p>':''}
+    <p style="font-size:.9rem">Si en algún momento se vuelve demasiado, llama a una de estas líneas:</p>`;
+  else h=`<h2>Lo que sientes hoy necesita ayuda ya ❤️</h2><p class="dx-pulse" style="font-weight:800;font-size:1.1rem">Llama ahora. No tienes que decidir nada más: solo marca.</p>
+    <p>No esperes a que tu psicóloga responda: ella no ve este chequeo en tiempo real. Si puedes, pide a alguien que te acompañe mientras llamas.</p>`;
+  return `<div class="dx-res" style="background:${C.bg};border-color:${C.c}">${h}</div>${n==='v'?'':dxLineas(n==='r')}`;
+}
+function renderDiario(){
+  reCss(); dxCss(); const b=$('#body');
+  if(dxModo==='wiz'){
+    const P=dxPasos(dxE), id=P[dxPaso], tot=P.length;
+    rgBarra(dxPaso,tot); $('#scene').innerHTML=escenaFaro(dxE.an);
+    const nav=(dis,txt)=>`<div class="re-nav"><button type="button" class="re-btn sec" id="dxPrev">${dxPaso===0?'Cancelar':'← Anterior'}</button>${txt===false?'<span></span>':`<button type="button" class="re-btn pri" id="dxNext" ${dis?'disabled':''}>${txt||'Siguiente →'}</button>`}</div>`;
+    const yn=(q,sub,k)=>`<h2 class="re-q">${q}</h2>${sub?`<p class="re-sub">${sub}</p>`:''}<div class="dx-yn">
+      <button type="button" data-yn="1" class="${dxE[k]===1?'on':''}"><span class="e">🙋</span>Sí</button><button type="button" data-yn="0" class="${dxE[k]===0?'on':''}"><span class="e">🙅</span>No</button></div>${nav(dxE[k]==null)}`;
+    const sl=(q,sub,k,izq,der)=>{ const v=dxE[k]==null?5:dxE[k]; dxE[k]=v;
+      return `<h2 class="re-q">${q}</h2>${sub?`<p class="re-sub">${sub}</p>`:''}<div class="dx-cara" id="dxCara">${DX_CARA[v]}</div><div class="dx-num" id="dxNum">${v}</div>
+        <input type="range" class="re-range" id="dxR" min="0" max="10" step="1" value="${v}"><div class="re-scale"><span>0 · ${izq}</span><span>10 · ${der}</span></div>${nav()}`; };
+    let h=`<div class="re-ey">Pregunta ${dxPaso+1} de ${tot}</div>`;
+    if(id==='an') h+=sl('¿Cómo está tu ánimo hoy?','Mueve la barra hasta donde te sientas.','an','muy mal','muy bien');
+    else if(id==='di') h+=sl('¿Cuánto disfrutaste o te interesó algo hoy?','Música, personas, actividades… lo que sea.','di','nada','mucho');
+    else if(id==='se') h+=sl('¿Qué tanto sentiste hoy que sabes quién eres y qué le da sentido a tu vida?','','se','nada','mucho');
+    else if(id==='id') h+=yn('Hoy, ¿pasó por tu mente que sería mejor no estar, no despertar o desaparecer?','Responde con honestidad: aquí no hay respuestas malas.','id');
+    else if(id==='ac') h+=`<h2 class="re-q">Esos pensamientos…</h2><div class="dx-ops">
+        <button type="button" class="dx-op${dxE.ac===0?' on':''}" data-ac="0"><span class="e">☁️</span>Solo pasaron por mi mente</button>
+        <button type="button" class="dx-op${dxE.ac===1?' on':''}" data-ac="1"><span class="e">⚠️</span>Pensé en hacer algo para acabar con mi vida</button></div>${nav(dxE.ac==null)}`;
+    else if(id==='pl') h+=yn('¿Pensaste en cómo lo harías?','','pl');
+    else if(id==='int') h+=yn('¿Sentiste deseo o intención de hacerlo?','','int');
+    else if(id==='me') h+=yn('¿Hay hoy a tu alcance algo con lo que podrías hacerte daño?','Por ejemplo, medicamentos guardados, armas u otros objetos.','me');
+    else h+=`<h2 class="re-q">¿Qué hiciste hoy para cuidarte?</h2><p class="re-sub">Toca todo lo que hiciste.</p>
+        <div class="re-chips">${DX_EST.map(n=>`<button type="button" class="re-chip${dxE.est.includes(n)?' on':''}" data-est="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+        <p class="re-sub" style="margin:12px 0 4px">¿Algo que quieras contarle a tu psicóloga? (opcional)</p>
+        <textarea class="re-ta" id="dxNota" style="min-height:80px" maxlength="400" placeholder="Escribe aquí…">${esc(dxE.nota||'')}</textarea>${nav(false,'Ver mi resultado →')}`;
+    b.innerHTML=dxSos()+`<div class="re-wrap">${h}</div>`;
+    const q=s=>b.querySelector(s), next=()=>{ if(dxPaso<tot-1){ dxPaso++; renderDiario(); } else { dxE.n=dxNivel(dxE); dxE.env=0;
+        DX=DX.filter(x=>x.f!==dxE.f).concat([dxE]).sort((x,y)=>x.f.localeCompare(y.f)).slice(-60); dxGuardar(); dxModo='res'; renderDiario(); } };
+    q('#dxPrev').onclick=()=>{ if(dxPaso===0){ dxModo='home'; renderDiario(); } else { dxPaso--; renderDiario(); } };
+    if(q('#dxNext')) q('#dxNext').onclick=next;
+    const r=q('#dxR'); if(r) r.addEventListener('input',()=>{ const v=+r.value; dxE[id]=v; q('#dxCara').textContent=DX_CARA[v]; q('#dxNum').textContent=v; if(id==='an') $('#scene').innerHTML=escenaFaro(v); });
+    b.querySelectorAll('[data-yn]').forEach(x=>x.onclick=()=>{ dxE[id]=+x.dataset.yn;
+      if(id==='id'&&!dxE.id){ delete dxE.ac; delete dxE.pl; delete dxE.int; }
+      b.querySelectorAll('[data-yn]').forEach(y=>y.classList.toggle('on',y===x)); setTimeout(next,260); });
+    b.querySelectorAll('[data-ac]').forEach(x=>x.onclick=()=>{ dxE.ac=+x.dataset.ac; b.querySelectorAll('[data-ac]').forEach(y=>y.classList.toggle('on',y===x)); setTimeout(next,260); });
+    b.querySelectorAll('[data-est]').forEach(x=>x.onclick=()=>{ const n=x.dataset.est;
+      if(n==='Ninguna hoy') dxE.est=dxE.est.includes(n)?[]:[n]; else { dxE.est=dxE.est.filter(z=>z!=='Ninguna hoy'); const i=dxE.est.indexOf(n); if(i>=0) dxE.est.splice(i,1); else dxE.est.push(n); }
+      b.querySelectorAll('[data-est]').forEach(y=>y.classList.toggle('on',dxE.est.includes(y.dataset.est))); });
+    if(q('#dxNota')) q('#dxNota').addEventListener('input',e=>{ dxE.nota=e.target.value; });
+    return;
+  }
+  rgBarra(null);
+  const hoyE=dxHoyE(); $('#scene').innerHTML=escenaFaro(hoyE?hoyE.an:(DX.length?DX[DX.length-1].an:5));
+  if(dxModo==='res'&&hoyE){
+    b.innerHTML=dxSos()+`<div class="eyebrow">Tu chequeo de hoy</div>${dxResultado(hoyE)}
+      <div class="nav"><button class="btn sec" id="dxHome">← Volver</button><button class="btn teal" id="dxEnv">📲 Enviar a mi psicóloga</button></div>`;
+    $('#dxHome').onclick=()=>{ dxModo='home'; renderDiario(); }; $('#dxEnv').onclick=()=>{ dxModo='enviar'; renderDiario(); };
+    return;
+  }
+  if(dxModo==='enviar'){
+    const nuevos=DX.filter(x=>!x.env), L=nuevos.length?nuevos:DX.slice(-7);
+    const codigo='SANA1:'+b64u(JSON.stringify({v:1,t:A.token,k:'d',c:A.clave||'us',reg:L,f:reHoy()}));
+    const msg=`🌿 Mi chequeo diario (${L.length} día${L.length===1?'':'s'})\n${codigo}`;
+    const marcar=()=>{ L.forEach(x=>x.env=1); dxGuardar(); };
+    b.innerHTML=dxSos()+`<div class="eyebrow">Enviar</div><h1>Tu chequeo para tu psicóloga</h1>
+      <p class="lead">Se enviarán ${L.length} día${L.length===1?'':'s'}: ${L.map(x=>DX_COL[x.n].ic).join(' ')}</p>
+      ${A.tel?`<div class="nav" style="margin:10px 0"><a class="btn pri" id="dxWa" style="text-decoration:none" href="https://api.whatsapp.com/send?phone=${A.tel}&text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">📲 Enviar por WhatsApp</a></div>`:''}
+      <div class="nav" style="margin-top:6px"><button class="btn sec" id="copiar">📋 Copiar mi chequeo</button></div><div id="okc" class="ok" style="margin-top:6px"></div>
+      <details><summary class="foot" style="text-align:left;cursor:pointer">Si el botón de copiar no funciona, copia este texto</summary><div class="code">${esc(msg)}</div></details>
+      <div class="dx-aviso">⏳ Tu psicóloga lo leerá cuando pueda; no es inmediato. Si estás en riesgo ahora, llama a una línea de crisis.</div>
+      <div class="nav"><button class="btn sec" id="dxHome">← Volver</button></div>`;
+    $('#dxHome').onclick=()=>{ dxModo='home'; renderDiario(); };
+    if($('#dxWa')) $('#dxWa').addEventListener('click',marcar);
+    $('#copiar').onclick=()=>{ const ok=()=>{ marcar(); $('#okc').textContent='✓ Copiado. Ahora pégalo en WhatsApp.'; };
+      try{ navigator.clipboard.writeText(msg).then(ok,()=>{ $('details').open=true; $('#okc').textContent='Selecciona el texto de abajo y cópialo.'; }); }catch(_){ $('details').open=true; } };
+    return;
+  }
+  const dias=[...Array(14)].map((_,i)=>{ const d=new Date(); d.setDate(d.getDate()-13+i); const f=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const e=DX.find(x=>x.f===f); return `<div class="dx-dia"><i style="${e?`background:${DX_COL[e.n].c};border:2px solid ${DX_COL[e.n].c}`:''}"></i>${RE_DIAS[d.getDay()].slice(0,2)}</div>`; }).join('');
+  const pend=DX.filter(x=>!x.env).length;
+  b.innerHTML=dxSos()+`<div class="eyebrow">Un minuto para ti</div><h1>Mi chequeo diario</h1>
+    <p class="lead">Unas preguntas cortas para darte cuenta de cómo estás hoy y saber qué hacer.</p>
+    <div class="dx-aviso">🔒 ${esc(DX_AVISO)}</div>
+    ${hoyE?`<div class="dx-hoy" style="background:${DX_COL[hoyE.n].bg};border-color:${DX_COL[hoyE.n].c}"><span class="e">${DX_COL[hoyE.n].ic}</span><div style="flex:1"><b>Hoy ya hiciste tu chequeo</b><br><span style="font-size:.9rem">Ánimo ${hoyE.an}/10</span></div><button class="btn sec" id="dxVer" style="padding:9px 16px">Ver qué hacer</button></div>`:''}
+    ${DX.length?`<p class="re-sub" style="margin:12px 0 0"><b>Tus últimos 14 días</b></p><div class="dx-dias">${dias}</div>`:''}
+    <div class="nav"><button class="btn pri" id="dxGo">${hoyE?'✏️ Actualizar el de hoy':'☀️ Hacer mi chequeo de hoy'}</button>${DX.length?`<button class="btn teal" id="dxEnv">📲 Enviar${pend?` (${pend} nuevo${pend>1?'s':''})`:''}</button>`:''}</div>
+    <p class="foot" style="text-align:left">💡 Abre siempre este mismo enlace, desde el mismo celular y navegador (no en modo incógnito): tus días quedan guardados ahí.</p>
+    <details style="margin-top:6px"><summary class="foot" style="text-align:left;cursor:pointer">📞 Mis líneas de crisis (${esc(dxRegion().n)})</summary>${dxLineas(false)}</details>`;
+  $('#dxGo').onclick=()=>{ dxE=hoyE? JSON.parse(JSON.stringify(hoyE)) : {f:reHoy(),est:[]}; if(!Array.isArray(dxE.est)) dxE.est=[]; dxPaso=0; dxModo='wiz'; renderDiario(); };
+  if($('#dxVer')) $('#dxVer').onclick=()=>{ dxModo='res'; renderDiario(); };
+  if($('#dxEnv')) $('#dxEnv').onclick=()=>{ dxModo='enviar'; renderDiario(); };
+}
 
 function pintarBarra(){
   const tot=D?D.pasos.length:0, bar=$('#bar');
@@ -492,7 +688,7 @@ function pintarEscena(){
   $('#scene').innerHTML=escena(D.escena,prog,txt,lab)+(!sinCard&&String(txt).trim()?`<div class="scard float${oscuro?' dark':''}"><div class="st">${esc(String(txt).slice(0,160))}${String(txt).length>160?'…':''}</div>${lab?`<div class="sl">${esc(lab)}</div>`:''}</div>`:'');
 }
 function render(){
-  if(D&&D.especial) return renderReg();
+  if(D&&D.especial) return A.tipo==='d'? renderDiario() : renderReg();
   pintarBarra(); pintarEscena();
   const b=$('#body');
   if(!D){ b.innerHTML=`<div class="eyebrow">Hola</div><h1>Este enlace está incompleto</h1><p class="lead">Pídele a tu psicóloga que te envíe de nuevo el enlace de la actividad.</p>`; return; }
