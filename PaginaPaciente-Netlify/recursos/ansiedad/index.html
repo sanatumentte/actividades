@@ -112,6 +112,9 @@
   </section>
   <section class="cartilla" id="cartilla">
     <h2>Mi cartilla</h2>
+    <div class="fila" style="align-items:center"><label for="quien" style="font-weight:800;color:var(--petroleo)">Cartilla de:</label>
+      <select id="quien" style="flex:1;min-width:0;max-width:340px;border:2px solid var(--salvia);border-radius:12px;padding:9px 12px;font:inherit;color:var(--tinta);background:#fff"></select>
+      <button class="btn sec" id="bNombre" type="button">✏️ Nombre</button></div>
     <p id="ultima">Puedes guardar cada sesión con su fecha, ver tus avances y pasar la cartilla a otro dispositivo para seguir donde quedaste.</p>
     <div class="fila">
       <button class="btn teal" id="bGuardar" type="button">💾 Guardar esta sesión</button>
@@ -130,7 +133,7 @@
     <div class="ok" id="okc" aria-live="polite"></div>
     <details><summary class="foot" style="text-align:left;cursor:pointer">Ver el texto que se va a enviar</summary><div class="code" id="code"></div></details>
     <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>
-    <div class="fila"><button class="btn sec" id="borrar" type="button">Borrar mis respuestas</button><span class="ok" id="okb"></span></div>
+    <div class="fila"><button class="btn sec" id="borrar" type="button">Borrar esta cartilla</button><span class="ok" id="okb"></span></div>
   </section>
   <p class="foot">Tus respuestas no se guardan en internet: solo las recibe tu psicóloga cuando se las envías.</p>
 </main>
@@ -234,7 +237,15 @@ P(29,'Serotonina','✍️ Anota 3 maneras de liberar serotonina: cómo, dónde, 
 P(30,'Reflexión','✍️ Escribe tu reflexión final: qué aprendiste y qué te llevas de este libro.',[ta('p30','Reflexión',117,152,414,560,{cls:'lines',ph:''})]);
 
 /* ---------- Estado guardado en este dispositivo ---------- */
-const KEY='sana_ansiedad_libro';
+/* Varias cartillas en un mismo dispositivo: una por paciente (útil en el computador de la psicóloga) */
+const KEYC='sana_ansiedad_cartillas';
+let C=null; try{ C=JSON.parse(localStorage.getItem(KEYC)||'null'); }catch(_){}
+if(!C||!Array.isArray(C.lista)||!C.lista.length) C={actual:'yo',lista:[{id:'yo',n:'Mi cartilla'}]};
+if(!C.lista.some(x=>x.id===C.actual)) C.actual=C.lista[0].id;
+const guardarC=()=>{ try{ localStorage.setItem(KEYC,JSON.stringify(C)); }catch(_){} };
+const nombreActual=()=>C.lista.find(x=>x.id===C.actual).n;
+const conNombre=()=>nombreActual()!=='Mi cartilla';
+const KEY='sana_ansiedad_libro'+(C.actual==='yo'?'':':'+C.actual);   // 'yo' conserva la clave de la primera versión
 let S={}; try{ S=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(_){ S={}; }
 let tGuardar; const guardar=()=>{ clearTimeout(tGuardar); tGuardar=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){} actualizar(); },250); };
 const $=s=>document.querySelector(s);
@@ -321,7 +332,8 @@ function actualizar(){
   document.querySelectorAll('#chips a').forEach(a=>a.classList.toggle('ok',hechas.has(+a.dataset.p)));
   const tot=PAG.filter(p=>p.hint).length;
   $('#prog').textContent=`${hechas.size} de ${tot} ejercicios hechos`;
-  const msg=r.length?`🌿 Mis respuestas — Ansiedad: libro de actividades\n\n${r.join('\n\n')}`:'';
+  const quien=conNombre()?` (${nombreActual()})`:'';
+  const msg=r.length?`🌿 Mis respuestas — Ansiedad: libro de actividades${quien}\n\n${r.join('\n\n')}`:'';
   $('#code').textContent=msg||'Todavía no hay respuestas.';
   const tel=(location.hash.match(/^#(\d{8,15})$/)||[])[1];
   $('#wa').href=`https://api.whatsapp.com/send?${tel?'phone='+tel+'&':''}text=${encodeURIComponent(msg)}`;
@@ -331,12 +343,13 @@ $('#copiar').onclick=()=>{ const msg=actualizar(); if(!msg){ $('#okc').textConte
   const sel=()=>{ $('details').open=true; const r=document.createRange(); r.selectNodeContents($('#code')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $('#okc').textContent='Selecciona el texto de abajo y cópialo.'; };
   try{ navigator.clipboard.writeText(msg).then(()=>{ $('#okc').textContent='✓ Copiado. Ahora pégalo en WhatsApp para tu psicóloga.'; },sel); }catch(_){ sel(); } };
 let confirmar=false;
-$('#borrar').onclick=()=>{ if(!confirmar){ confirmar=true; $('#borrar').textContent='Sí, borrar todo'; $('#okb').textContent='¿Seguro? Esto borra todo lo que escribiste y las sesiones guardadas en este dispositivo.'; return; }
-  S={}; try{ localStorage.removeItem(KEY); localStorage.removeItem(KEYH); }catch(_){} location.reload(); };
+$('#borrar').onclick=()=>{ if(!confirmar){ confirmar=true; $('#borrar').textContent='Sí, borrar todo'; $('#okb').textContent=`¿Seguro? Esto borra la cartilla «${nombreActual()}»: sus respuestas y sus sesiones guardadas.`; return; }
+  S={}; try{ localStorage.removeItem(KEY); localStorage.removeItem(KEYH); }catch(_){}
+  if(C.lista.length>1){ C.lista=C.lista.filter(x=>x.id!==C.actual); C.actual=C.lista[0].id; } guardarC(); location.reload(); };
 actualizar();
 
 /* ---------- Sesiones guardadas, avances y paso a otro dispositivo ---------- */
-const KEYH='sana_ansiedad_sesiones';
+const KEYH='sana_ansiedad_sesiones'+(C.actual==='yo'?'':':'+C.actual);
 let H=[]; try{ H=JSON.parse(localStorage.getItem(KEYH)||'[]')||[]; }catch(_){ H=[]; }
 const guardarH=()=>{ try{ localStorage.setItem(KEYH,JSON.stringify(H)); }catch(_){} pintarUltima(); };
 const copia=o=>JSON.parse(JSON.stringify(o||{}));
@@ -400,7 +413,7 @@ const PREF='SANA-CARTILLA1:';
 const aB64=o=>{ const by=new TextEncoder().encode(JSON.stringify(o)); let bin=''; by.forEach(x=>bin+=String.fromCharCode(x)); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
 const deB64=t=>{ const b=t.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(b+'==='.slice((b.length+3)%4)); return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))); };
 $('#bLlevar').onclick=()=>{
-  const cod=PREF+aB64({v:1,libro:'ansiedad',s:S,h:H});
+  const cod=PREF+aB64({v:1,libro:'ansiedad',n:conNombre()?nombreActual():'',s:S,h:H});
   const msg=`🔁 Mi cartilla de ansiedad (pégala en «Pasar a otro dispositivo» → «Recibir»):\n${cod}`;
   const tel=(location.hash.match(/^#(\d{8,15})$/)||[])[1];
   const h=hoja(`<h3>Pasar a otro dispositivo</h3>
@@ -419,9 +432,34 @@ $('#bLlevar').onclick=()=>{
     if(i<0){ m.textContent='Ese texto no tiene un código de cartilla. Copia el mensaje completo que te enviaron.'; return; }
     let o; try{ o=deB64(t.slice(i+PREF.length).trim().split(/\s/)[0]); }catch(_){ m.textContent='El código está incompleto. Vuelve a copiarlo completo.'; return; }
     if(!o||o.libro!=='ansiedad'){ m.textContent='Ese código es de otra cartilla.'; return; }
-    const hay=Object.keys(S).length||H.length;
-    if(hay&&!conf){ conf=true; h.querySelector('#lok').textContent='Sí, reemplazar'; m.textContent='En este dispositivo ya hay respuestas. Al abrir el código se reemplazan por las de la cartilla recibida.'; return; }
-    S=o.s||{}; H=o.h||[]; try{ localStorage.setItem(KEY,JSON.stringify(S)); localStorage.setItem(KEYH,JSON.stringify(H)); }catch(_){} location.reload(); };
+    /* Destino: la cartilla con el mismo nombre; si no existe, la actual si está vacía; si no, una nueva */
+    const nom=String(o.n||'').trim(), igual=nom&&C.lista.find(x=>x.n.toLowerCase()===nom.toLowerCase());
+    const vacia=!Object.keys(S).length&&!H.length;
+    let dest=igual?igual.id:(vacia?C.actual:null);
+    const hayDatos=dest&&(dest===C.actual?!vacia:true);
+    if(hayDatos&&!conf){ conf=true; h.querySelector('#lok').textContent='Sí, reemplazar'; m.textContent=`La cartilla «${igual?igual.n:nombreActual()}» ya tiene respuestas en este dispositivo. Al abrir el código se reemplazan por las recibidas.`; return; }
+    if(!dest){ dest='c'+Date.now().toString(36); C.lista.push({id:dest,n:nom||'Cartilla recibida'}); }
+    else if(nom&&dest===C.actual&&!igual) C.lista.find(x=>x.id===dest).n=nom;
+    const k=dest==='yo'?'':':'+dest;
+    try{ localStorage.setItem('sana_ansiedad_libro'+k,JSON.stringify(o.s||{})); localStorage.setItem('sana_ansiedad_sesiones'+k,JSON.stringify(o.h||[])); }catch(_){}
+    C.actual=dest; guardarC(); location.reload(); };
 };
 pintarUltima();
+
+const NUEVA='__nueva__';
+function pintarQuien(){ $('#quien').innerHTML=C.lista.map(x=>`<option value="${x.id}"${x.id===C.actual?' selected':''}>${esc(x.n)}</option>`).join('')+`<option value="${NUEVA}">➕ Nueva cartilla (otro paciente)</option>`;
+  const top=document.querySelector('.top b'); top.textContent=conNombre()?`Ansiedad · ${nombreActual()}`:'Ansiedad'; }
+function pedirNombre(titulo,valor,alListo){
+  const h=hoja(`<h3>${esc(titulo)}</h3><p>Usa el nombre o las iniciales del paciente. Cada cartilla guarda sus respuestas y sus sesiones por separado en este dispositivo.</p>
+    <label for="nn">Nombre</label><input type="text" id="nn" value="${esc(valor)}" autocomplete="off"><div class="fila"><button class="btn teal" type="button" id="nok">Listo</button></div><div class="ok" id="nmsg"></div>`);
+  const i=h.querySelector('#nn'); i.focus(); i.select();
+  h.querySelector('#nok').onclick=()=>{ const n=i.value.trim(); if(!n){ h.querySelector('#nmsg').textContent='Escribe un nombre.'; return; }
+    if(C.lista.some(x=>x.n.toLowerCase()===n.toLowerCase()&&x.id!==C.actual)){ h.querySelector('#nmsg').textContent='Ya hay una cartilla con ese nombre.'; return; } alListo(n); };
+  h.addEventListener('click',e=>{ if(e.target===h||e.target.closest('[data-cerrar]')) pintarQuien(); });
+}
+$('#quien').onchange=()=>{ const v=$('#quien').value;
+  if(v===NUEVA){ pedirNombre('Nueva cartilla','',n=>{ const id='c'+Date.now().toString(36); C.lista.push({id,n}); C.actual=id; guardarC(); location.reload(); }); return; }
+  C.actual=v; guardarC(); location.reload(); };
+$('#bNombre').onclick=()=>pedirNombre('Nombre de esta cartilla',conNombre()?nombreActual():'',n=>{ C.lista.find(x=>x.id===C.actual).n=n; guardarC(); location.reload(); });
+pintarQuien();
 </script>
