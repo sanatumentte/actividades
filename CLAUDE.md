@@ -11,7 +11,7 @@ Cuando Camila pida hacer interactivo un PDF sin cambiar el diseño, sigue el mis
 3. En `recursos/<tema>/index.html` define los campos de cada página en la lista `PAG` (copia `recursos/ansiedad/index.html` como plantilla). Tipos: `ta` recuadro de texto, `in` línea, `chk` casilla, `hl` frase para resaltar, `oval` óvalo para marcar, `nivel` opción única, `rueda` rueda para colorear.
 4. Encima de cada página con ejercicio va una sola línea de pista (fuera de la imagen). Nada más se agrega sobre el diseño.
 5. Las respuestas se guardan en el dispositivo (localStorage) y se envían copiando el texto o por WhatsApp. En teléfonos, los recuadros se abren en un editor grande. Incluye la sección «Mi cartilla»: guardar cada sesión con fecha, «Ver mis avances» (compara dos momentos) y «Pasar a otro dispositivo» (código SANA-CARTILLA1). Tiene una cartilla por paciente en el mismo dispositivo (selector «Cartilla de:»). Cambia los prefijos `sana_ansiedad_*` y `libro` para cada cuadernillo nuevo.
-6. Enlaza el cuadernillo desde la biblioteca de `PaginaPaciente-Netlify/index.html` (objeto `LIBROS` y la lista `r` de su categoría).
+6. Cada cuadernillo se abre con su propio enlace: `<sitio>/recursos/<tema>/` (agrega `#57XXXXXXXXXX` al final para que el botón de WhatsApp vaya directo al número de Camila).
 7. Pruébalo con datos de ejemplo (capturas de las páginas con ejercicios, en escritorio y a 390 px) y muéstrale a Camila una vista previa antes de subir nada: ella aprueba primero.
 
 ## Reglas

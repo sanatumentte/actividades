@@ -58,38 +58,6 @@
   .note{background:#fdf0ea;border:1px solid #efd3c4;color:#7a4a33;border-radius:14px;padding:12px 14px;font-size:.93rem;margin:12px 0}
   .ok{color:var(--verde);font-weight:800}
   .foot{font-size:.75rem;color:var(--suave);text-align:center;margin-top:10px}
-  .bus{width:100%;border:2px solid var(--beige);border-radius:999px;background:#fff;padding:12px 18px;font:inherit;color:var(--tinta);outline:none;margin:6px 0 16px}
-  .bus:focus{border-color:var(--salvia);box-shadow:0 0 0 5px rgba(129,169,167,.2)}
-  .cats{display:grid;gap:12px}
-  .cat{background:#fff;border:1px solid var(--beige);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(22,90,108,.05)}
-  .cat>summary{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;list-style:none;border-left:5px solid var(--cc)}
-  .cat>summary::-webkit-details-marker{display:none}
-  .cat>summary:hover{background:var(--cb)}
-  .cat>summary:focus-visible{outline:3px solid var(--arena);outline-offset:-3px}
-  .ci{flex:none;width:44px;height:44px;border-radius:50%;background:var(--cb);display:grid;place-items:center;font-size:1.35rem}
-  .cn{flex:1;display:flex;flex-direction:column;line-height:1.25}
-  .cn b{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:1.3rem;color:var(--petroleo)}
-  .cn small{color:var(--suave);font-size:.8rem;font-weight:700}
-  .cv{flex:none;width:12px;height:12px;border-right:3px solid var(--cc);border-bottom:3px solid var(--cc);transform:rotate(45deg);transition:transform .2s;margin-right:6px}
-  .cat[open] .cv{transform:rotate(225deg)}
-  .cb{padding:4px 16px 16px;display:grid;gap:10px;background:linear-gradient(var(--cb),#fff 70px)}
-  .cd{margin:6px 0 2px;color:var(--suave);font-size:.93rem}
-  .rec{display:grid;gap:2px;text-decoration:none;color:var(--tinta);background:#fff;border:2px solid var(--beige);border-radius:14px;padding:12px 40px 12px 14px;position:relative;transition:border-color .15s,transform .1s}
-  .rec::after{content:"→";position:absolute;right:14px;top:50%;translate:0 -50%;color:var(--cc);font-weight:800;font-size:1.1rem}
-  .rec:hover{border-color:var(--cc)}
-  .rec:focus-visible{outline:3px solid var(--arena);outline-offset:2px}
-  .rec .rt{font-weight:800;color:var(--petroleo)}
-  .rec .rd{font-size:.9rem;color:var(--suave)}
-  .rec .rm{font-size:.75rem;color:var(--suave);font-weight:700;margin-top:2px}
-  .vacio{color:var(--suave);text-align:center}
-  .rec[hidden],.cat[hidden]{display:none}
-  .resp{display:grid;place-items:center;padding:22px 0 8px}
-  .resp-c{width:min(210px,60vw);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 40%,#fff,#dcefeb);border:3px solid var(--salvia);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:scale(.62);transition:transform 4s ease-in-out;box-shadow:0 0 0 14px rgba(129,169,167,.15)}
-  .resp-c[data-f="in"],.resp-c[data-f="hold"]{transform:scale(1)}
-  .resp-c[data-f="out"]{transform:scale(.62)}
-  .resp-c[data-f="fin"]{transform:scale(.85)}
-  .resp-c span{font-weight:800;color:var(--petroleo);font-size:1.15rem}
-  .resp-c b{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:2.4rem;color:var(--verde);line-height:1.1;font-variant-numeric:tabular-nums}
   @media (max-width:860px){
     .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
     .scene{min-height:0;height:34vh;max-height:300px}
@@ -157,90 +125,8 @@ const RECURSOS=[
   {titulo:'Tú no eres tus pensamientos',slides:['A veces nos «fusionamos» con un pensamiento: lo tratamos como un hecho («soy un fracaso» = verdad absoluta).','La defusión es ver el pensamiento como lo que es: un evento mental, no una orden ni un veredicto.','Truco: en vez de «soy un fracaso», di «estoy teniendo el pensamiento de que soy un fracaso».','Otro truco: repite la palabra clave en voz alta 20 o 30 veces; suele perder su peso.','Imagina tus pensamientos como hojas en un río: los ves pasar sin subirte a cada una.','Defusionarte no elimina el pensamiento; cambia tu relación con él.','Es una habilidad: se practica poco a poco.']},
   {titulo:'Valores: tu brújula',slides:['Los valores no son metas que se cumplen: son direcciones en las que quieres caminar.','Una meta se alcanza y se cierra; un valor guía el camino de forma continua.','Los valores no dependen de la aprobación de otros ni de que todo salga bien: son elegidos.','Pregúntate: «en este momento, ¿qué es lo que realmente me importa?».','Explóralos por áreas: familia, pareja, amistad, trabajo, salud, ocio, crecimiento, fe.','Puedes actuar según tus valores incluso sintiendo miedo o tristeza.','Cuando has vivido muchas decepciones, reconocer tus valores cuesta más, porque valorar implica volver a exponerse.']},
   {titulo:'Mindfulness: observar sin engancharte',slides:['Mindfulness es prestar atención al presente, con curiosidad y sin juzgar lo que aparece.','La mente tiende a viajar al pasado o al futuro. Mindfulness es notarlo y volver, con amabilidad.','Práctica: observa tu respiración un minuto; cuando la mente se distraiga, vuelve al aire que entra y sale.','No es relajarse a toda costa ni «vaciar la mente»; a veces hace más visible el malestar, y eso también es parte.','Practicar unos minutos con frecuencia ayuda más que hacerlo perfecto una vez.','Es una habilidad, como aprender un idioma: mejora con la repetición.']},
-  {titulo:'Autocompasión',slides:['Muchas veces tenemos un crítico interno muy duro, que jamás usaríamos con alguien que queremos.','Autocompasión no es lástima ni «dejarse pasar todo»: es reconocer tu dolor sin juzgarlo.','Tiene tres partes: darte cuenta de que sufres, recordar que sufrir es humano y tratarte con amabilidad.','Ser dura contigo no aumenta la disciplina; suele aumentar la evitación y la desesperanza.','Ejercicio: cuando notes autocrítica, pregúntate «¿qué le diría a alguien querido?» y dítelo a ti.','La autocompasión no reemplaza el cambio: lo acompaña sin la carga del castigo.','Puede sentirse incómodo al principio, sobre todo si aprendiste que exigirte era la única forma de mejorar.']},
-  /* ---- A partir de aquí: recursos de la biblioteca (materiales de la carpeta de Camila). No cambiar el orden: el número es el enlace #r.N ---- */
-  /* 8 */ {titulo:'Entender la ansiedad',desc:'Qué es, cómo se siente y por qué no es debilidad.',slides:['La ansiedad es una respuesta natural del cuerpo ante algo que percibe como amenaza o incertidumbre. Sentirla a veces es normal: nos prepara para actuar.','Se vuelve un problema cuando es constante, muy intensa o desproporcionada, y empieza a interferir con tu descanso, tu trabajo o tus relaciones.','Tener ansiedad no es debilidad, exageración ni un defecto de carácter. Cerca de 1 de cada 4 personas la vivirá en algún momento de su vida.','No tiene una sola causa: influyen la química del cerebro, la genética, el temperamento, los pensamientos, lo que hacemos y lo que hemos vivido.','Se nota en tres lugares: el cuerpo (tensión, palpitaciones, estómago revuelto, insomnio), la mente («¿y si…?», mente en blanco) y la conducta (evitar, aislarse, postergar).','Como un iceberg, lo que otros ven (nervios, irritabilidad) es solo la punta. Debajo suele haber miedo al rechazo, culpa, cansancio o vergüenza.','Reconocer tu ansiedad y buscar herramientas no es rendirse: es un acto de valentía y de cuidado propio.',
-    {k:'txt',q:'¿Dónde notas más tu ansiedad: en el cuerpo, en la mente o en lo que haces? Cuenta un ejemplo.',opcional:true},{k:'txt',q:'Si tu ansiedad fuera un iceberg, ¿qué hay debajo de la superficie que los demás no ven?',opcional:true}]},
-  /* 9 */ {titulo:'Respiración 4-7-8',desc:'Una respiración guiada para bajar la activación en minutos.',slides:['Tu respiración es el puente más directo entre tu mente y tu cuerpo. Una exhalación larga le avisa a tu sistema nervioso que estás a salvo.','Así se hace: inhala por la nariz contando 4, retén el aire con suavidad contando 7 y exhala por la boca, como apagando una vela, contando 8.','Si retener 7 segundos te incomoda, no pasa nada: lo importante es que la exhalación sea más larga que la inhalación. Vamos a practicarlo juntas.',
-    {k:'resp',q:'Respira conmigo: 4 ciclos',ciclos:4,fases:[['Inhala',4,'in'],['Retén',7,'hold'],['Exhala',8,'out']]},'Practícala dos veces al día (al despertar y antes de dormir), no solo en momentos de crisis. Así tu cuerpo aprende a calmarse cada vez más rápido.',
-    {k:'txt',q:'¿Qué notaste en tu cuerpo antes y después de respirar? Si quieres, ponle un número de tensión (0–10) antes y después.',opcional:true}]},
-  /* 10 */ {titulo:'Anclarte al presente: 5-4-3-2-1',desc:'Usa tus cinco sentidos para volver al aquí y ahora.',escena:'jardin',slides:['La ansiedad vive en el futuro; tu cuerpo vive en el presente. Este ejercicio usa tus cinco sentidos para traerte de vuelta al aquí y ahora.','Mientras más específica seas, mejor funciona: no «una silla», sino «una silla de madera con un rasguño en el asiento». Hazlo donde estés, ahora mismo.',
-    {k:'txt',q:'5 cosas que VES (colores, formas, la luz, tus manos…)',opcional:true},{k:'txt',q:'4 cosas que SIENTES en tu piel o tu cuerpo (la ropa, la silla, la temperatura…)',opcional:true},{k:'txt',q:'3 cosas que ESCUCHAS (cerca, lejos, tu respiración…)',opcional:true},{k:'txt',q:'2 cosas que HUELES (si no percibes nada, tu aroma favorito)',opcional:true},{k:'txt',q:'1 cosa que SABOREAS (puedes tomar un sorbo de agua y notar su temperatura)',opcional:true},
-    'Muy bien. Si la mente se vuelve a ir, no es un error: solo vuelve a nombrar lo que ves, una cosa a la vez.']},
-  /* 11 */ {titulo:'Pon tu pensamiento a juicio',desc:'Separa hechos de opiniones: acusación, defensa y veredicto.',escena:'balanza',slides:['Los pensamientos no son hechos. Cuando hay ansiedad, al cerebro le cuesta distinguir entre un hecho (algo comprobable) y una opinión o predicción.','Ejemplo: «mañana tengo una presentación» es un hecho. «Voy a hacer el ridículo» es una predicción. Se sienten igual de reales, pero no lo son.','Hoy vas a ser jueza de un pensamiento: escucharás a la acusación y a la defensa, y darás un veredicto basado en hechos, no en miedos.',
-    {k:'txt',q:'El pensamiento en juicio: ¿qué te preocupa exactamente?'},{k:'txt',q:'La acusación: ¿qué HECHOS (no opiniones) dicen que es cierto?'},{k:'txt',q:'La defensa: ¿qué HECHOS dicen que no es cierto, o no del todo?'},{k:'txt',q:'El veredicto: mirando todas las pruebas, ¿qué tan probable es? ¿Cómo lo dirías de una forma más justa?'},{k:'txt',q:'Tu «¿y si…?» amable: si la mente dice «¿y si sale mal?», escribe un «¿y si sale bien?».',opcional:true}]},
-  /* 12 */ {titulo:'Descatastrofizar',desc:'Del peor escenario al escenario más probable.',escena:'camino',slides:['Catastrofizar es imaginar solo el peor escenario y dar por hecho que sería insoportable. La preocupación crece y los pensamientos se exageran.','No se trata de pensar «todo saldrá perfecto», sino de mirar lo más probable y recordar tu capacidad para afrontarlo.',
-    {k:'txt',q:'¿Qué te preocupa?'},{k:'txt',q:'Según las pruebas y tu experiencia, ¿qué probabilidad real hay de que pase (0–100 %)?'},{k:'txt',q:'Si pasara, ¿qué sería lo peor… y qué es lo más probable que ocurra en realidad?'},{k:'txt',q:'Si ocurre, ¿qué podrías hacer tú o a quién podrías acudir?'},{k:'txt',q:'¿Esto importará mañana? ¿En un mes? ¿En un año?',opcional:true}]},
-  /* 13 */ {titulo:'Lo que sí puedo controlar',desc:'El círculo de control para soltar lo que no depende de ti.',escena:'brujula',slides:['Preocuparte por lo que no puedes controlar es como una mecedora: te mantiene ocupada, pero no te lleva a ninguna parte.','Fuera de tu control: el pasado, lo que otros piensan o hacen, el futuro, muchos resultados. Dentro: tus acciones, tus palabras, tus límites, cómo te cuidas y con quién pasas tu tiempo.','Práctica diaria: cuando notes una preocupación, pregúntate «¿esto está en mi círculo de control?». Si no, suéltalo con compasión. Si sí, elige una acción posible.',
-    {k:'txt',q:'Lo que hoy te preocupa y NO depende de ti'},{k:'txt',q:'Lo que SÍ depende de ti en esa misma situación'},{k:'txt',q:'Una acción pequeña que harás desde tu círculo de control'}]},
-  /* 14 */ {titulo:'Carta a mi ansiedad',desc:'Escritura terapéutica para mirar tu ansiedad desde afuera.',escena:'nube',slides:['Escribirle a tu ansiedad como si fuera un personaje (y no tú) crea una distancia sana: puedes mirarla con menos miedo y recuperar tu voz.','No hay respuestas correctas. Escribe con honestidad y sin juzgarte. Si algo te remueve mucho, puedes parar y retomarlo con tu psicóloga.',
-    {k:'txt',q:'Salúdala: ¿cómo la llamarías? ¿Tiene forma, color o voz?'},{k:'txt',q:'Cuéntale cómo te ha afectado: ¿qué te ha impedido hacer?'},{k:'txt',q:'Reconoce lo que intenta hacer: ¿de qué crees que intenta protegerte?'},{k:'txt',q:'Un nuevo acuerdo: ¿qué espacio le darás y qué límites le pondrás?'},{k:'txt',q:'Despídete con compasión: ¿cómo quieres relacionarte con ella desde hoy?'}]},
-  /* 15 */ {titulo:'Estilos de pensamiento que duelen',desc:'Las distorsiones cognitivas más comunes y cómo reconocerlas.',escena:'nube',slides:['A veces la mente nos cuenta la realidad con un filtro. Estos «estilos de pensamiento» son muy humanos, y aprender a verlos les quita fuerza.','Filtro mental: ver solo lo negativo y dejar de lado lo positivo. Conclusiones precipitadas: creer que sabes lo que otros piensan o que el futuro saldrá mal.','Razonamiento emocional: «si lo siento, debe ser verdad» («me siento fea, entonces lo soy»). Los «debería»: exigencias rígidas que traen culpa y vergüenza.','Personalización: culparte de lo que no estaba en tus manos. Etiquetar: reducirte a una palabra («soy un fracaso») por un solo hecho.','Catastrofizar: ir directo al peor escenario. Generalizar: «siempre», «nunca», «todo me sale mal». Blanco o negro: todo o nada, sin punto medio.',
-    {k:'opc',q:'¿Cuál de estos estilos reconoces más en ti últimamente?',opciones:[['filtro','Filtro mental'],['conclusiones','Conclusiones precipitadas'],['emocional','Razonamiento emocional'],['deberia','Los «debería»'],['personalizacion','Personalización'],['etiquetar','Etiquetar'],['catastrofizar','Catastrofizar'],['generalizar','Generalizar / blanco o negro']]},
-    {k:'txt',q:'Escribe un pensamiento reciente que encaje en ese estilo.'},{k:'txt',q:'Ahora reescríbelo de una forma más justa y compasiva, como se lo dirías a una amiga.'}]},
-  /* 16 */ {titulo:'Tus químicos de la felicidad',desc:'Dopamina, oxitocina, serotonina y endorfinas en tu día.',escena:'amanecer',slides:['Tu cuerpo produce sustancias que ayudan a regular el ánimo. No reemplazan un tratamiento, pero sí son pequeños empujones que puedes darte cada día.','Dopamina (recompensa): terminar una tarea pequeña, celebrar logros, escuchar tu música favorita, tomar sol, dormir bien.','Oxitocina (conexión): abrazos largos, decirle a alguien que le quieres, jugar con una mascota, un acto de bondad inesperado.','Serotonina (ánimo estable): gratitud, caminar en la naturaleza, recordar momentos felices, probar algo nuevo, un masaje.','Endorfinas (alivio): reír a carcajadas, bailar en casa, moverte, hacer arte o jugar sin un propósito.',
-    {k:'txt',q:'Dopamina: ¿qué harás esta semana? (qué, cuándo, dónde, con quién)'},{k:'txt',q:'Oxitocina: ¿qué harás esta semana?'},{k:'txt',q:'Serotonina: ¿qué harás esta semana?'},{k:'txt',q:'Endorfinas: ¿qué harás esta semana?'}]},
-  /* 17 */ {titulo:'Pequeñas victorias y momentos buenos',desc:'Entrena tu mente para notar lo que sí está bien.',escena:'amanecer',slides:['El cerebro tiende a fijarse más en lo negativo; es un instinto de supervivencia. Por eso lo bueno necesita que lo miremos a propósito.','Frasco de momentos buenos: pon un frasco visible con papelitos cerca. Cada vez que pase algo lindo, anótalo y guárdalo. Al final del mes, léelos.','Tres cosas buenas: cada noche, durante una semana, escribe tres cosas por las que te sientas agradecida. Pueden ser muy pequeñas.','Celebra las pequeñas victorias: hacer la cama, bañarte, responder un mensaje. En días difíciles, eso también cuenta.',
-    {k:'txt',q:'3 cosas buenas de hoy (por pequeñas que sean)'},{k:'txt',q:'Una pequeña victoria de hoy que merece celebrarse'},{k:'txt',q:'Algo o alguien por quien te sientes agradecida hoy',opcional:true}]},
-  /* 18 */ {titulo:'Mi plan de autocuidado',desc:'Un plan realista para sueño, cuerpo, conexión y tiempo para ti.',escena:'manos',slides:['El autocuidado no es un lujo ni egoísmo: es la base sobre la que se sostiene tu salud mental. Y funciona mejor cuando es un plan, no una improvisación.','La clave: estrategias realistas, que disfrutes y que empiecen pequeñas. Para cada área piensa en lo que ya haces, lo que quieres sumar y un primer paso concreto.',
-    {k:'txt',q:'Sueño: lo que ya hago, lo que quiero sumar y mi primer paso'},{k:'txt',q:'Alimentación: lo que ya hago, lo que quiero sumar y mi primer paso'},{k:'txt',q:'Movimiento: lo que ya hago, lo que quiero sumar y mi primer paso'},{k:'txt',q:'Conexión con otros: lo que ya hago, lo que quiero sumar y mi primer paso'},{k:'txt',q:'Tiempo para mí: lo que ya hago, lo que quiero sumar y mi primer paso'},{k:'txt',q:'Mi kit de emergencia: 3 cosas que haré cuando me sienta muy mal, y a quién llamaré'}]},
-  /* 19 */ {titulo:'Co-regulación: calmarnos juntos',desc:'Tu sistema nervioso también se calma en compañía.',escena:'manos',slides:['No solo nos calmamos por dentro: también nos regulamos a través de otros. A eso se le llama co-regulación, y no es debilidad: es biología.','Ejemplo: una pareja que atraviesa algo difícil se sienta junta, comparte sus miedos y se escucha. La calma de uno ayuda a encontrar la del otro.','Pequeñas dosis sirven: un abrazo de al menos 6 segundos, una conversación sin celular, un saludo mirando a los ojos o simplemente estar en silencio juntos.','Funciona mejor de forma preventiva: no esperes a estar en crisis para buscar a tus personas seguras.',
-    {k:'txt',q:'¿Quién te ayuda a sentirte tranquila y segura cuando estás estresada? ¿Qué hace esa persona que te sirve?'},{k:'txt',q:'Recuerda una vez en que la presencia de alguien te ayudó a calmarte. ¿Qué pasó?'},{k:'txt',q:'¿Qué tan cómoda te sientes pidiendo apoyo? ¿Qué te lo hace difícil?'},{k:'txt',q:'Actividades o personas que te hacen sentir relajada y conectada',opcional:true}]},
-  /* 20 */ {titulo:'Responder en lugar de reaccionar',desc:'La técnica STOP y la escucha activa para conversaciones difíciles.',escena:'camino',slides:['Reaccionar es inmediato y automático; responder implica una pausa y una elección. Esa pausa protege tus vínculos.','Técnica STOP. S — Para: detente físicamente. T — Toma aire: tres respiraciones lentas. O — Observa: ¿qué siento? ¿es urgencia real o emocional? ¿qué consecuencias tendría? P — Procede: ahora elige.','Escucha activa: antes de responder, repite con tus palabras lo que entendiste («lo que me dices es que…»). La otra persona se siente escuchada y bajan los malentendidos.','Antes de una conversación importante, reduce el ruido (celular, televisión) y habla desde el «yo siento» en lugar del «tú siempre».',
-    {k:'txt',q:'Piensa en una conversación reciente en la que reaccionaste. ¿Qué pasó?'},{k:'txt',q:'Si hubieras hecho STOP, ¿qué habrías observado en ti?'},{k:'txt',q:'¿Cómo te gustaría responder la próxima vez? Escríbelo empezando por «Yo siento…».'}]},
-  /* 21 */ {titulo:'Trampas de pensamiento en los vínculos',desc:'Leer la mente, culpar, personalizar y esperar que el otro cambie.',escena:'balanza',slides:['Algunas formas de pensar hacen mucho daño en las relaciones, sin que nos demos cuenta.','Leer la mente: «no me contestó, ya no le importo». Suponer sin preguntar nos hace sufrir por historias que quizá no son ciertas.','Culpar: «él me hace sentir mal conmigo misma». Personalizar: creer que todo lo que el otro hace es por tu culpa. Ambas quitan la responsabilidad compartida.','La falacia del cambio: esperar que el otro cambie para poder ser feliz. Lo que sí puedes cambiar es cómo te cuidas, qué pides y qué límites pones.','La alternativa: preguntar en lugar de suponer, hablar de lo que tú sientes y necesitas, y ver cada situación con sus matices.',
-    {k:'txt',q:'¿Cuál de estas trampas aparece más en tus relaciones? Cuenta un ejemplo.'},{k:'txt',q:'¿Qué podrías preguntar o decir en lugar de suponer?'}]},
-  /* 22 */ {titulo:'Explorando quién soy',desc:'Tus logros, cualidades y lo que te hace única.',escena:'manos',slides:['La autoestima crece cuando te conoces y te miras con justicia: no solo tus errores, también lo que eres, lo que has logrado y cómo tratas a los demás.','Responde con calma. Si te cuesta encontrar respuestas, piensa qué diría de ti alguien que te quiere.',
-    {k:'txt',q:'Cosas en las que soy buena'},{k:'txt',q:'Lo que me gusta de mí'},{k:'txt',q:'Elogios que he recibido (aunque me haya costado creerlos)'},{k:'txt',q:'Desafíos que ya superé'},{k:'txt',q:'Soy buena amiga porque…'},{k:'txt',q:'Cosas que me hacen única'}]},
-  /* 23 */ {titulo:'Mis fortalezas en acción',desc:'Identifica tus fortalezas y ponlas a trabajar esta semana.',escena:'camino',slides:['Las personas que reconocen sus fortalezas y las usan a propósito suelen tener más confianza, menos estrés y mejor ánimo.','Algunas fortalezas: honestidad, curiosidad, gratitud, trabajo en equipo, perdón, liderazgo, amabilidad, lealtad, paciencia, valentía, compasión, optimismo, apreciar la belleza.','El método: 1) elige una fortaleza, 2) planea cómo usarla, 3) hazlo, 4) reflexiona cómo te hizo sentir. Ejemplo: amabilidad → «mañana le diré algo bonito a una amiga».',
-    {k:'txt',q:'Tus 3 fortalezas principales'},{k:'txt',q:'Un plan concreto para usar una esta semana (qué, cuándo, con quién)'},{k:'txt',q:'Una fortaleza que te gustaría desarrollar más, y un primer paso',opcional:true}]},
-  /* 24 */ {titulo:'El árbol de mi vida',desc:'Raíces, tronco, ramas, hojas y frutos de tu historia.',escena:'jardin',slides:['Vas a dibujar tu vida como un árbol. Cada parte guarda algo tuyo: de dónde vienes, lo que sabes hacer, lo que sueñas y quién te acompaña.','No tiene que quedar perfecto. Escribe lo primero que aparezca; siempre puedes volver.',
-    {k:'txt',q:'Raíces — de dónde vengo: ¿dónde naciste, quiénes te formaron, tus recuerdos favoritos?'},{k:'txt',q:'Suelo — mi vida presente: ¿qué es lo mejor de tu vida hoy? ¿Qué valoras más?'},{k:'txt',q:'Tronco — mis habilidades: tus tres principales habilidades y cómo las desarrollaste'},{k:'txt',q:'Ramas — mis sueños: si tuvieras tres deseos, ¿cuáles serían?'},{k:'txt',q:'Hojas — personas importantes: ¿en quién confías? ¿saben lo importantes que son para ti?'},{k:'txt',q:'Frutos — regalos recibidos: halagos, fortalezas o apoyos que te han dado'},{k:'txt',q:'Tormentas — desafíos: ¿qué tormentas has atravesado y qué te ayudó a seguir en pie?'}]},
-  /* 25 */ {titulo:'Etiquetas que no te definen',desc:'Suelta los «soy un fracaso» y los «debería».',escena:'nube',slides:['Etiquetar es reducirte a una sola palabra por un solo hecho: «soy un fracaso», «soy tonta», «nadie me puede querer». Una etiqueta nunca cuenta la historia completa.','Los «debería» («debería haberlo hecho mejor», «tengo que bajar de peso para valer») suelen traer culpa y vergüenza, no motivación.','Alternativa: describe la conducta, no a la persona («me equivoqué en esto», no «soy un desastre») y cambia «debería» por «me gustaría» o «elijo».',
-    {k:'txt',q:'Una etiqueta o un «debería» que te dices seguido'},{k:'txt',q:'¿Qué hechos muestran que eres más que esa etiqueta?'},{k:'txt',q:'Reescribe la frase describiendo lo que pasó, con respeto hacia ti'}]},
-  /* 26 */ {titulo:'Diario de amor propio',desc:'Unas preguntas diarias para mirarte con cariño.',escena:'amanecer',slides:['El amor propio también se entrena con pequeños gestos diarios. Este diario te toma dos minutos: puedes volver a hacerlo cada día que quieras.',
-    {k:'txt',q:'3 cosas que me gustaron de hoy'},{k:'txt',q:'Algo que hice bien hoy'},{k:'txt',q:'Algo que me hizo sonreír o reír'},{k:'txt',q:'Un cumplido que recibí… o que hoy me doy a mí misma'}]},
-  /* 27 */ {titulo:'Hoja de ruta para emociones difíciles',desc:'Seis pasos para atravesar la tristeza, el dolor o la rabia.',escena:'camino',slides:['Las emociones son señales: la tristeza suele hablar de una pérdida; la rabia, de un límite cruzado; el miedo, de algo que nos importa. No son problemas que arreglar, sino mensajes que escuchar.','1. Vuélvete hacia la emoción: nota dónde vive en tu cuerpo (un nudo en la garganta, peso en el pecho). 2. Nómbrala: «esto es tristeza». Ponerle nombre crea un poco de espacio.','3. Acéptala: aceptar no es aprobar lo que pasó, es permitir que lo que sientes esté ahí. 4. Recuerda que es temporal: como un tren que llega a la estación, puedes verlo pasar sin subirte.','5. Sé curiosa y amable: pregúntate «¿qué me está pidiendo notar esta emoción?» en lugar de «¿por qué soy así?». 6. Suelta el control: imagina la emoción sobre una hoja que flota río abajo, a su propio ritmo.',
-    {k:'txt',q:'¿Dónde sientes hoy esta emoción en tu cuerpo? Si tuviera forma o color, ¿cuál sería?'},{k:'txt',q:'Nómbrala: «Esto es…»'},{k:'txt',q:'¿Qué necesidad hay debajo? (compañía, descanso, despedirme, ser escuchada…)'},{k:'txt',q:'¿Qué puedes decirte o hacer para dejarla pasar con amabilidad?'}]},
-  /* 28 */ {titulo:'Surfear la ola',desc:'Cuando la emoción llega fuerte y sin aviso.',escena:'rio',slides:['Las emociones funcionan como olas: llegan, suben hasta un pico y luego bajan. En el duelo, a veces llegan sin aviso: una canción, una fecha, un olor.','Luchar contra la ola —negarla o juzgarte por sentirla— la hace más intensa y larga. Surfearla es observarla con curiosidad mientras respiras.','La ola llega… subes a ella notando dónde la sientes… llega al pico (el momento más difícil, pero temporal)… baja… y vuelve la calma. Siempre vuelve.','Sentir mucho no significa que estés retrocediendo. Cada ola que atraviesas te recuerda que puedes.',
-    {k:'resp',q:'Respira mientras pasa la ola: 5 ciclos',ciclos:5,fases:[['Inhala',4,'in'],['Sostén',4,'hold'],['Exhala',6,'out']]},
-    {k:'txt',q:'¿Qué suele traer tus olas más fuertes?'},{k:'txt',q:'¿Qué o quién te ayuda a sostenerte mientras pasa la ola?'}]},
-  /* 29 */ {titulo:'Mi historia: pasado, presente y futuro',desc:'Integrar lo vivido y mirar hacia adelante.',escena:'amanecer',slides:['Contar tu historia ayuda a integrar lo que has vivido. Las pérdidas y los golpes son parte de tu historia, pero no son el final de ella.','Escribe con calma, sin prisa por llegar a ninguna conclusión. Si algo duele mucho, puedes guardarlo para trabajarlo en sesión.',
-    {k:'txt',q:'Mi pasado: ¿qué desafíos tuve que atravesar y qué fortalezas me dejaron?'},{k:'txt',q:'Mi presente: ¿cómo describiría mi vida hoy? ¿En qué soy distinta de quien era antes?'},{k:'txt',q:'Mi futuro: ¿cómo me gustaría que fuera? ¿Quiénes estarán conmigo? ¿Cómo quiero honrar lo que he vivido?'}]},
-  /* 30 */ {titulo:'Tu sistema nervioso en 3 colores',desc:'Teoría polivagal: verde, amarillo y rojo.',escena:'faro',slides:['Tu sistema nervioso tiene un acelerador (el sistema simpático: «lucha o huida») y un freno (el parasimpático: «descanso y recuperación»). El nervio vago es una pieza clave de ese freno.','Verde — seguridad y conexión: como estar alrededor de una fogata con amigos. Puedes hablar, reír, pensar con claridad.','Amarillo — movilización: el corazón se acelera, alerta máxima, ansiedad, irritabilidad. Como tener que huir de un león… o haber tomado demasiado café.','Rojo — inmovilización: desconexión, entumecimiento, sentirte invisible o sin energía. El cuerpo «se apaga» para protegerse.','Regularte no es estar siempre en verde: es darte cuenta de dónde estás y tener herramientas para volver.',
-    {k:'opc',q:'¿En qué color te has sentido la mayor parte del tiempo esta semana?',opciones:[['verde','Verde: segura y conectada'],['amarillo','Amarillo: en alerta, acelerada'],['rojo','Rojo: apagada, desconectada'],['mezcla','Una mezcla que cambia mucho']]},
-    {k:'txt',q:'¿Qué te ayuda a volver al verde? (personas, lugares, actividades)'}]},
-  /* 31 */ {titulo:'Técnicas para activar tu calma',desc:'Abrazo de mariposa, zumbido, masaje de ojos y más.',escena:'manos',slides:['Estas técnicas estimulan el nervio vago y le envían al cerebro señales de seguridad desde el cuerpo. Prueba varias y quédate con las que te sirvan.','Abrazo de mariposa: cruza los brazos, con cada mano bajo la clavícula contraria, y da toquecitos alternados (izquierda, derecha) mientras respiras lento.','Zumbido «hummm»: exhala haciendo «hummm» y siente la vibración en el pecho y la garganta. Puedes hacerlo varios minutos, incluso en la ducha.','Masaje de ojos: con los ojos cerrados, presiona muy suavemente los párpados con la palma unos segundos. Ayuda a bajar la frecuencia cardíaca.','Manos que calman: una mano en el corazón y otra en el abdomen, o una en la frente y otra en la nuca. Quédate unos minutos sintiendo el contacto.','Tragar despacio: toca el paladar con la lengua y traga conscientemente varias veces, con el cuello relajado.',
-    {k:'resp',q:'Cierra con respiración profunda: 5 ciclos',ciclos:5,fases:[['Inhala',4,'in'],['Sostén',4,'hold'],['Exhala',6,'out']]},
-    {k:'txt',q:'¿Qué técnica te sirvió más? Califícala de 0 a 10 y cuenta qué notaste.'}]},
-  /* 32 */ {titulo:'Tus 5 minutos diarios',desc:'Un protocolo corto para regularte cada día.',escena:'faro',slides:['Cinco minutos al día, siempre a la misma hora, pueden cambiar cómo tu sistema nervioso responde al estrés. La constancia importa más que la perfección.',
-    {k:'txt',q:'Minuto 1 — ¿Cómo me siento ahora? Nombra una emoción y ponle intensidad (0–10).'},
-    {k:'resp',q:'Minuto 2 — Respiración 4-7-8 (2 ciclos)',ciclos:2,fases:[['Inhala',4,'in'],['Retén',7,'hold'],['Exhala',8,'out']]},
-    'Minuto 3 — Elige un ejercicio del cuerpo: abrazo de mariposa, masaje suave de ojos o zumbido «hummm». Hazlo ahora durante un minuto.',
-    {k:'txt',q:'Minuto 4 — Conecta: escribe un pensamiento reconfortante («estoy a salvo, esto también pasará») o a quién le enviarás un mensaje cariñoso.'},
-    {k:'txt',q:'Minuto 5 — Tres cosas buenas de hoy y una intención concreta para las próximas horas.'},
-    {k:'txt',q:'¿A qué acción que ya haces cada día vas a «pegar» esta práctica? (el café, después de almorzar, al apagar la luz…)',opcional:true}]},
-  /* 33 */ {titulo:'Plan de 6 semanas para tu sistema nervioso',desc:'De observarte a convertir la calma en hábito.',escena:'camino',slides:['Este plan va por etapas y pide solo 10 a 20 minutos al día. Cada etapa se apoya en la anterior.','Semana 1 — Observar: registra al despertar y antes de dormir cómo está tu cuerpo, qué te estresa y qué te calma. Solo observa, sin juzgar.','Semanas 2 y 3 — Practicar: elige 3 técnicas (respiración, abrazo de mariposa, zumbido, masaje de ojos, tragar despacio, frasco de momentos buenos). Una al despertar y otra antes de dormir.','Semanas 4 y 5 — Conectar: cultiva a tus personas seguras, haz un plan diario de autocuidado, escribe 3 gratitudes cada mañana y reduce noticias y redes que te alteran.','Semana 6 en adelante — Consolidar: revisa qué funcionó, arma tu kit de emergencia y elige un día fijo a la semana para revisar cómo vas.',
-    {k:'txt',q:'Las 3 técnicas que elijo para las semanas 2 y 3'},{k:'txt',q:'Mi kit de emergencia: mis 3 técnicas más efectivas para momentos de mucho estrés'},{k:'txt',q:'El día y la hora de mi revisión semanal',opcional:true}]},
-  /* 34 */ {titulo:'TDAH en adultos: no estás rota',desc:'Entender tu cerebro sin culpa.',escena:'brujula',slides:['El TDAH es una condición del neurodesarrollo que afecta cómo el cerebro regula la atención, los impulsos y las emociones. Muchas personas adultas lo viven sin saberlo.','No es falta de atención absoluta: es dificultad para dirigirla a voluntad. Por eso puedes hiperenfocarte horas en algo que te apasiona y no lograr empezar algo aburrido.','No es cuestión de esfuerzo. Pedirle a alguien con TDAH que «simplemente se concentre» es como pedirle a alguien con miopía que «simplemente vea mejor».','Se puede notar en: desatención, emociones muy intensas, impulsividad, inquietud interna, hiperfoco y desorganización (incluida la «ceguera del tiempo»).','Muchas personas, sobre todo mujeres, aprendieron a enmascararlo con perfeccionismo y esfuerzo triple. El costo suele ser agotamiento, ansiedad y culpa.','El TDAH también trae fortalezas: creatividad, energía, adaptabilidad, intuición y una resiliencia enorme. Entenderte es el primer paso para diseñar una vida que funcione para tu mente.',
-    {k:'txt',q:'¿Qué parte de esto te hizo sentir identificada? ¿Qué te gustaría hablar en sesión?'}]},
-  /* 35 */ {titulo:'TDAH: estrategias para el día a día',desc:'Herramientas concretas para empezar, organizarte y frenar impulsos.',escena:'camino',slides:['Método de los 10 minutos: pon un temporizador, elige UNA tarea concreta («lavar los platos», no «limpiar la casa») y empieza. Al sonar puedes parar con honor… o seguir si fluyó.','Tres prioridades: cada mañana, antes de abrir el correo o redes, escribe en papel las 3 tareas más importantes del día.','Contrato de 2 minutos: identifica la tarea que evitas y su primer paso MÁS pequeño («abrir el documento y escribir el título»). Comprométete solo a eso.','Rutina mínima viable: 3 a 5 hábitos diarios, visibles y marcados cada día. La meta no es la perfección, es no saltarte dos días seguidos.','Bloques de enfoque: 25 minutos de trabajo + 5 de pausa en movimiento. Ayudan la música instrumental y trabajar acompañada de alguien (body doubling).','Antes de un impulso (comprar, responder un mensaje) usa STOP: para, respira tres veces, observa y luego decide.',
-    {k:'txt',q:'Elige UNA estrategia para esta semana: ¿cuál, cuándo y dónde la aplicarás?'},{k:'txt',q:'La tarea que estás evitando y su primer paso más pequeño posible'}]}
+  {titulo:'Autocompasión',slides:['Muchas veces tenemos un crítico interno muy duro, que jamás usaríamos con alguien que queremos.','Autocompasión no es lástima ni «dejarse pasar todo»: es reconocer tu dolor sin juzgarlo.','Tiene tres partes: darte cuenta de que sufres, recordar que sufrir es humano y tratarte con amabilidad.','Ser dura contigo no aumenta la disciplina; suele aumentar la evitación y la desesperanza.','Ejercicio: cuando notes autocrítica, pregúntate «¿qué le diría a alguien querido?» y dítelo a ti.','La autocompasión no reemplaza el cambio: lo acompaña sin la carga del castigo.','Puede sentirse incómodo al principio, sobre todo si aprendiste que exigirte era la única forma de mejorar.']}
 ];
-/* ---------- Biblioteca de recursos (se abre con #recursos o sin enlace) ---------- */
-const DESC_BASE=['Cómo se conectan lo que pasa, lo que piensas, lo que sientes y lo que haces.','Paso a paso para revisar un pensamiento que duele.','Por qué evitar alimenta el miedo, y cómo salir del círculo.','Cuando no hay ganas: pequeñas acciones que devuelven el ánimo.','Mirar tus pensamientos sin creerles todo.','Encontrar la dirección de lo que de verdad te importa.','Observar el presente con curiosidad y sin juzgar.','Tratarte como tratarías a alguien que quieres.'];
-DESC_BASE.forEach((d,i)=>{ if(RECURSOS[i]&&!RECURSOS[i].desc) RECURSOS[i].desc=d; });
-/* Libros completos (páginas del PDF original con ejercicios interactivos) */
-const LIBROS={libroAnsiedad:{titulo:'Ansiedad: libro de actividades',desc:'El cuaderno completo de 30 páginas, con sus ejercicios para escribir y marcar aquí mismo.',href:'recursos/ansiedad/',meta:'📘 30 páginas · ✍️ 21 ejercicios'}};
-const CATEGORIAS=[
-  {k:'ansiedad',n:'Ansiedad',ic:'🌊',c:'#047578',bg:'#e3f1ef',d:'Para entender tu ansiedad, calmar el cuerpo y poner a prueba los «¿y si…?».',r:['libroAnsiedad',8,2,9,10,11,12,13,14]},
-  {k:'depresion',n:'Depresión',ic:'🌅',c:'#a4712f',bg:'#f8eedc',d:'Para cuando el ánimo pesa: pequeños pasos, pensamientos más justos y cuidado propio.',r:[3,0,1,15,16,17,18]},
-  {k:'relaciones',n:'Relaciones',ic:'🤝',c:'#165a6c',bg:'#e2edf0',d:'Para vincularte desde la calma: co-regulación, comunicación y trampas de pensamiento.',r:[19,20,21]},
-  {k:'autoestima',n:'Autoestima',ic:'🌱',c:'#4f7f5a',bg:'#e7f1e8',d:'Para conocerte, reconocer tus fortalezas y hablarte con cariño.',r:[7,22,23,24,25,26,5]},
-  {k:'duelo',n:'Duelo',ic:'🕊️',c:'#7a5f8e',bg:'#efe9f4',d:'Para atravesar la pérdida y las emociones difíciles a tu ritmo. No tienes que hacerlo sola.',r:[27,28,29,19,7]},
-  {k:'otros',n:'Otros',ic:'✨',c:'#a86f52',bg:'#f7ebe3',d:'Sistema nervioso, mindfulness y TDAH en adultos.',r:[30,31,32,33,6,4,34,35]}
-];
-
 
 /* ---------- Escenas ilustradas ---------- */
 const C={pe:'#165a6c',ve:'#047578',sa:'#81a9a7',ar:'#dabb81',be:'#e7decf',cr:'#f5e8da',te:'#c9987c',no:'#0e3440'};
@@ -512,7 +398,7 @@ function reTabla(L){
 const partes=decodeURIComponent((location.hash||'').slice(1)).split('.');
 const A={tipo:partes[0], clave:partes[1], token:partes[2]||'', tel:(partes[3]||'').replace(/\D/g,'')};
 let paso=-1, R=[];
-const KEY='sana_'+(A.token||(A.tipo+'_'+(A.clave||'')));   // sin token (abierto desde la biblioteca) cada recurso guarda aparte
+const KEY='sana_'+A.token;
 try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&Array.isArray(d.r)){ R=d.r; } }catch(_){}
 function guardar(){ try{ localStorage.setItem(KEY,JSON.stringify({r:R})); }catch(_){} }
 const $=s=>document.querySelector(s);
@@ -522,9 +408,8 @@ function def(){
   if(A.tipo==='d') return {titulo:'Mi chequeo diario',eyebrow:'Cada día',intro:'',escena:'faro',especial:true,pasos:[]};
   if(A.tipo==='i'&&INTERACTIVOS[A.clave]){ const it=INTERACTIVOS[A.clave]; return {titulo:it.titulo,eyebrow:it.enfoque,intro:it.intro,escena:it.escena,pasos:it.campos.map(c=>({k:'txt',q:c}))}; }
   if(A.tipo==='t'&&ESCALAS[A.clave]){ const E=ESCALAS[A.clave]; return {titulo:E.titulo,eyebrow:'Cuestionario',intro:'Responde con lo primero que sientas más cercano a tu experiencia. No hay respuestas buenas ni malas.',escena:'jardin',instr:E.instr,pasos:E.items.map(q=>({k:'opc',q,opciones:E.opciones}))}; }
-  if(A.tipo==='r'&&RECURSOS[+A.clave]){ const r=RECURSOS[+A.clave]; const pasos=r.slides.map(s=>typeof s==='string'?{k:'slide',q:s}:s), ej=pasos.some(p=>p.k==='txt'||p.k==='opc');
-    return {titulo:r.titulo,eyebrow:ej?'Para practicar con calma':'Para leer con calma',intro:ej?'Lee cada tarjeta con calma y responde los ejercicios con tus palabras. Al final puedes enviarle a tu psicóloga lo que escribiste.':'Lee cada tarjeta con calma. Al final puedes contarle a tu psicóloga qué te llevas.',escena:r.escena||'papel',slides:r.slides,
-    pasos:pasos.concat([{k:'txt',q:'¿Qué idea te quedó más de esta lectura? (opcional)',opcional:true}])}; }
+  if(A.tipo==='r'&&RECURSOS[+A.clave]){ const r=RECURSOS[+A.clave]; return {titulo:r.titulo,eyebrow:'Para leer con calma',intro:'Lee cada tarjeta con calma. Al final puedes contarle a tu psicóloga qué te llevas.',escena:'papel',slides:r.slides,
+    pasos:r.slides.map(s=>({k:'slide',q:s})).concat([{k:'txt',q:'¿Qué idea te quedó más de esta lectura? (opcional)',opcional:true}])}; }
   return null;
 }
 const D=def();
@@ -803,8 +688,6 @@ function pintarEscena(){
   $('#scene').innerHTML=escena(D.escena,prog,txt,lab)+(!sinCard&&String(txt).trim()?`<div class="scard float${oscuro?' dark':''}"><div class="st">${esc(String(txt).slice(0,160))}${String(txt).length>160?'…':''}</div>${lab?`<div class="sl">${esc(lab)}</div>`:''}</div>`:'');
 }
 function render(){
-  clearTimeout(respT);
-  if(A.tipo===''||A.tipo==='recursos') return renderBiblioteca();
   if(D&&D.especial) return A.tipo==='d'? renderDiario() : renderReg();
   pintarBarra(); pintarEscena();
   const b=$('#body');
@@ -815,7 +698,7 @@ function render(){
       <div class="steps"><div class="stp"><b class="n">1</b><span>Tómate tu tiempo. Puedes volver atrás cuando quieras.</span></div>
       <div class="stp"><b class="n">2</b><span>Escribe con tus palabras: aquí no hay respuestas correctas.</span></div>
       <div class="stp"><b class="n">3</b><span>Al final envías tus respuestas a tu psicóloga.</span></div></div>
-      <div class="nav">${A.tipo==='r'?'<a class="btn sec" style="text-decoration:none" href="#recursos">← Recursos</a>':'<span></span>'}<button class="btn pri" id="go">${R.length?'Seguir donde iba →':'Comenzar →'}</button></div>`;
+      <div class="nav"><span></span><button class="btn pri" id="go">${R.length?'Seguir donde iba →':'Comenzar →'}</button></div>`;
     $('#go').onclick=()=>{ paso=0; render(); }; $('#go').focus(); return;
   }
   if(paso>=tot) return final();
@@ -823,15 +706,9 @@ function render(){
   if(p.k==='slide'){
     b.innerHTML=`<div class="eyebrow">${esc(D.titulo)}</div><div class="slide">${esc(p.q)}</div>
       <div class="nav"><button class="btn sec" id="prev">← Anterior</button><button class="btn pri" id="next">Siguiente →</button></div>`;
-  } else if(p.k==='resp'){
-    b.innerHTML=`<div class="eyebrow">${esc(D.titulo)}</div><h2>${esc(p.q)}</h2>
-      <div class="resp"><div class="resp-c" id="rc" role="timer" aria-live="polite"><span id="rl">¿Lista?</span><b id="rn">${p.fases.map(f=>f[1]).join('-')}</b></div></div>
-      <p class="cnt" id="rciclo" style="text-align:center">Sigue el círculo: crece al inhalar y se encoge al exhalar.</p>
-      <div class="nav"><button class="btn sec" id="prev">← Anterior</button><button class="btn teal" id="rgo">▶ Empezar</button><button class="btn pri" id="next">Siguiente →</button></div>`;
-    $('#rgo').onclick=()=>respirar(p);
   } else if(p.k==='txt'){
     const v=typeof R[paso]==='string'?R[paso]:'';
-    b.innerHTML=`<div class="eyebrow">Paso ${paso+1} de ${tot}${p.opcional?' · opcional':''}</div><h2>${esc(p.q)}</h2>
+    b.innerHTML=`<div class="eyebrow">Paso ${paso+1} de ${tot}</div><h2>${esc(p.q)}</h2>
       <textarea id="ta" maxlength="1000" placeholder="Escribe aquí…">${esc(v)}</textarea><div class="cnt" id="cnt">${v.length} / 1000</div>
       <div class="nav"><button class="btn sec" id="prev">← Anterior</button><button class="btn pri" id="next">${paso===tot-1?'Terminar →':'Siguiente →'}</button></div>`;
     const ta=$('#ta'); ta.focus();
@@ -846,46 +723,6 @@ function render(){
   $('#prev').onclick=()=>{ paso--; render(); };
   $('#next').onclick=()=>{ paso++; render(); };
 }
-let respT=null;
-/* Respiración guiada: el círculo crece al inhalar y se encoge al exhalar */
-function respirar(p){
-  const rc=$('#rc'), rl=$('#rl'), rn=$('#rn'), ci=$('#rciclo'), go=$('#rgo');
-  let c=0, f=0, s=0; clearTimeout(respT); go.disabled=true;
-  const tic=()=>{ const [lab,seg,tipo]=p.fases[f];
-    if(s===0){ rl.textContent=lab; rc.style.transitionDuration=seg+'s'; rc.dataset.f=tipo; }
-    rn.textContent=seg-s; ci.textContent=`Ciclo ${c+1} de ${p.ciclos}`;
-    respT=setTimeout(()=>{ if(++s<seg) return tic(); s=0;
-      if(++f<p.fases.length) return tic(); f=0;
-      if(++c<p.ciclos) return tic();
-      rl.textContent='Muy bien'; rn.textContent='✓'; rc.style.transitionDuration='1s'; rc.dataset.f='fin';
-      ci.textContent='Terminaste. Nota cómo está tu cuerpo ahora.'; go.textContent='↻ Repetir'; go.disabled=false; },1000); };
-  tic();
-}
-function sinTildes(t){ return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
-function renderBiblioteca(){
-  document.title='Recursos · Sana tu Mentte';
-  $('#bar').innerHTML=''; $('#count').textContent=''; $('#scene').innerHTML=escena('papel',0);
-  let abiertas=[]; try{ abiertas=JSON.parse(sessionStorage.getItem('sana_bib')||'[]'); }catch(_){}
-  const item=i=>{ if(LIBROS[i]){ const L=LIBROS[i]; return `<a class="rec" href="${L.href}" data-t="${esc(sinTildes(L.titulo+' '+L.desc))}"><span class="rt">${esc(L.titulo)}</span><span class="rd">${esc(L.desc)}</span><span class="rm">${L.meta}</span></a>`; }
-    const r=RECURSOS[i], ej=r.slides.filter(x=>typeof x!=='string'&&x.k!=='resp').length, resp=r.slides.some(x=>x&&x.k==='resp'), tj=r.slides.filter(x=>typeof x==='string').length;
-    const meta=[tj?`${tj} tarjeta${tj>1?'s':''}`:'',ej?`✍️ ${ej} ejercicio${ej>1?'s':''}`:'',resp?'🫁 respiración guiada':''].filter(Boolean).join(' · ');
-    return `<a class="rec" href="#r.${i}" data-t="${esc(sinTildes(r.titulo+' '+(r.desc||'')+' '+r.slides.map(x=>typeof x==='string'?x:x.q).join(' ')))}"><span class="rt">${esc(r.titulo)}</span><span class="rd">${esc(r.desc||'')}</span><span class="rm">${meta}</span></a>`; };
-  $('#body').innerHTML=`<div class="eyebrow">Biblioteca</div><h1>Recursos para ti</h1>
-    <p class="lead">Lecturas y ejercicios para acompañarte entre sesiones. Abre un tema, elige un recurso y avanza a tu ritmo.</p>
-    <input type="search" id="bus" class="bus" placeholder="Buscar: respiración, culpa, TDAH…" aria-label="Buscar un recurso">
-    <div class="cats">${CATEGORIAS.map(c=>`<details class="cat" data-k="${c.k}" style="--cc:${c.c};--cb:${c.bg}"${abiertas.includes(c.k)?' open':''}>
-      <summary><span class="ci" aria-hidden="true">${c.ic}</span><span class="cn"><b>${esc(c.n)}</b><small>${c.r.length} recursos</small></span><span class="cv" aria-hidden="true"></span></summary>
-      <div class="cb"><p class="cd">${esc(c.d)}</p>${c.r.map(item).join('')}</div></details>`).join('')}</div>
-    <p class="vacio" id="vacio" hidden>No encontramos recursos con esa palabra. Prueba con otra.</p>
-    <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>`;
-  const cats=[...document.querySelectorAll('.cat')];
-  const guardarAbiertas=()=>{ if($('#bus').value.trim()) return; abiertas=cats.filter(d=>d.open).map(d=>d.dataset.k); try{ sessionStorage.setItem('sana_bib',JSON.stringify(abiertas)); }catch(_){} };
-  cats.forEach(d=>d.addEventListener('toggle',guardarAbiertas));
-  $('#bus').addEventListener('input',()=>{ const q=sinTildes($('#bus').value.trim()); let hay=false;
-    cats.forEach(d=>{ let n=0; d.querySelectorAll('.rec').forEach(a=>{ const ok=!q||a.dataset.t.includes(q); a.hidden=!ok; if(ok) n++; });
-      d.hidden=!!q&&!n; if(q) d.open=n>0; else d.open=abiertas.includes(d.dataset.k); if(n) hay=true; });
-    $('#vacio').hidden=hay; });
-}
 function b64u(s){ const by=new TextEncoder().encode(s); let bin=''; by.forEach(x=>bin+=String.fromCharCode(x)); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 function final(){
   pintarBarra();
@@ -895,7 +732,7 @@ function final(){
   if(faltan.length){ b.innerHTML=`<div class="eyebrow">Casi listo</div><h2>Te faltan ${faltan.length} pregunta(s)</h2><p class="lead">Vuelve a la pregunta ${faltan[0]+1} para completarla.</p>
     <div class="nav"><button class="btn pri" id="ir">Ir a la pregunta ${faltan[0]+1}</button></div>`; $('#ir').onclick=()=>{ paso=faltan[0]; render(); }; return; }
   const riesgo=A.tipo==='t'&&ESCALAS[A.clave].riesgoItem!=null&&+R[ESCALAS[A.clave].riesgoItem]>0;
-  const codigo='SANA1:'+b64u(JSON.stringify({v:1,t:A.token,k:A.tipo,c:A.clave,r:D.pasos.map((p,i)=>p.k==='slide'||p.k==='resp'?null:(R[i]==null?'':R[i])),f:new Date().toISOString().slice(0,10)}));
+  const codigo='SANA1:'+b64u(JSON.stringify({v:1,t:A.token,k:A.tipo,c:A.clave,r:D.pasos.map((p,i)=>p.k==='slide'?null:(R[i]==null?'':R[i])),f:new Date().toISOString().slice(0,10)}));
   const msg=`🌿 Respuestas de «${D.titulo}»\n${codigo}`;
   b.innerHTML=`<div class="eyebrow">¡Lo lograste!</div><h1>Gracias por tomarte este momento</h1>
     ${riesgo?`<div class="note">Gracias por contarlo con honestidad; tu psicóloga lo va a leer. Si en este momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>`:''}
@@ -906,13 +743,12 @@ function final(){
     </div>
     <details><summary class="foot" style="text-align:left;cursor:pointer">Si el botón de copiar no funciona, copia este texto</summary><div class="code" id="code">${esc(msg)}</div></details>`
     :`<p class="lead">Ya puedes cerrar esta página. Nos vemos en la próxima sesión 🌿</p>`}
-    <div class="nav"><button class="btn sec" id="prev">← Revisar mis respuestas</button>${A.tipo==='r'?'<a class="btn pri" style="text-decoration:none" href="#recursos">Ver más recursos →</a>':''}</div>`;
+    <div class="nav"><button class="btn sec" id="prev">← Revisar mis respuestas</button></div>`;
   $('#prev').onclick=()=>{ paso=D.pasos.length-1; render(); };
   if($('#copiar')) $('#copiar').onclick=()=>{ const ok=()=>{ $('#okc').textContent='✓ Copiado. Ahora pégalo en WhatsApp.'; };
     try{ navigator.clipboard.writeText(msg).then(ok,()=>{ $('details').open=true; const r=document.createRange(); r.selectNodeContents($('#code')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $('#okc').textContent='Selecciona el texto de abajo y cópialo.'; }); }
     catch(_){ $('details').open=true; } };
   pintarEscena();
 }
-addEventListener('hashchange',()=>location.reload());
 render();
 </script>
