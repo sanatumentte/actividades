@@ -237,12 +237,20 @@ P(29,'Serotonina','✍️ Anota 3 maneras de liberar serotonina: cómo, dónde, 
 P(30,'Reflexión','✍️ Escribe tu reflexión final: qué aprendiste y qué te llevas de este libro.',[ta('p30','Reflexión',117,152,414,560,{cls:'lines',ph:''})]);
 
 /* ---------- Estado guardado en este dispositivo ---------- */
+/* El enlace puede traer, separados por «&»: el WhatsApp de la psicóloga (solo números) y
+   c=<paciente> para abrir su cartilla (así la abre «✍️ Llenar en sesión» desde Casos Clínicos). */
+const HASH=(()=>{ const o={}; decodeURIComponent(location.hash.slice(1)).split('&').forEach(t=>{ t=t.trim();
+  if(/^\d{8,15}$/.test(t)) o.tel=t; else if(/^c=/.test(t)) o.c=t.slice(2).trim().slice(0,60); }); return o; })();
 /* Varias cartillas en un mismo dispositivo: una por paciente (útil en el computador de la psicóloga) */
 const KEYC='sana_ansiedad_cartillas';
 let C=null; try{ C=JSON.parse(localStorage.getItem(KEYC)||'null'); }catch(_){}
 if(!C||!Array.isArray(C.lista)||!C.lista.length) C={actual:'yo',lista:[{id:'yo',n:'Mi cartilla'}]};
 if(!C.lista.some(x=>x.id===C.actual)) C.actual=C.lista[0].id;
 const guardarC=()=>{ try{ localStorage.setItem(KEYC,JSON.stringify(C)); }catch(_){} };
+if(HASH.c){ const x=C.lista.find(y=>y.n.toLowerCase()===HASH.c.toLowerCase());
+  if(x) C.actual=x.id; else { const id='c'+Date.now().toString(36); C.lista.push({id,n:HASH.c}); C.actual=id; }
+  guardarC();
+  try{ history.replaceState(null,'',location.pathname+location.search+(HASH.tel?'#'+HASH.tel:'')); }catch(_){} }   // que al cambiar de cartilla no vuelva a esta
 const nombreActual=()=>C.lista.find(x=>x.id===C.actual).n;
 const conNombre=()=>nombreActual()!=='Mi cartilla';
 const KEY='sana_ansiedad_libro'+(C.actual==='yo'?'':':'+C.actual);   // 'yo' conserva la clave de la primera versión
@@ -335,7 +343,7 @@ function actualizar(){
   const quien=conNombre()?` (${nombreActual()})`:'';
   const msg=r.length?`🌿 Mis respuestas — Ansiedad: libro de actividades${quien}\n\n${r.join('\n\n')}`:'';
   $('#code').textContent=msg||'Todavía no hay respuestas.';
-  const tel=(location.hash.match(/^#(\d{8,15})$/)||[])[1];
+  const tel=HASH.tel;
   $('#wa').href=`https://api.whatsapp.com/send?${tel?'phone='+tel+'&':''}text=${encodeURIComponent(msg)}`;
   return msg;
 }
@@ -415,7 +423,7 @@ const deB64=t=>{ const b=t.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(b
 $('#bLlevar').onclick=()=>{
   const cod=PREF+aB64({v:1,libro:'ansiedad',n:conNombre()?nombreActual():'',s:S,h:H});
   const msg=`🔁 Mi cartilla de ansiedad (pégala en «Pasar a otro dispositivo» → «Recibir»):\n${cod}`;
-  const tel=(location.hash.match(/^#(\d{8,15})$/)||[])[1];
+  const tel=HASH.tel;
   const h=hoja(`<h3>Pasar a otro dispositivo</h3>
     <p><b>Enviar:</b> copia este código y ábrelo en el otro teléfono o computador. Incluye todo lo escrito y las sesiones guardadas.</p>
     <div class="code" id="lc">${esc(cod)}</div>
