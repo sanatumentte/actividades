@@ -74,6 +74,26 @@
   .hoja label{font-weight:800;color:var(--petroleo)}
   .hoja textarea{width:100%;min-height:150px;border:2px solid var(--salvia);border-radius:14px;padding:12px 14px;font:inherit;color:var(--tinta);resize:vertical;outline:none;background:#fff}
   .hoja textarea:focus{box-shadow:0 0 0 4px rgba(129,169,167,.25)}
+  .cartilla{background:#fff;border:1px solid var(--beige);border-radius:18px;padding:16px 20px;display:grid;gap:10px;scroll-margin-top:70px}
+  .cartilla h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;color:var(--petroleo);font-size:1.45rem;margin:0}
+  .cartilla p{margin:0;color:var(--suave);font-size:.93rem}
+  .hoja>div{max-height:88vh;overflow:auto}
+  .hoja h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;color:var(--petroleo);font-size:1.4rem;margin:0}
+  .hoja p{margin:0;color:var(--suave);font-size:.93rem}
+  .hoja input[type=text],.hoja select{width:100%;border:2px solid var(--salvia);border-radius:12px;padding:10px 12px;font:inherit;color:var(--tinta);background:#fff}
+  .hoja .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .linea{display:grid;gap:6px}
+  .ses{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--beige);border-radius:12px;padding:9px 12px;font-size:.9rem}
+  .ses b{color:var(--petroleo)}
+  .ses span{color:var(--suave);font-variant-numeric:tabular-nums}
+  .cambios{display:grid;gap:10px}
+  .cambios section{background:#fff;border:1px solid var(--beige);border-radius:12px;padding:10px 12px}
+  .cambios h4{margin:0 0 4px;color:var(--petroleo);font-size:.95rem}
+  .cambios ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:.88rem}
+  .cambios .antes{color:var(--suave);text-decoration:line-through}
+  .cambios .mas{color:#2f7d4a;font-weight:700}
+  .cambios .menos{color:#b0413e;font-weight:700}
+  .hoja .code{max-height:120px}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -89,6 +109,15 @@
     <p>Lee cada página y completa los ejercicios aquí mismo: escribe en los recuadros, marca las casillas y toca las opciones. Lo que escribes se guarda solo en este dispositivo.</p>
     <p>Al final puedes enviarle tus respuestas a tu psicóloga.</p>
     <div class="chips" id="chips"></div>
+  </section>
+  <section class="cartilla" id="cartilla">
+    <h2>Mi cartilla</h2>
+    <p id="ultima">Puedes guardar cada sesión con su fecha, ver tus avances y pasar la cartilla a otro dispositivo para seguir donde quedaste.</p>
+    <div class="fila">
+      <button class="btn teal" id="bGuardar" type="button">💾 Guardar esta sesión</button>
+      <button class="btn sec" id="bAvances" type="button">📈 Ver mis avances</button>
+      <button class="btn sec" id="bLlevar" type="button">🔁 Pasar a otro dispositivo</button>
+    </div>
   </section>
   <div id="paginas" style="display:grid;gap:26px"></div>
   <section class="enviar" id="enviar">
@@ -302,7 +331,97 @@ $('#copiar').onclick=()=>{ const msg=actualizar(); if(!msg){ $('#okc').textConte
   const sel=()=>{ $('details').open=true; const r=document.createRange(); r.selectNodeContents($('#code')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $('#okc').textContent='Selecciona el texto de abajo y cópialo.'; };
   try{ navigator.clipboard.writeText(msg).then(()=>{ $('#okc').textContent='✓ Copiado. Ahora pégalo en WhatsApp para tu psicóloga.'; },sel); }catch(_){ sel(); } };
 let confirmar=false;
-$('#borrar').onclick=()=>{ if(!confirmar){ confirmar=true; $('#borrar').textContent='Sí, borrar todo'; $('#okb').textContent='¿Seguro? Esto borra todo lo que escribiste.'; return; }
-  S={}; try{ localStorage.removeItem(KEY); }catch(_){} location.reload(); };
+$('#borrar').onclick=()=>{ if(!confirmar){ confirmar=true; $('#borrar').textContent='Sí, borrar todo'; $('#okb').textContent='¿Seguro? Esto borra todo lo que escribiste y las sesiones guardadas en este dispositivo.'; return; }
+  S={}; try{ localStorage.removeItem(KEY); localStorage.removeItem(KEYH); }catch(_){} location.reload(); };
 actualizar();
+
+/* ---------- Sesiones guardadas, avances y paso a otro dispositivo ---------- */
+const KEYH='sana_ansiedad_sesiones';
+let H=[]; try{ H=JSON.parse(localStorage.getItem(KEYH)||'[]')||[]; }catch(_){ H=[]; }
+const guardarH=()=>{ try{ localStorage.setItem(KEYH,JSON.stringify(H)); }catch(_){} pintarUltima(); };
+const copia=o=>JSON.parse(JSON.stringify(o||{}));
+const fechaTxt=iso=>{ try{ return new Date(iso).toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'}); }catch(_){ return iso.slice(0,10); } };
+const CAMPOS=PAG.flatMap(p=>p.f.map(f=>Object.assign({pag:p},f)));
+function hechasEn(D){ return PAG.filter(p=>p.hint&&p.f.some(f=>f.k==='rueda'?Object.keys(D.p17r||{}).length:(f.k==='nivel'?D.p20===f.id:(D[f.id]&&String(D[f.id]).trim())))).length; }
+function nivelEn(D){ const f=CAMPOS.find(f=>f.id===D.p20); return f?f.lab:''; }
+function pintarUltima(){ const u=H[H.length-1];
+  $('#ultima').textContent=u?`Última sesión guardada: ${u.n} · ${fechaTxt(u.f)}. Llevas ${H.length} sesión${H.length>1?'es':''} guardada${H.length>1?'s':''}.`:'Puedes guardar cada sesión con su fecha, ver tus avances y pasar la cartilla a otro dispositivo para seguir donde quedaste.'; }
+function hoja(html){ const h=document.createElement('div'); h.className='hoja'; h.innerHTML=`<div role="dialog" aria-modal="true">${html}<div class="fila" style="justify-content:flex-end"><button class="btn sec" type="button" data-cerrar>Cerrar</button></div></div>`;
+  document.body.appendChild(h); const c=()=>h.remove(); h.addEventListener('click',e=>{ if(e.target===h||e.target.closest('[data-cerrar]')) c(); }); h.cerrar=c; return h; }
+
+$('#bGuardar').onclick=()=>{
+  const h=hoja(`<h3>Guardar esta sesión</h3><p>Se guarda una copia con la fecha de hoy. Después puedes seguir escribiendo en la misma cartilla y comparar.</p>
+    <label for="sn">Nombre de la sesión</label><input type="text" id="sn" value="Sesión ${H.length+1}">
+    <div class="fila"><button class="btn teal" type="button" id="sok">💾 Guardar</button></div><div class="ok" id="smsg" aria-live="polite"></div>`);
+  h.querySelector('#sok').onclick=()=>{ const n=h.querySelector('#sn').value.trim()||`Sesión ${H.length+1}`;
+    H.push({n,f:new Date().toISOString(),d:copia(S)}); guardarH();
+    h.querySelector('#smsg').textContent=`✓ Guardada «${n}» (${fechaTxt(H[H.length-1].f)}). Puedes seguir trabajando.`; h.querySelector('#sok').disabled=true; };
+};
+
+/* Diferencias entre dos momentos de la cartilla */
+function cambios(A,B){
+  const out=[];
+  PAG.forEach(p=>{ const L=[], grupos={};
+    p.f.forEach(f=>{
+      if(f.k==='ta'||f.k==='in'){ const a=String(A[f.id]||'').trim(), b=String(B[f.id]||'').trim(); if(a===b||f.sil) return;
+        const lab=f.k==='in'&&f.g?f.g:f.lab;
+        L.push(!a?`<li><b>${esc(lab)}:</b> <span class="mas">nuevo</span> ${esc(b)}</li>`:!b?`<li><b>${esc(lab)}:</b> <span class="menos">borró</span> <span class="antes">${esc(a)}</span></li>`:`<li><b>${esc(lab)}:</b> <span class="antes">${esc(a)}</span> → ${esc(b)}</li>`); }
+      else if((f.k==='chk'||f.k==='hl'||f.k==='oval')&&!f.sil){ const a=!!A[f.id], b=!!B[f.id]; if(a===b) return;
+        const g=grupos[f.g]=grupos[f.g]||{mas:[],menos:[]}; (b?g.mas:g.menos).push(f.lab); }
+      else if(f.k==='nivel'&&f.id===p.f[0].id){ const a=nivelEn(A), b=nivelEn(B); if(a!==b) L.push(`<li><b>Nivel del día:</b> ${a?`<span class="antes">${esc(a)}</span> → `:''}${b?esc(b):'<span class="menos">sin marcar</span>'}</li>`); }
+      else if(f.k==='rueda'){ const cuenta=D=>{ const c={}; Object.keys(D.p17r||{}).forEach(k=>{ const e=k.split('-')[0]; c[e]=(c[e]||0)+1; }); return c; };
+        const ca=cuenta(A), cb=cuenta(B);
+        for(let e=0;e<6;e++){ const x=ca[e]||0, y=cb[e]||0; if(x===y) continue; const nom=e<3?EMO[e]:(String(B['p17e'+e]||A['p17e'+e]||'').trim()||'Emoción '+(e+1));
+          L.push(`<li><b>${esc(nom)}:</b> ${x} → ${y} días coloreados</li>`); } }
+    });
+    Object.keys(grupos).forEach(g=>{ const x=grupos[g];
+      L.unshift(`<li><b>${esc(g)}:</b> ${x.mas.length?`<span class="mas">marcó</span> ${esc(x.mas.join(', '))}`:''}${x.mas.length&&x.menos.length?' · ':''}${x.menos.length?`<span class="menos">desmarcó</span> ${esc(x.menos.join(', '))}`:''}</li>`); });
+    if(L.length) out.push(`<section><h4>${esc(p.t)}</h4><ul>${L.join('')}</ul></section>`);
+  });
+  return out;
+}
+$('#bAvances').onclick=()=>{
+  if(!H.length){ hoja(`<h3>Mis avances</h3><p>Todavía no hay sesiones guardadas. Al terminar cada sesión, toca «Guardar esta sesión»; así podrás comparar cómo va cambiando tu cartilla.</p>`); return; }
+  const opt=(sel)=>H.map((x,i)=>`<option value="${i}"${i===sel?' selected':''}>${esc(x.n)} · ${fechaTxt(x.f)}</option>`).join('');
+  const h=hoja(`<h3>Mis avances</h3>
+    <div class="linea">${H.map(x=>`<div class="ses"><b>${esc(x.n)}</b><span>${fechaTxt(x.f)} · ${hechasEn(x.d)} de ${PAG.filter(p=>p.hint).length} ejercicios${nivelEn(x.d)?' · nivel '+esc(nivelEn(x.d)):''}</span></div>`).join('')}
+      <div class="ses"><b>Ahora</b><span>${hechasEn(S)} de ${PAG.filter(p=>p.hint).length} ejercicios${nivelEn(S)?' · nivel '+esc(nivelEn(S)):''}</span></div></div>
+    <p>Compara dos momentos para ver qué cambió:</p>
+    <div class="cols"><div><label for="ca">Desde</label><select id="ca">${opt(H.length-1)}</select></div>
+      <div><label for="cb">Hasta</label><select id="cb">${opt(-1)}<option value="ahora" selected>Ahora (lo actual)</option></select></div></div>
+    <div class="cambios" id="cc"></div>`);
+  const pintar=()=>{ const a=H[+h.querySelector('#ca').value].d, vb=h.querySelector('#cb').value, b=vb==='ahora'?S:H[+vb].d;
+    const c=cambios(a,b); h.querySelector('#cc').innerHTML=c.length?c.join(''):'<p>No hay cambios entre estos dos momentos.</p>'; };
+  h.querySelector('#ca').onchange=pintar; h.querySelector('#cb').onchange=pintar; pintar();
+};
+
+/* Pasar la cartilla a otro dispositivo con un código */
+const PREF='SANA-CARTILLA1:';
+const aB64=o=>{ const by=new TextEncoder().encode(JSON.stringify(o)); let bin=''; by.forEach(x=>bin+=String.fromCharCode(x)); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
+const deB64=t=>{ const b=t.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(b+'==='.slice((b.length+3)%4)); return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))); };
+$('#bLlevar').onclick=()=>{
+  const cod=PREF+aB64({v:1,libro:'ansiedad',s:S,h:H});
+  const msg=`🔁 Mi cartilla de ansiedad (pégala en «Pasar a otro dispositivo» → «Recibir»):\n${cod}`;
+  const tel=(location.hash.match(/^#(\d{8,15})$/)||[])[1];
+  const h=hoja(`<h3>Pasar a otro dispositivo</h3>
+    <p><b>Enviar:</b> copia este código y ábrelo en el otro teléfono o computador. Incluye todo lo escrito y las sesiones guardadas.</p>
+    <div class="code" id="lc">${esc(cod)}</div>
+    <div class="fila"><button class="btn teal" type="button" id="lcop">📋 Copiar código</button><a class="btn pri" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?${tel?'phone='+tel+'&':''}text=${encodeURIComponent(msg)}">📲 Enviar por WhatsApp</a></div>
+    <div class="ok" id="lmsg" aria-live="polite"></div>
+    <p><b>Recibir:</b> pega aquí el código que te enviaron para seguir con esa cartilla en este dispositivo.</p>
+    <textarea id="lin" placeholder="Pega aquí el código SANA-CARTILLA1:…"></textarea>
+    <div class="fila"><button class="btn pri" type="button" id="lok">Abrir esta cartilla</button></div><div class="ok" id="lrec" aria-live="polite"></div>`);
+  h.querySelector('#lcop').onclick=()=>{ const ok=()=>h.querySelector('#lmsg').textContent='✓ Copiado.';
+    const sel=()=>{ const r=document.createRange(); r.selectNodeContents(h.querySelector('#lc')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); h.querySelector('#lmsg').textContent='Selecciona el código y cópialo.'; };
+    try{ navigator.clipboard.writeText(cod).then(ok,sel); }catch(_){ sel(); } };
+  let conf=false;
+  h.querySelector('#lok').onclick=()=>{ const t=h.querySelector('#lin').value, i=t.indexOf(PREF), m=h.querySelector('#lrec');
+    if(i<0){ m.textContent='Ese texto no tiene un código de cartilla. Copia el mensaje completo que te enviaron.'; return; }
+    let o; try{ o=deB64(t.slice(i+PREF.length).trim().split(/\s/)[0]); }catch(_){ m.textContent='El código está incompleto. Vuelve a copiarlo completo.'; return; }
+    if(!o||o.libro!=='ansiedad'){ m.textContent='Ese código es de otra cartilla.'; return; }
+    const hay=Object.keys(S).length||H.length;
+    if(hay&&!conf){ conf=true; h.querySelector('#lok').textContent='Sí, reemplazar'; m.textContent='En este dispositivo ya hay respuestas. Al abrir el código se reemplazan por las de la cartilla recibida.'; return; }
+    S=o.s||{}; H=o.h||[]; try{ localStorage.setItem(KEY,JSON.stringify(S)); localStorage.setItem(KEYH,JSON.stringify(H)); }catch(_){} location.reload(); };
+};
+pintarUltima();
 </script>
