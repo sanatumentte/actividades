@@ -1,0 +1,308 @@
+<meta charset="utf-8">
+<title>Ansiedad · Libro de actividades</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Caveat:wght@600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+  :root{
+    --petroleo:#165a6c; --verde:#047578; --salvia:#81a9a7; --arena:#dabb81; --beige:#e7decf;
+    --terracota:#c9987c; --papel:#fbf6ef; --tinta:#1f3d45; --suave:#5d7a7f; --rojo:#e0525f;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papel);color:var(--tinta);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+  .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:12px;justify-content:space-between;padding:10px 16px;background:rgba(251,246,239,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--beige)}
+  .top b{font-family:"DM Serif Display",Georgia,serif;font-weight:400;color:var(--petroleo);font-size:1.15rem}
+  .top small{display:block;color:var(--suave);font-size:.78rem;font-weight:700}
+  .btn{border:none;border-radius:999px;padding:11px 20px;font:inherit;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .btn.pri{background:var(--arena);color:#3a2a0c;box-shadow:0 6px 18px rgba(218,187,129,.45)}
+  .btn.teal{background:var(--verde);color:#fff}
+  .btn.sec{background:#fff;color:var(--petroleo);border:2px solid var(--beige)}
+  .btn:focus-visible{outline:3px solid var(--arena);outline-offset:2px}
+  .top .btn{white-space:nowrap;padding:9px 16px;font-size:.92rem}
+  main{max-width:760px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:26px}
+  .intro{background:#fff;border:1px solid var(--beige);border-radius:18px;padding:18px 20px}
+  .intro .eyebrow{font-family:"Caveat",cursive;font-size:1.5rem;color:var(--terracota);line-height:1}
+  .intro h1{font-family:"DM Serif Display",Georgia,serif;font-weight:400;color:var(--petroleo);font-size:clamp(1.8rem,5vw,2.4rem);line-height:1.1;margin:.15em 0 .3em}
+  .intro p{margin:.3em 0;color:var(--suave)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chips a{font-size:.82rem;font-weight:700;color:var(--petroleo);background:#eef5f4;border:1px solid #d5e6e3;border-radius:999px;padding:5px 11px;text-decoration:none}
+  .chips a.ok{background:#e1f1e6;border-color:#b8dcc3}
+  .chips a.ok::before{content:"✓ ";color:#2f7d4a}
+  figure{margin:0;display:grid;gap:8px;scroll-margin-top:70px}
+  .hint{display:flex;gap:8px;align-items:flex-start;font-weight:700;color:var(--petroleo);font-size:.92rem;background:#fff;border:1px solid var(--beige);border-left:4px solid var(--verde);border-radius:12px;padding:8px 12px}
+  .pg{position:relative;container-type:inline-size;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(22,90,108,.12);background:#fff;aspect-ratio:648/792}
+  .pg img{display:block;width:100%;height:100%}
+  /* Campos sobre la página: coordenadas en puntos del PDF (648 × 792) */
+  .f{position:absolute;left:calc(var(--x)/648*100%);top:calc(var(--y)/792*100%);width:calc(var(--w)/648*100%);height:calc(var(--h)/792*100%);--u:calc(100cqw/648)}
+  textarea.f,input.f{border:1.5px dashed rgba(22,90,108,.38);border-radius:calc(5*var(--u));background:rgba(255,255,255,.45);color:#23343a;font-family:"Nunito",sans-serif;font-weight:600;font-size:max(calc(var(--fs,9.5)*var(--u)),7px);line-height:1.3;padding:calc(3*var(--u)) calc(4*var(--u));resize:none;outline:none;transition:background .15s,border-color .15s}
+  input.f{border-width:0 0 0 0;background:transparent;padding:0 calc(2*var(--u))}
+  textarea.f:hover,input.f:hover{background:rgba(255,255,255,.7)}
+  textarea.f:focus,input.f:focus{background:rgba(255,255,255,.92);border:1.5px solid var(--verde);box-shadow:0 0 0 3px rgba(4,117,120,.18)}
+  textarea.f::placeholder,input.f::placeholder{color:rgba(22,90,108,.45);font-weight:600}
+  textarea.f.clear{background:transparent;border-color:transparent}
+  textarea.f.clear:hover{border-color:rgba(22,90,108,.3)}
+  textarea.f.lines{border:none;background:transparent;line-height:calc(35*var(--u));padding:0 calc(3*var(--u));font-size:max(calc(12*var(--u)),8px)}
+  button.f{background:transparent;border:0;padding:0;cursor:pointer;border-radius:calc(4*var(--u));transition:background .15s}
+  button.f:hover{background:rgba(4,117,120,.08)}
+  button.f:focus-visible{outline:2px solid var(--verde);outline-offset:1px}
+  button.f .mk{position:absolute;top:50%;translate:0 -50%;width:calc(15*var(--u));height:calc(15*var(--u));display:grid;place-items:center;color:var(--rojo);font-weight:900;font-size:calc(15*var(--u));line-height:1;opacity:0;transition:opacity .15s}
+  button.f[aria-pressed="true"] .mk{opacity:1}
+  button.f.chk[aria-pressed="true"]{background:rgba(224,82,95,.08)}
+  button.f.hl[aria-pressed="true"]{background:rgba(255,213,79,.55);mix-blend-mode:multiply}
+  button.f.oval{border-radius:50%}
+  button.f.oval[aria-pressed="true"]{background:rgba(233,122,110,.28);box-shadow:inset 0 0 0 calc(3*var(--u)) rgba(224,82,95,.75)}
+  button.f.oval[aria-pressed="true"]::after{content:"✓";position:absolute;top:calc(2*var(--u));right:calc(12*var(--u));color:var(--rojo);font-weight:900;font-size:calc(14*var(--u))}
+  button.f.nivel{border-radius:calc(4*var(--u))}
+  button.f.nivel[aria-pressed="true"]{box-shadow:inset 0 0 0 calc(3*var(--u)) var(--petroleo)}
+  button.f.nivel[aria-pressed="true"]::after{content:"Hoy estoy aquí";position:absolute;right:calc(8*var(--u));top:calc(6*var(--u));background:var(--petroleo);color:#fff;font-weight:800;font-size:calc(8.5*var(--u));padding:calc(2*var(--u)) calc(7*var(--u));border-radius:999px}
+  svg.rueda{position:absolute;inset:0;width:100%;height:100%}
+  svg.rueda path{fill:transparent;cursor:pointer;transition:fill .12s}
+  svg.rueda path:hover{fill:rgba(4,117,120,.12)}
+  svg.rueda path:focus-visible{outline:none;stroke:var(--verde);stroke-width:1.5}
+  .enviar{background:#fff;border:1px solid var(--beige);border-radius:18px;padding:18px 20px;display:grid;gap:12px;scroll-margin-top:70px}
+  .enviar h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;color:var(--petroleo);font-size:1.6rem;margin:0}
+  .enviar p{margin:0;color:var(--suave)}
+  .fila{display:flex;flex-wrap:wrap;gap:10px}
+  .ok{color:var(--verde);font-weight:800;min-height:1.5em}
+  .code{white-space:pre-wrap;font-size:.8rem;background:var(--papel);border:2px dashed var(--salvia);border-radius:12px;padding:12px;max-height:220px;overflow:auto;color:var(--tinta);user-select:all}
+  .note{background:#fdf0ea;border:1px solid #efd3c4;color:#7a4a33;border-radius:14px;padding:12px 14px;font-size:.92rem}
+  .foot{font-size:.78rem;color:var(--suave);text-align:center}
+  /* Editor grande para teléfonos */
+  .hoja{position:fixed;inset:0;z-index:50;background:rgba(15,40,48,.45);display:flex;align-items:flex-end;justify-content:center}
+  .hoja>div{background:var(--papel);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;box-shadow:0 -10px 30px rgba(0,0,0,.2)}
+  .hoja label{font-weight:800;color:var(--petroleo)}
+  .hoja textarea{width:100%;min-height:150px;border:2px solid var(--salvia);border-radius:14px;padding:12px 14px;font:inherit;color:var(--tinta);resize:vertical;outline:none;background:#fff}
+  .hoja textarea:focus{box-shadow:0 0 0 4px rgba(129,169,167,.25)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div><b>Ansiedad</b><small id="prog">Libro de actividades</small></div>
+  <a class="btn pri" href="#enviar">Enviar respuestas</a>
+</header>
+
+<main id="main">
+  <section class="intro">
+    <div class="eyebrow">Para hacer con calma</div>
+    <h1>Ansiedad: libro de actividades</h1>
+    <p>Lee cada página y completa los ejercicios aquí mismo: escribe en los recuadros, marca las casillas y toca las opciones. Lo que escribes se guarda solo en este dispositivo.</p>
+    <p>Al final puedes enviarle tus respuestas a tu psicóloga.</p>
+    <div class="chips" id="chips"></div>
+  </section>
+  <div id="paginas" style="display:grid;gap:26px"></div>
+  <section class="enviar" id="enviar">
+    <h2>Envía tus respuestas</h2>
+    <p id="resumen">Cuando termines (o cuando quieras), copia tus respuestas y pégalas en WhatsApp para tu psicóloga.</p>
+    <div class="fila">
+      <button class="btn teal" id="copiar" type="button">📋 Copiar mis respuestas</button>
+      <a class="btn pri" id="wa" href="#" target="_blank" rel="noopener">📲 Abrir WhatsApp</a>
+    </div>
+    <div class="ok" id="okc" aria-live="polite"></div>
+    <details><summary class="foot" style="text-align:left;cursor:pointer">Ver el texto que se va a enviar</summary><div class="code" id="code"></div></details>
+    <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>
+    <div class="fila"><button class="btn sec" id="borrar" type="button">Borrar mis respuestas</button><span class="ok" id="okb"></span></div>
+  </section>
+  <p class="foot">Tus respuestas no se guardan en internet: solo las recibe tu psicóloga cuando se las envías.</p>
+</main>
+
+<script>
+"use strict";
+/* Cada página: número, título (para el resumen), pista y campos.
+   Campos en puntos del PDF (x, y, ancho, alto). Tipos:
+   ta = recuadro de texto · in = línea de texto · chk = casilla · hl = frase para resaltar
+   oval = óvalo para marcar · nivel = opción única del grupo · rueda = rueda de emociones */
+const PAG=[];
+const P=(n,t,hint,f)=>PAG.push({n,t,hint,f:f||[]});
+const ta=(id,lab,x,y,w,h,o)=>Object.assign({k:'ta',id,lab,x,y,w,h},o||{});
+const inp=(id,lab,x,y,w,h,o)=>Object.assign({k:'in',id,lab,x,y,w,h:h||16},o||{});
+
+P(1,'Portada');P(2,'¿Qué es la ansiedad?');P(3,'Debido a ansiedad');
+P(4,'Comprendiendo su ansiedad','✍️ Escribe dentro de cada recuadro qué factores han influido en tu ansiedad.',
+  [['amb','El medio ambiente',216,291],['qui','Química cerebral',299,376],['per','Tipo de personalidad',389,464],['pen','Pensamientos',475,551],['com','Comportamiento',562,637],['gen','Genética',648,724]]
+  .map(([id,lab,y0,y1])=>ta('p4'+id,lab,80,y0+20,478,y1-y0-25,{fs:10})));
+P(5,'Ansiedad iceberg');
+P(6,'Ansiedad iceberg: llena tu propio iceberg','✍️ Llena tu propio iceberg: arriba lo que se ve; dentro del agua lo que no se ve.',[
+  ta('p6ves','Lo que ves',18,250,185,88,{fs:10}),
+  ta('p6nov','Lo que no ves',232,385,188,175,{fs:10})]);
+{ const fis=['Dolores musculares','Dolores de cabeza','Náuseas','Dolor de espalda','Presión arterial alta, hinchazón','Dolores de estómago','Sensación de malestar','Cansancio','Enfermarse constantemente','Pérdida de peso','Dolor en el pecho'];
+  const cy1=[244,262,279,297,315,333,351,369,389,407,425];
+  const pens=[['¿Y si no lo logré?',234,18],['Me daría un infarto.',252,18],['La gente se reiría de mí si me equivoco durante la presentación.',270,35],['Me volvería loco si no pudiera dejar de sentirme tan ansioso.',306,35],['Las cosas no saldrían bien.',342,18]];
+  const comp=[['Aislamiento',533],['Mala higiene',550],['Trastornos del sueño',568],['Cambios en la apariencia',585],['Asuntos personales',603],['No devolver llamadas o mensajes',621],['Dejar de hacer cosas que antes disfrutabas',648,34],['Falta de ejercicio',677],['Moverse lentamente',695]];
+  const sent=['Abrumado','Desesperanzado','Vacío','Insensible','Frustrado','Irritado','Triste','Culpable','Afligido','Preocupado','Enojado'];
+  const cy2=[526,544,562,580,598,616,634,652,671,689,707];
+  P(7,'Síntomas de ansiedad (lista de verificación)','☑️ Toca las casillas con las que te identificas. En «Pensamientos», toca las frases para resaltarlas.',[
+    ...fis.map((l,i)=>({k:'chk',id:'p7f'+i,g:'Síntomas físicos',lab:l,x:97,y:cy1[i]-9,w:210,h:18,mx:2})),
+    ...pens.map(([l,y,h],i)=>({k:'hl',id:'p7p'+i,g:'Pensamientos',lab:l,x:328,y,w:222,h})),
+    ...comp.map(([l,y,h],i)=>({k:'chk',id:'p7c'+i,g:'Comportamiento',lab:l,x:97,y:y-(h||18)/2,w:210,h:h||18,mx:2})),
+    {k:'in',id:'p7cx',g:'Comportamiento',lab:'Otro',x:116,y:713-9,w:190,h:18},
+    ...sent.map((l,i)=>({k:'chk',id:'p7s'+i,g:'Sentimientos',lab:l,x:326,y:cy2[i]-9,w:226,h:18,mx:210}))]);
+  P(8,'Síntomas de ansiedad (tu propia lista)','✍️ Escribe tus propios síntomas y marca la casilla de cada uno.',[
+    ...cy1.map((c,i)=>({k:'chk',id:'p8fc'+i,g:'Síntomas físicos',lab:'✓',x:99,y:c-9,w:16,h:18,mx:1,sil:true})),
+    ...cy1.map((c,i)=>inp('p8f'+i,'Síntomas físicos',118,c-9,188,18,{fs:9})),
+    ta('p8p','Pensamientos',329,231,222,207,{fs:10}),
+    ...[533,550,568,585,603,621,639,657,677,695,713].map((c,i)=>({k:'chk',id:'p8cc'+i,g:'Comportamiento',lab:'✓',x:97,y:c-9,w:16,h:18,mx:1,sil:true})),
+    ...[533,550,568,585,603,621,639,657,677,695,713].map((c,i)=>inp('p8c'+i,'Comportamiento',116,c-9,190,18,{fs:9})),
+    ...cy2.map((c,i)=>({k:'chk',id:'p8sc'+i,g:'Sentimientos',lab:'✓',x:534,y:c-9,w:17,h:18,mx:1,sil:true})),
+    ...cy2.map((c,i)=>inp('p8s'+i,'Sentimientos',330,c-9,200,18,{fs:9}))]);
+}
+P(9,'Ansiedad y mi cuerpo','👆 Toca los síntomas que tú sientes cuando tienes ansiedad.',
+  [['Transpiración',107,229,118,59],['Latidos cardíacos rápidos',108,310,120,61],['Hormigueo',112,400,120,57],['Mareo',112,486,120,58],['Músculos tensos',107,572,118,62],['Respiración rápida',88,649,119,58],['Dolor de cabeza',192,693,119,57],['Irritabilidad',326,693,120,56],['Orinar',441,661,119,57],['Piernas temblorosas',432,569,119,61],['Náuseas',433,481,121,60],['Mariposas en el estómago',441,400,119,61],['Temblor',432,311,119,60],['Boca seca',432,234,119,60]]
+  .map(([l,x,y,w,h],i)=>({k:'oval',id:'p9o'+i,g:'Síntomas que siento',lab:l,x,y,w,h})));
+P(10,'El ciclo de la ansiedad');P(11,'El ciclo de la ansiedad (cómo revertirlo)');
+{ const B=[['bue','Cosas en las que soy bueno',[269,297,329],115,182],['elo','Elogios que ya he recibido',[267,296,328],372,182],['gus','Lo que me gusta de mí mismo',[398,428,459],115,182],['des','Desafíos que superé',[398,428,459],366,181],['ayu','Cómo ya he ayudado a otras personas',[531,559,591],115,182],['ami','Soy un buen amigo porque',[532,561,593],369,182],['log','Mis mayores logros',[663,692,724],119,181],['uni','Cosas que me hacen único',[663,692,724],373,182]];
+  P(12,'Logros','✍️ Escribe sobre cada línea: tus logros, grandes o pequeños, cuentan.',
+    B.flatMap(([id,lab,ys,x,w])=>ys.map((y,j)=>inp('p12'+id+j,lab,x,y-17,w,16,{fs:10})))); }
+{ const col=[['Escenario / evento',59],['Gatillo',193],['Acción / respuesta',326],['Resultado / consecuencia',459]];
+  const fil=[222,292,361,432,502,572,642,713];
+  P(13,'Identifica tu patrón','✍️ Llena cada fila con una situación: qué pasó, qué la disparó, qué hiciste y qué resultó.',
+    fil.flatMap((y,r)=>col.map(([lab,x],c)=>ta(`p13r${r}c${c}`,`Fila ${r+1} · ${lab}`,x+2,y+2,126,55,{fs:8,cls:'clear'})))); }
+P(14,'Reformulando pensamientos','✍️ Al lado de cada pensamiento, escribe una forma mejor de verlo.',
+  [['¿Y si cometo un error?',335],['No conoceré a nadie en la fiesta.',401],['No quiero hacer eso.',467],['A nadie en la escuela le caigo bien.',533],['Soy un fracaso.',603],['Seré el último.',670]]
+  .map(([l,y],i)=>ta('p14m'+i,'En lugar de «'+l+'», mejor…',342,y+2,214,52,{fs:10,cls:'clear'})));
+P(15,'Plan de seguridad','✍️ Completa tu plan de seguridad para tenerlo a mano en un momento difícil.',[
+  ta('p15cuando','Cuando me siento…',84,146,226,56,{fs:10,cls:'clear'}),
+  inp('p15cuer0','Mi cuerpo se siente como…',348,142,205,17),inp('p15cuer1','Mi cuerpo se siente como…',348,180,205,17),
+  ...[289,329,370].map((y,i)=>inp('p15ale'+i,'Señales de alerta de una crisis',96,y-18,457,17)),
+  ...[[80,454,122,54],[220,454,124,54],[82,528,122,52],[221,528,125,52]].map(([x,y,w,h],i)=>ta('p15est'+i,'Estrategias de afrontamiento que puedo utilizar',x,y,w,h,{fs:9.5,cls:'clear'})),
+  ...[[372,452,82,42],[485,449,82,42],[387,531,82,42],[500,529,82,42]].map(([x,y,w,h],i)=>ta('p15per'+i,'Personas a las que puedo llamar',x,y,w,h,{fs:9.5,cls:'clear'})),
+  ...[655,689,723].map((y,i)=>inp('p15age'+i,'Agencias profesionales que puedo contactar',92,y-18,236,17)),
+  ta('p15vale','Algo o alguien por quien valga la pena vivir',398,665,200,90,{fs:10.5,cls:'clear'})]);
+P(16,'Frases para afrontar la ansiedad');
+P(17,'Seguimiento de emociones','🎨 Toca las casillas de la rueda para colorear las emociones que sentiste cada día (el número es el día del mes). Puedes escribir tres emociones tuyas en los espacios en blanco.',[
+  inp('p17e3','Emoción 4',205,258,125,21,{fs:10,ph:'Emoción…',sil:true}),inp('p17e4','Emoción 5',205,284,125,21,{fs:10,ph:'Emoción…',sil:true}),inp('p17e5','Emoción 6',205,310,125,21,{fs:10,ph:'Emoción…',sil:true}),
+  {k:'rueda',id:'p17r'},
+  ...[668,691,715,740].map((y,i)=>inp('p17n'+i,'Notas',100,y-17,450,16,{fs:10}))]);
+P(18,'Poner los pensamientos a prueba','✍️ Escribe el pensamiento que te preocupa y ponlo a juicio: defensa, acusación y veredicto.',[
+  ta('p18pen','Pensamiento: ¿qué me preocupa?',80,148,487,84,{fs:10.5,cls:'clear'}),
+  ta('p18def','La defensa: pruebas de que puede ser cierto',80,340,225,258,{fs:10.5,cls:'clear'}),
+  ta('p18acu','La acusación: pruebas de que no puede ser cierto',343,340,225,258,{fs:10.5,cls:'clear'}),
+  ta('p18ver','El veredicto del juez',80,677,487,54,{fs:10.5,cls:'clear'})]);
+P(19,'Desencadenantes de la ansiedad','✍️ Escribe una situación que te dispare la ansiedad, lo que piensas, lo que sientes y lo que puedes hacer.',[
+  ta('p19suc','Cuando esto sucede',86,251,477,117,{fs:10.5,cls:'clear'}),
+  ta('p19pie','Esto es lo que pienso',86,415,227,144,{fs:10.5,cls:'clear'}),
+  ta('p19sie','Así es como me siento',336,415,227,144,{fs:10.5,cls:'clear'}),
+  ta('p19hac','¿Qué puedo hacer en esta situación para sentirme mejor?',86,602,477,133,{fs:10.5,cls:'clear'})]);
+P(20,'Escala de ansiedad','👆 Toca el nivel en el que te sientes hoy.',
+  [['1 · Mínimo',79,128],['2 · Vivir',220,127],['3 · Moderado',360,127],['4 · Fuerte',500,128],['5 · Debilitante',639,128]]
+  .map(([l,y,h],i)=>({k:'nivel',id:'p20n'+i,g:'p20',lab:l,x:61,y,w:522,h})));
+P(21,'Estrategias para afrontar','✍️ Para cada nivel, escribe cosas que puedes hacer para ayudar a reducir tu ansiedad.',
+  [['Nivel 1 · Mínimo',126,92],['Nivel 2 · Vivir',260,93],['Nivel 3 · Moderado',396,92],['Nivel 4 · Fuerte',530,93],['Nivel 5 · Debilitante',664,93]]
+  .map(([l,y,h],i)=>ta('p21n'+i,l,128,y,438,h,{fs:10.5,cls:'clear'})));
+{ const cols=[['Aumentar',80],['Reducir / detener',253],['¿Cómo cambiará esto mi comportamiento?',422]];
+  const filas=[['Comportamiento',196],['Pensamientos',392],['Sentimientos / emociones',592]];
+  P(22,'Plan de acción para la ansiedad','✍️ Completa cada recuadro: qué quieres aumentar, qué quieres reducir y cómo cambiará tu comportamiento.',
+    filas.flatMap(([f,y],r)=>cols.map(([c,x],k)=>ta(`p22r${r}c${k}`,`${f} · ${c}`,x,y,148,104,{fs:9.5,cls:'clear'})))); }
+P(23,'Cosas que no puedo controlar');
+P(24,'Círculo de preocupación','✍️ Arriba, escribe lo que te preocupa y no controlas. Abajo, lo que sí está en tu círculo de control.',[
+  ta('p24pre','Mi círculo de preocupación',258,222,140,132,{fs:10,cls:'clear',ph:'Lo que me preocupa…'}),
+  ta('p24con','Mi círculo de control',262,515,158,146,{fs:10,cls:'clear',ph:'Lo que sí puedo controlar…'})]);
+P(25,'Químicos de la felicidad');
+P(26,'Oxitocina','✍️ Escribe 3 maneras de liberar oxitocina: cómo, dónde, cuándo y con quién.',[ta('p26','3 maneras de liberar oxitocina',86,500,468,230,{fs:11,cls:'clear'})]);
+P(27,'Dopamina','✍️ Escribe 3 maneras de liberar dopamina: cómo, dónde, cuándo y con quién.',[ta('p27','3 maneras de liberar dopamina',86,500,468,230,{fs:11,cls:'clear'})]);
+P(28,'Endorfinas','✍️ Anota 3 maneras de liberar endorfinas: cómo, dónde, cuándo y con quién.',[ta('p28','3 maneras de liberar endorfinas',86,502,468,228,{fs:11,cls:'clear'})]);
+P(29,'Serotonina','✍️ Anota 3 maneras de liberar serotonina: cómo, dónde, cuándo y con quién.',[ta('p29','3 maneras de liberar serotonina',86,500,468,230,{fs:11,cls:'clear'})]);
+P(30,'Reflexión','✍️ Escribe tu reflexión final: qué aprendiste y qué te llevas de este libro.',[ta('p30','Reflexión',117,152,414,560,{cls:'lines',ph:''})]);
+
+/* ---------- Estado guardado en este dispositivo ---------- */
+const KEY='sana_ansiedad_libro';
+let S={}; try{ S=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(_){ S={}; }
+let tGuardar; const guardar=()=>{ clearTimeout(tGuardar); tGuardar=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){} actualizar(); },250); };
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pos=f=>`--x:${f.x};--y:${f.y};--w:${f.w};--h:${f.h}${f.fs?';--fs:'+f.fs:''}`;
+const movil=()=>matchMedia('(max-width: 700px)').matches;
+
+/* Rueda de emociones: centro (335,385), anillos de 26 pt desde r=52; 31 días de 9° desde arriba, en sentido horario */
+const RUEDA={cx:335,cy:385,r0:52,dr:26,paso:9,col:['#f6c94c','#6fa8dc','#b39ddb','#8fd19e','#f4a7b9','#f6a96b']};
+const EMO=['Feliz','Triste','Preocupado'];
+function rueda(){
+  const {cx,cy,r0,dr,paso}=RUEDA, pt=(r,a)=>{ const t=a*Math.PI/180; return [(cx+r*Math.sin(t)).toFixed(2),(cy-r*Math.cos(t)).toFixed(2)]; };
+  let s='';
+  for(let e=0;e<6;e++){ const ro=r0+dr*(6-e), ri=ro-dr;   // e=0 (Feliz) es el anillo de afuera
+    for(let d=0;d<31;d++){ const a0=d*paso, a1=a0+paso, [x1,y1]=pt(ro,a0),[x2,y2]=pt(ro,a1),[x3,y3]=pt(ri,a1),[x4,y4]=pt(ri,a0);
+      s+=`<path tabindex="0" role="checkbox" data-e="${e}" data-d="${d+1}" d="M${x1} ${y1}A${ro} ${ro} 0 0 1 ${x2} ${y2}L${x3} ${y3}A${ri} ${ri} 0 0 0 ${x4} ${y4}Z"><title>Día ${d+1}</title></path>`; } }
+  return `<svg class="rueda" viewBox="0 0 648 792" aria-label="Rueda de emociones">${s}</svg>`;
+}
+function pintarRueda(svg){ const R=S.p17r||{}; svg.querySelectorAll('path').forEach(p=>{ const on=!!R[p.dataset.e+'-'+p.dataset.d];
+  p.style.fill=on?RUEDA.col[p.dataset.e]:''; p.style.fillOpacity=on?.85:''; p.setAttribute('aria-checked',on); }); }
+
+/* ---------- Pintar páginas ---------- */
+function campo(f){
+  const v=S[f.id];
+  if(f.k==='ta') return `<textarea class="f ${f.cls||''}" id="${f.id}" style="${pos(f)}" aria-label="${esc(f.lab)}" placeholder="${esc(f.ph!=null?f.ph:'Escribe aquí…')}">${esc(v||'')}</textarea>`;
+  if(f.k==='in') return `<input class="f" id="${f.id}" style="${pos(f)}" aria-label="${esc(f.lab)}" placeholder="${esc(f.ph||'')}" value="${esc(v||'')}">`;
+  if(f.k==='rueda') return rueda();
+  const cls={chk:'chk',hl:'hl',oval:'oval',nivel:'nivel'}[f.k];
+  const on=f.k==='nivel'? S.p20===f.id : !!v;
+  return `<button type="button" class="f ${cls}" id="${f.id}" style="${pos(f)}" aria-pressed="${on}" aria-label="${esc(f.lab)}">${f.k==='chk'?`<span class="mk" style="left:calc(${f.mx}*var(--u))">✓</span>`:''}</button>`;
+}
+const cont=$('#paginas');
+cont.innerHTML=PAG.map(p=>`<figure id="p${p.n}">${p.hint?`<div class="hint">${esc(p.hint)}</div>`:''}
+  <div class="pg"><img src="p${String(p.n).padStart(2,'0')}.jpg" alt="Página ${p.n}: ${esc(p.t)}" loading="${p.n<3?'eager':'lazy'}" width="1200" height="1467">${p.f.map(campo).join('')}</div></figure>`).join('');
+$('#chips').innerHTML=PAG.filter(p=>p.hint).map(p=>`<a href="#p${p.n}" data-p="${p.n}">${esc(p.t.split(':')[0].replace(' (lista de verificación)','').replace(' (tu propia lista)',' II'))}</a>`).join('');
+document.querySelectorAll('svg.rueda').forEach(pintarRueda);
+
+/* Escritura */
+cont.addEventListener('input',e=>{ const el=e.target; if(!el.classList.contains('f')) return; S[el.id]=el.value; guardar(); });
+/* Casillas, frases, óvalos y niveles */
+cont.addEventListener('click',e=>{
+  const b=e.target.closest('button.f'); if(b){ const on=b.getAttribute('aria-pressed')!=='true';
+    if(b.classList.contains('nivel')){ document.querySelectorAll('button.nivel').forEach(x=>x.setAttribute('aria-pressed',x===b&&on)); S.p20=on?b.id:''; }
+    else { b.setAttribute('aria-pressed',on); S[b.id]=on; }
+    guardar(); return; }
+  const p=e.target.closest('svg.rueda path'); if(p){ const R=S.p17r=S.p17r||{}, k=p.dataset.e+'-'+p.dataset.d; if(R[k]) delete R[k]; else R[k]=1; pintarRueda(p.ownerSVGElement); guardar(); }
+});
+cont.addEventListener('keydown',e=>{ const p=e.target.closest&&e.target.closest('svg.rueda path'); if(p&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); p.dispatchEvent(new MouseEvent('click',{bubbles:true})); } });
+
+/* En el teléfono, los recuadros se abren en un editor grande para escribir cómodo */
+cont.addEventListener('focusin',e=>{ const el=e.target; if(!movil()||!el.matches('textarea.f,input.f')) return; el.blur(); abrirHoja(el); });
+function abrirHoja(el){
+  const h=document.createElement('div'); h.className='hoja';
+  h.innerHTML=`<div role="dialog" aria-modal="true" aria-labelledby="hl"><label id="hl" for="ht">${esc(el.getAttribute('aria-label'))}</label><textarea id="ht" placeholder="Escribe aquí…">${esc(el.value)}</textarea><div class="fila" style="justify-content:flex-end"><button class="btn pri" type="button">Listo</button></div></div>`;
+  document.body.appendChild(h); const t=h.querySelector('textarea'); t.focus();
+  t.addEventListener('input',()=>{ el.value=t.value; S[el.id]=t.value; guardar(); });
+  const cerrar=()=>h.remove(); h.querySelector('button').onclick=cerrar; h.addEventListener('click',e=>{ if(e.target===h) cerrar(); });
+}
+
+/* ---------- Resumen para enviar ---------- */
+function resumen(){
+  const out=[];
+  PAG.forEach(p=>{ const L=[]; const grupos={};
+    p.f.forEach(f=>{
+      if(f.k==='ta'||f.k==='in'){ const v=String(S[f.id]||'').trim(); if(!v||f.sil) return;
+        if(p.n===8&&f.k==='in'){ const c=S[f.id.replace(/(\d+)$/,'c$1')]; (grupos[f.lab]=grupos[f.lab]||[]).push((c?'✓ ':'')+v); return; }
+        if(f.k==='in'&&f.g){ (grupos[f.g]=grupos[f.g]||[]).push(v); return; }
+        if(f.k==='in'){ (grupos[f.lab]=grupos[f.lab]||[]).push(v); return; }
+        L.push(`${f.lab}: ${v}`); }
+      else if((f.k==='chk'||f.k==='hl'||f.k==='oval')&&S[f.id]&&!f.sil) (grupos[f.g]=grupos[f.g]||[]).push(f.lab);
+      else if(f.k==='nivel'&&S.p20===f.id) L.push(`Hoy me siento en el nivel ${f.lab}`);
+      else if(f.k==='rueda'){ const R=S.p17r||{}, porE={};
+        Object.keys(R).forEach(k=>{ const [e,d]=k.split('-'); (porE[e]=porE[e]||[]).push(+d); });
+        Object.keys(porE).sort().forEach(e=>{ const nom=e<3?EMO[e]:(String(S['p17e'+e]||'').trim()||'Emoción '+(+e+1)); L.push(`${nom}: días ${porE[e].sort((a,b)=>a-b).join(', ')}`); }); }
+    });
+    const T=Object.keys(grupos).map(g=>`${g}: ${grupos[g].join(' · ')}`).concat(L);
+    if(T.length) out.push(`▸ ${p.t}\n`+T.join('\n'));
+  });
+  return out;
+}
+function actualizar(){
+  const r=resumen(), hechas=new Set();
+  PAG.forEach(p=>{ if(p.f.some(f=>f.k==='rueda'?Object.keys(S.p17r||{}).length:(f.k==='nivel'?S.p20===f.id:(S[f.id]&&String(S[f.id]).trim())))) hechas.add(p.n); });
+  document.querySelectorAll('#chips a').forEach(a=>a.classList.toggle('ok',hechas.has(+a.dataset.p)));
+  const tot=PAG.filter(p=>p.hint).length;
+  $('#prog').textContent=`${hechas.size} de ${tot} ejercicios hechos`;
+  const msg=r.length?`🌿 Mis respuestas — Ansiedad: libro de actividades\n\n${r.join('\n\n')}`:'';
+  $('#code').textContent=msg||'Todavía no hay respuestas.';
+  const tel=(location.hash.match(/^#(\d{8,15})$/)||[])[1];
+  $('#wa').href=`https://api.whatsapp.com/send?${tel?'phone='+tel+'&':''}text=${encodeURIComponent(msg)}`;
+  return msg;
+}
+$('#copiar').onclick=()=>{ const msg=actualizar(); if(!msg){ $('#okc').textContent='Todavía no has escrito nada.'; return; }
+  const sel=()=>{ $('details').open=true; const r=document.createRange(); r.selectNodeContents($('#code')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $('#okc').textContent='Selecciona el texto de abajo y cópialo.'; };
+  try{ navigator.clipboard.writeText(msg).then(()=>{ $('#okc').textContent='✓ Copiado. Ahora pégalo en WhatsApp para tu psicóloga.'; },sel); }catch(_){ sel(); } };
+let confirmar=false;
+$('#borrar').onclick=()=>{ if(!confirmar){ confirmar=true; $('#borrar').textContent='Sí, borrar todo'; $('#okb').textContent='¿Seguro? Esto borra todo lo que escribiste.'; return; }
+  S={}; try{ localStorage.removeItem(KEY); }catch(_){} location.reload(); };
+actualizar();
+</script>

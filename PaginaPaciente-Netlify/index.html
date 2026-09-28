@@ -230,8 +230,10 @@ const RECURSOS=[
 /* ---------- Biblioteca de recursos (se abre con #recursos o sin enlace) ---------- */
 const DESC_BASE=['Cómo se conectan lo que pasa, lo que piensas, lo que sientes y lo que haces.','Paso a paso para revisar un pensamiento que duele.','Por qué evitar alimenta el miedo, y cómo salir del círculo.','Cuando no hay ganas: pequeñas acciones que devuelven el ánimo.','Mirar tus pensamientos sin creerles todo.','Encontrar la dirección de lo que de verdad te importa.','Observar el presente con curiosidad y sin juzgar.','Tratarte como tratarías a alguien que quieres.'];
 DESC_BASE.forEach((d,i)=>{ if(RECURSOS[i]&&!RECURSOS[i].desc) RECURSOS[i].desc=d; });
+/* Libros completos (páginas del PDF original con ejercicios interactivos) */
+const LIBROS={libroAnsiedad:{titulo:'Ansiedad: libro de actividades',desc:'El cuaderno completo de 30 páginas, con sus ejercicios para escribir y marcar aquí mismo.',href:'recursos/ansiedad/',meta:'📘 30 páginas · ✍️ 21 ejercicios'}};
 const CATEGORIAS=[
-  {k:'ansiedad',n:'Ansiedad',ic:'🌊',c:'#047578',bg:'#e3f1ef',d:'Para entender tu ansiedad, calmar el cuerpo y poner a prueba los «¿y si…?».',r:[8,2,9,10,11,12,13,14]},
+  {k:'ansiedad',n:'Ansiedad',ic:'🌊',c:'#047578',bg:'#e3f1ef',d:'Para entender tu ansiedad, calmar el cuerpo y poner a prueba los «¿y si…?».',r:['libroAnsiedad',8,2,9,10,11,12,13,14]},
   {k:'depresion',n:'Depresión',ic:'🌅',c:'#a4712f',bg:'#f8eedc',d:'Para cuando el ánimo pesa: pequeños pasos, pensamientos más justos y cuidado propio.',r:[3,0,1,15,16,17,18]},
   {k:'relaciones',n:'Relaciones',ic:'🤝',c:'#165a6c',bg:'#e2edf0',d:'Para vincularte desde la calma: co-regulación, comunicación y trampas de pensamiento.',r:[19,20,21]},
   {k:'autoestima',n:'Autoestima',ic:'🌱',c:'#4f7f5a',bg:'#e7f1e8',d:'Para conocerte, reconocer tus fortalezas y hablarte con cariño.',r:[7,22,23,24,25,26,5]},
@@ -864,7 +866,8 @@ function renderBiblioteca(){
   document.title='Recursos · Sana tu Mentte';
   $('#bar').innerHTML=''; $('#count').textContent=''; $('#scene').innerHTML=escena('papel',0);
   let abiertas=[]; try{ abiertas=JSON.parse(sessionStorage.getItem('sana_bib')||'[]'); }catch(_){}
-  const item=i=>{ const r=RECURSOS[i], ej=r.slides.filter(x=>typeof x!=='string'&&x.k!=='resp').length, resp=r.slides.some(x=>x&&x.k==='resp'), tj=r.slides.filter(x=>typeof x==='string').length;
+  const item=i=>{ if(LIBROS[i]){ const L=LIBROS[i]; return `<a class="rec" href="${L.href}" data-t="${esc(sinTildes(L.titulo+' '+L.desc))}"><span class="rt">${esc(L.titulo)}</span><span class="rd">${esc(L.desc)}</span><span class="rm">${L.meta}</span></a>`; }
+    const r=RECURSOS[i], ej=r.slides.filter(x=>typeof x!=='string'&&x.k!=='resp').length, resp=r.slides.some(x=>x&&x.k==='resp'), tj=r.slides.filter(x=>typeof x==='string').length;
     const meta=[tj?`${tj} tarjeta${tj>1?'s':''}`:'',ej?`✍️ ${ej} ejercicio${ej>1?'s':''}`:'',resp?'🫁 respiración guiada':''].filter(Boolean).join(' · ');
     return `<a class="rec" href="#r.${i}" data-t="${esc(sinTildes(r.titulo+' '+(r.desc||'')+' '+r.slides.map(x=>typeof x==='string'?x:x.q).join(' ')))}"><span class="rt">${esc(r.titulo)}</span><span class="rd">${esc(r.desc||'')}</span><span class="rm">${meta}</span></a>`; };
   $('#body').innerHTML=`<div class="eyebrow">Biblioteca</div><h1>Recursos para ti</h1>
