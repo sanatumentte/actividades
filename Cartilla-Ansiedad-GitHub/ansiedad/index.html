@@ -59,8 +59,10 @@
   button.f.nivel{border-radius:calc(4*var(--u))}
   button.f.nivel[aria-pressed="true"]{box-shadow:inset 0 0 0 calc(3*var(--u)) var(--petroleo)}
   button.f.nivel[aria-pressed="true"]::after{content:"Hoy estoy aquí";position:absolute;right:calc(8*var(--u));top:calc(6*var(--u));background:var(--petroleo);color:#fff;font-weight:800;font-size:calc(8.5*var(--u));padding:calc(2*var(--u)) calc(7*var(--u));border-radius:999px}
-  svg.rueda{position:absolute;inset:0;width:100%;height:100%}
-  svg.rueda path{fill:transparent;cursor:pointer;transition:fill .12s}
+  input.f.emo{background:#fff;text-align:center;font-weight:800}
+  input.f.emo::placeholder{color:#1f3d45;font-weight:800;text-transform:uppercase}
+  svg.rueda{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}   /* la rueda no tapa los recuadros «Emoción…» */
+  svg.rueda path{fill:transparent;cursor:pointer;transition:fill .12s;pointer-events:auto}
   svg.rueda path:hover{fill:rgba(4,117,120,.12)}
   svg.rueda path:focus-visible{outline:none;stroke:var(--verde);stroke-width:1.5}
   .enviar{background:#fff;border:1px solid var(--beige);border-radius:18px;padding:18px 20px;display:grid;gap:12px;scroll-margin-top:70px}
@@ -206,7 +208,8 @@ P(15,'Plan de seguridad','✍️ Completa tu plan de seguridad para tenerlo a ma
   ...[655,689,723].map((y,i)=>inp('p15age'+i,'Agencias profesionales que puedo contactar',92,y-18,236,17)),
   ta('p15vale','Algo o alguien por quien valga la pena vivir',398,665,200,90,{fs:10.5,cls:'clear'})]);
 P(16,'Frases para afrontar la ansiedad');
-P(17,'Seguimiento de emociones','🎨 Toca las casillas de la rueda para colorear las emociones que sentiste cada día (el número es el día del mes). Puedes escribir tres emociones tuyas en los espacios en blanco.',[
+P(17,'Seguimiento de emociones','🎨 Toca las casillas de la rueda para colorear las emociones que sentiste cada día (el número es el día del mes). Escribe tus propias emociones: puedes cambiar Feliz, Triste y Preocupado, y llenar los espacios en blanco.',[
+  ...[['Feliz',180],['Triste',206],['Preocupado',232]].map(([n,y],i)=>inp('p17e'+i,'Emoción '+(i+1),205,y,125,21,{fs:10,ph:n,sil:true,cls:'emo'})),
   inp('p17e3','Emoción 4',205,258,125,21,{fs:10,ph:'Emoción…',sil:true}),inp('p17e4','Emoción 5',205,284,125,21,{fs:10,ph:'Emoción…',sil:true}),inp('p17e5','Emoción 6',205,310,125,21,{fs:10,ph:'Emoción…',sil:true}),
   {k:'rueda',id:'p17r'},
   ...[668,691,715,740].map((y,i)=>inp('p17n'+i,'Notas',100,y-17,450,16,{fs:10}))]);
@@ -293,7 +296,7 @@ function pintarRueda(svg){ const R=S.p17r||{}; svg.querySelectorAll('path').forE
 function campo(f){
   const v=S[f.id];
   if(f.k==='ta') return `<textarea class="f ${f.cls||''}" id="${f.id}" style="${pos(f)}" aria-label="${esc(f.lab)}" placeholder="${esc(f.ph!=null?f.ph:'Escribe aquí…')}">${esc(v||'')}</textarea>`;
-  if(f.k==='in') return `<input class="f" id="${f.id}" style="${pos(f)}" aria-label="${esc(f.lab)}" placeholder="${esc(f.ph||'')}" value="${esc(v||'')}">`;
+  if(f.k==='in') return `<input class="f${f.cls?' '+f.cls:''}" id="${f.id}" style="${pos(f)}" aria-label="${esc(f.lab)}" placeholder="${esc(f.ph||'')}" value="${esc(v||'')}">`;
   if(f.k==='rueda') return rueda();
   const cls={chk:'chk',hl:'hl',oval:'oval',nivel:'nivel'}[f.k];
   const on=f.k==='nivel'? S.p20===f.id : !!v;
@@ -341,7 +344,7 @@ function resumen(){
       else if(f.k==='nivel'&&S.p20===f.id) L.push(`Hoy me siento en el nivel ${f.lab}`);
       else if(f.k==='rueda'){ const R=S.p17r||{}, porE={};
         Object.keys(R).forEach(k=>{ const [e,d]=k.split('-'); (porE[e]=porE[e]||[]).push(+d); });
-        Object.keys(porE).sort().forEach(e=>{ const nom=e<3?EMO[e]:(String(S['p17e'+e]||'').trim()||'Emoción '+(+e+1)); L.push(`${nom}: días ${porE[e].sort((a,b)=>a-b).join(', ')}`); }); }
+        Object.keys(porE).sort().forEach(e=>{ const nom=String(S['p17e'+e]||'').trim()||(e<3?EMO[e]:'Emoción '+(+e+1)); L.push(`${nom}: días ${porE[e].sort((a,b)=>a-b).join(', ')}`); }); }
     });
     const T=Object.keys(grupos).map(g=>`${g}: ${grupos[g].join(' · ')}`).concat(L);
     if(T.length) out.push([p.t,T]);
@@ -420,7 +423,7 @@ function cambios(A,B){
       else if(f.k==='nivel'&&f.id===p.f[0].id){ const a=nivelEn(A), b=nivelEn(B); if(a!==b) L.push(`<li><b>Nivel del día:</b> ${a?`<span class="antes">${esc(a)}</span> → `:''}${b?esc(b):'<span class="menos">sin marcar</span>'}</li>`); }
       else if(f.k==='rueda'){ const cuenta=D=>{ const c={}; Object.keys(D.p17r||{}).forEach(k=>{ const e=k.split('-')[0]; c[e]=(c[e]||0)+1; }); return c; };
         const ca=cuenta(A), cb=cuenta(B);
-        for(let e=0;e<6;e++){ const x=ca[e]||0, y=cb[e]||0; if(x===y) continue; const nom=e<3?EMO[e]:(String(B['p17e'+e]||A['p17e'+e]||'').trim()||'Emoción '+(e+1));
+        for(let e=0;e<6;e++){ const x=ca[e]||0, y=cb[e]||0; if(x===y) continue; const nom=String(B['p17e'+e]||A['p17e'+e]||'').trim()||(e<3?EMO[e]:'Emoción '+(e+1));
           L.push(`<li><b>${esc(nom)}:</b> ${x} → ${y} días coloreados</li>`); } }
     });
     Object.keys(grupos).forEach(g=>{ const x=grupos[g];
