@@ -262,10 +262,14 @@ const nombreActual=()=>C.lista.find(x=>x.id===C.actual).n;
 const conNombre=()=>nombreActual()!=='Mi cartilla';
 const KEY='sana_ansiedad_libro'+(C.actual==='yo'?'':':'+C.actual);   // 'yo' conserva la clave de la primera versión
 let S={}; try{ S=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(_){ S={}; }
-/* El enlace trae lo último guardado en el caso: en sesión (.p) manda eso; para el paciente, solo si este dispositivo está vacío (así no pierde lo que lleva) */
-if(ESTADO_ENLACE&&(EN_SESION||!Object.keys(S).length)){ try{ const b=ESTADO_ENLACE.replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+'==='.slice((b.length+3)%4));
-  const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))); if(o&&typeof o==='object'){ S=o; localStorage.setItem(KEY,JSON.stringify(S)); } }catch(_){} }
-let tGuardar; const guardar=()=>{ clearTimeout(tGuardar); tGuardar=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){} actualizar(); },250); };
+/* Cartilla compartida: el enlace trae lo último guardado en el caso (con su hora, _t).
+   Gana la versión más reciente: si el caso tiene algo más nuevo (p. ej. lo que se llenó en sesión), reemplaza lo de este dispositivo;
+   si el paciente tiene avances más nuevos sin enviar, se conservan. En sesión (.p) siempre manda el caso. */
+let ACTUALIZADA=false;
+if(ESTADO_ENLACE){ try{ const b=ESTADO_ENLACE.replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+'==='.slice((b.length+3)%4));
+  const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
+  if(o&&typeof o==='object'&&(EN_SESION||!Object.keys(S).length||(+o._t||0)>(+S._t||0))){ ACTUALIZADA=Object.keys(S).length>0&&!EN_SESION; S=o; localStorage.setItem(KEY,JSON.stringify(S)); } }catch(_){} }
+let tGuardar; const guardar=()=>{ S._t=Date.now(); clearTimeout(tGuardar); tGuardar=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){} actualizar(); },250); };
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pos=f=>`--x:${f.x};--y:${f.y};--w:${f.w};--h:${f.h}${f.fs?';--fs:'+f.fs:''}`;
@@ -498,6 +502,7 @@ pintarQuien();
 /* Sin selector de nombres ni códigos para pasar de dispositivo: cada enlace de la plataforma ya identifica al paciente y trae sus respuestas */
 $('#bLlevar').hidden=true;
 if(EN_SESION){ $('#modoSesion').hidden=false; $('#ultima').hidden=true; }
+if(ACTUALIZADA){ const n=$('#modoSesion'); n.hidden=false; n.innerHTML='✨ <b>Tu cartilla se actualizó</b> con lo más reciente que trabajaste con tu psicóloga. Sigue desde aquí y, cuando termines, envíasela.'; }
 </script>
 
 </body></html>
