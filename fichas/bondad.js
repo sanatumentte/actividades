@@ -1,0 +1,4 @@
+FICHA({clave:'bondad',titulo:'Mis actos de bondad',corto:'Actos de bondad',carp:['depresion','autoestima']});
+P('critico-interno',18,'Actos de bondad','👆 Toca cada corazón cuando hagas ese acto de bondad esta semana.',
+  [['Dejar que alguien pase delante de mí en la fila',0,0],['Mantener la puerta abierta para alguien',1,0],['Sonreír o saludar a alguien que no conozco',2,0],['Decirle algo bonito a alguien',0,1],['Ayudar a alguien que dejó caer algo',1,1],['Ayudar a alguien antes de que me pida ayuda',2,1],['Limpiar el desorden de otra persona',0,2],['Hacer algo por alguien',1,2],['Recoger la basura en el parque de mi comunidad',2,2],['Contribuir a una organización benéfica',0,3],['Prestar mi libro favorito a un amigo',1,3],['Preparar una comida deliciosa para mi familia',2,3]]
+  .map(([l,c,r],i)=>oval('bo'+i,l,[158,324,489][c]-68,[248,400,545,694][r]-62,136,124,{g:'Actos de bondad que hice'})),{chip:'Actos de bondad'});
