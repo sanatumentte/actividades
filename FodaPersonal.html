@@ -215,7 +215,7 @@ textarea{min-height:80px; resize:vertical}
     <div class="nota calida">Si al llenarlo aparecieron emociones muy intensas o recuerdos difíciles, no tienes que resolverlos solo/a: llévalos a tu próxima sesión.</div>
     <div class="acciones">
       <button class="btn pri" id="descargar" style="max-width:none">⬇️ Descargar mi FODA en PDF</button>
-      <button class="btn pri" id="whatsapp" style="max-width:none;background:#25a35a">📲 Enviar a mi psicóloga por WhatsApp</button>
+      <a class="btn pri" id="whatsapp" href="https://api.whatsapp.com/send?phone=573150898447" target="_blank" rel="noopener" style="max-width:none;background:#25a35a;text-decoration:none;text-align:center">📲 Enviar a mi psicóloga por WhatsApp</a>
       <button class="btn sec" id="plataforma">📋 Copiar para enviar a mi psicóloga</button>
       <div class="nota" id="platAviso" style="display:none"></div>
       <button class="btn sec" id="imprimir">🖨️ Imprimir</button>
@@ -232,13 +232,25 @@ textarea{min-height:80px; resize:vertical}
 <div id="pdf"></div>
 
 <script>
-const KEY = 'sana_foda_v1';
+/* Compartido como la cartilla: enlace de la plataforma #<token>.<WhatsApp>[.<lo último guardado en el caso>][.p = abierto en sesión].
+   El token se recuerda, así sirve aunque luego lo abra sin el enlace. */
+const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
+let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_foda_enlace')||'{}')||{}; }catch(e){}
+if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_foda_enlace', JSON.stringify(ULT)); }catch(e){} }
+const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
+const KEY = 'sana_foda_v1' + (TOKEN ? ':'+TOKEN : '');
 const LOGO = document.querySelector('header img').src;
 const cards = [...document.querySelectorAll('.card')];
 const CUAD = [['F','Fortalezas','--f'],['O','Oportunidades','--o'],['D','Áreas por fortalecer','--d'],['A','Amenazas','--a']];
 let estado = {campos:{}, chips:{}}, actual = 0;
 try{ const g = JSON.parse(localStorage.getItem(KEY)); if(g) estado = Object.assign(estado, g); }catch(e){}
-const guardar = ()=>{ try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} };
+/* Lo último guardado en el caso: en sesión (.p) manda eso; si no, gana la versión más reciente (_t) */
+let ACTUALIZADA = false;
+if(ENL[3]){ try{ const b=ENL[3].replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+'==='.slice((b.length+3)%4));
+  const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
+  const vacio=!Object.keys(estado.campos||{}).length&&!Object.keys(estado.chips||{}).length;
+  if(o&&typeof o==='object'&&(EN_SESION||vacio||(+o._t||0)>(+estado._t||0))){ ACTUALIZADA=!vacio&&!EN_SESION; estado=Object.assign({campos:{}, chips:{}}, o); localStorage.setItem(KEY, JSON.stringify(estado)); } }catch(e){} }
+const guardar = ()=>{ estado._t = Date.now(); try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} };
 const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const C = k => (estado.campos[k]||'').trim();
 
@@ -359,21 +371,27 @@ document.getElementById('descargar').onclick = async ()=>{
     if(!listo){ const a=document.createElement('a'); a.href=url; a.download=nombre; document.body.appendChild(a); a.click(); a.remove(); }
     let aviso=document.getElementById('pdfAviso');
     if(!aviso){ aviso=document.createElement('div'); aviso.id='pdfAviso'; aviso.className='nota'; b.insertAdjacentElement('afterend',aviso); }
-    aviso.innerHTML=`✅ Tu PDF está listo. Si no se descargó, <a href="${url}" target="_blank" rel="noopener"><b>tócalo aquí para abrirlo</b></a> y guárdalo desde ahí.`;
+    /* Sin abrir el PDF en otra pestaña: las extensiones de Chrome lo bloquean (ERR_BLOCKED_BY_CLIENT) */
+    aviso.innerHTML=`✅ Revisa tus <b>Descargas</b>. Si no aparece, <a href="${url}" download="${nombre}"><b>toca aquí para descargarlo otra vez</b></a>, o usa <b>🖨️ Imprimir</b> y elige «Guardar como PDF».`;
   }
   catch(e){ imprimir(); }
   b.textContent='⬇️ Descargar mi FODA en PDF'; b.disabled=false;
 };
 /* Código SANA1 para pegar en la app: Actividades o 📁 Recursos → 📥 Pegar respuestas */
 function mensajeSana(){
-  const json = JSON.stringify({v:1,k:'foda',f:C('fecha')||new Date().toISOString().slice(0,10),sec:secciones()});
-  const by = new TextEncoder().encode(json); let bin=''; by.forEach(x=>bin+=String.fromCharCode(x));
+  /* Formato compartido (k:'c'): res = lo que se lee en su historial · s = estado completo para abrirlo donde quedó */
+  const res = secciones().map(([t,it])=>({label:t, val:(it||[]).map(x=>'• '+x).join('\n')})).filter(r=>r.val);
+  const o = {v:1,k:'c',c:'foda',f:C('fecha')||new Date().toISOString().slice(0,10),res,s:estado}; if(TOKEN) o.t = TOKEN;
+  const by = new TextEncoder().encode(JSON.stringify(o)); let bin=''; for(let i=0;i<by.length;i+=0x8000) bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));
   const msg = '🧭 Mi FODA personal\nSANA1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   return msg;
 }
 /* WhatsApp de Camila: el paciente envía el código SANA1 directo (norma para todos los recursos) */
-const MI_WA = '573150898447';
-document.getElementById('whatsapp').onclick = ()=>{ window.open('https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent(mensajeSana()), '_blank', 'noopener'); };
+const MI_WA = ULT.w || '573150898447';
+/* Aviso arriba: abierto en sesión o actualizado con lo del caso */
+if(EN_SESION||ACTUALIZADA) document.body.insertAdjacentHTML('afterbegin', `<div style="background:#e7f1f0;border-bottom:1px solid #b9d6d2;color:#1f3d45;padding:10px 16px;font:600 .92rem Nunito,sans-serif;text-align:center">${EN_SESION?'🩺 <b>Modo sesión:</b> se abrió con lo último guardado en el caso. Al terminar, toca «📋 Copiar para enviar a mi psicóloga» y pégalo en la plataforma con 📥.':'✨ <b>Tu FODA se actualizó</b> con lo más reciente que trabajaste con tu psicóloga.'}</div>`);
+// Enlace real (<a>) como en la página del paciente: window.open lo frenan los bloqueadores de ventanas
+document.getElementById('whatsapp').addEventListener('click', e=>{ e.currentTarget.href = 'https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent(mensajeSana()); });
 document.getElementById('plataforma').onclick = ()=>{
   const msg = mensajeSana();
   const av = document.getElementById('platAviso'); av.style.display='block';
