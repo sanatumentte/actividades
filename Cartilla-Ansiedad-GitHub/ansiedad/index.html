@@ -116,10 +116,11 @@
   </section>
   <section class="cartilla" id="cartilla">
     <h2>Mi cartilla</h2>
-    <div class="fila" style="align-items:center"><label for="quien" style="font-weight:800;color:var(--petroleo)">Cartilla de:</label>
+    <div class="note" id="modoSesion" hidden style="background:#e7f1f0;border-color:#b9d6d2;color:#1f3d45">🩺 <b>Modo sesión:</b> se abrió con lo último guardado en el caso del paciente. Al terminar, toca <b>«📋 Copiar para enviar a mi psicóloga»</b> (abajo) y pégalo en la plataforma con <b>📥 Pegar respuestas</b>.</div>
+    <div class="fila" hidden style="align-items:center"><label for="quien" style="font-weight:800;color:var(--petroleo)">Cartilla de:</label>
       <select id="quien" style="flex:1;min-width:0;max-width:340px;border:2px solid var(--salvia);border-radius:12px;padding:9px 12px;font:inherit;color:var(--tinta);background:#fff"></select>
       <button class="btn sec" id="bNombre" type="button">✏️ Nombre</button></div>
-    <p id="ultima">Puedes guardar cada sesión con su fecha, ver tus avances y pasar la cartilla a otro dispositivo para seguir donde quedaste.</p>
+    <p id="ultima">Puedes guardar cada sesión con su fecha y ver tus avances. Lo que escribes queda guardado en este dispositivo.</p>
     <div class="fila">
       <button class="btn teal" id="bGuardar" type="button">💾 Guardar esta sesión</button>
       <button class="btn sec" id="bAvances" type="button">📈 Ver mis avances</button>
@@ -250,8 +251,9 @@ const guardarC=()=>{ try{ localStorage.setItem(KEYC,JSON.stringify(C)); }catch(_
 const actual=()=>C.lista.find(x=>x.id===C.actual);
 /* Enlace enviado desde la plataforma: #<token>.<WhatsApp de la psicóloga>[.<últimas respuestas guardadas en su caso>] (o solo #<WhatsApp>).
    El token se recuerda en la cartilla, así sirve aunque luego la abra sin el enlace. */
-let ESTADO_ENLACE=null;
-{ const h=decodeURIComponent(location.hash.slice(1)), m=h.match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]+))?$/), w=(h.match(/^(\d{8,15})$/)||[])[1];
+let ESTADO_ENLACE=null, EN_SESION=false;
+{ const h=decodeURIComponent(location.hash.slice(1)), m=h.match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/), w=(h.match(/^(\d{8,15})$/)||[])[1];
+  EN_SESION=!!(m&&m[4]);   // .p = la abre la psicóloga desde el caso: manda lo guardado en la plataforma
   if(m&&!w){ const tok=m[1]; let c=C.lista.find(x=>x.t===tok);
     if(!c){ c=actual(); if(c.t&&c.t!==tok){ c={id:'c'+Date.now().toString(36),n:'Cartilla '+(C.lista.length+1)}; C.lista.push(c); } c.t=tok; }
     if(m[2]) c.w=m[2]; C.actual=c.id; guardarC(); ESTADO_ENLACE=m[3]||null; }
@@ -260,8 +262,8 @@ const nombreActual=()=>C.lista.find(x=>x.id===C.actual).n;
 const conNombre=()=>nombreActual()!=='Mi cartilla';
 const KEY='sana_ansiedad_libro'+(C.actual==='yo'?'':':'+C.actual);   // 'yo' conserva la clave de la primera versión
 let S={}; try{ S=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(_){ S={}; }
-/* Si este dispositivo está vacío y el enlace trae lo último que guardó la psicóloga, se sigue desde ahí */
-if(ESTADO_ENLACE&&!Object.keys(S).length){ try{ const b=ESTADO_ENLACE.replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+'==='.slice((b.length+3)%4));
+/* El enlace trae lo último guardado en el caso: en sesión (.p) manda eso; para el paciente, solo si este dispositivo está vacío (así no pierde lo que lleva) */
+if(ESTADO_ENLACE&&(EN_SESION||!Object.keys(S).length)){ try{ const b=ESTADO_ENLACE.replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+'==='.slice((b.length+3)%4));
   const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))); if(o&&typeof o==='object'){ S=o; localStorage.setItem(KEY,JSON.stringify(S)); } }catch(_){} }
 let tGuardar; const guardar=()=>{ clearTimeout(tGuardar); tGuardar=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){} actualizar(); },250); };
 const $=s=>document.querySelector(s);
@@ -388,7 +390,7 @@ const CAMPOS=PAG.flatMap(p=>p.f.map(f=>Object.assign({pag:p},f)));
 function hechasEn(D){ return PAG.filter(p=>p.hint&&p.f.some(f=>f.k==='rueda'?Object.keys(D.p17r||{}).length:(f.k==='nivel'?D.p20===f.id:(D[f.id]&&String(D[f.id]).trim())))).length; }
 function nivelEn(D){ const f=CAMPOS.find(f=>f.id===D.p20); return f?f.lab:''; }
 function pintarUltima(){ const u=H[H.length-1];
-  $('#ultima').textContent=u?`Última sesión guardada: ${u.n} · ${fechaTxt(u.f)}. Llevas ${H.length} sesión${H.length>1?'es':''} guardada${H.length>1?'s':''}.`:'Puedes guardar cada sesión con su fecha, ver tus avances y pasar la cartilla a otro dispositivo para seguir donde quedaste.'; }
+  $('#ultima').textContent=u?`Última sesión guardada: ${u.n} · ${fechaTxt(u.f)}. Llevas ${H.length} sesión${H.length>1?'es':''} guardada${H.length>1?'s':''}.`:'Puedes guardar cada sesión con su fecha y ver tus avances. Lo que escribes queda guardado en este dispositivo.'; }
 function hoja(html){ const h=document.createElement('div'); h.className='hoja'; h.innerHTML=`<div role="dialog" aria-modal="true">${html}<div class="fila" style="justify-content:flex-end"><button class="btn sec" type="button" data-cerrar>Cerrar</button></div></div>`;
   document.body.appendChild(h); const c=()=>h.remove(); h.addEventListener('click',e=>{ if(e.target===h||e.target.closest('[data-cerrar]')) c(); }); h.cerrar=c; return h; }
 
@@ -493,6 +495,9 @@ $('#quien').onchange=()=>{ const v=$('#quien').value;
   C.actual=v; guardarC(); location.reload(); };
 $('#bNombre').onclick=()=>pedirNombre('Nombre de esta cartilla',conNombre()?nombreActual():'',n=>{ C.lista.find(x=>x.id===C.actual).n=n; guardarC(); location.reload(); });
 pintarQuien();
+/* Sin selector de nombres ni códigos para pasar de dispositivo: cada enlace de la plataforma ya identifica al paciente y trae sus respuestas */
+$('#bLlevar').hidden=true;
+if(EN_SESION){ $('#modoSesion').hidden=false; $('#ultima').hidden=true; }
 </script>
 
 </body></html>
