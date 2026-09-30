@@ -60,9 +60,11 @@ textarea:focus,input:focus{outline:none;border-color:var(--salvia)}
 .flechas button{border:0;background:var(--lav2);color:var(--lav);width:38px;height:38px;border-radius:50%;font-size:1.1rem;cursor:pointer}
 .flechas button:disabled{opacity:.35}
 .logro{border-radius:18px;padding:14px;margin:12px 0;position:relative}
-.logro:nth-of-type(1){background:var(--l1)}
-.logro:nth-of-type(2){background:var(--l2)}
-.logro:nth-of-type(3){background:var(--l3)}
+.logro:nth-of-type(3n+1){background:var(--l1)}
+.logro:nth-of-type(3n+2){background:var(--l2)}
+.logro:nth-of-type(3n){background:var(--l3)}
+.mas{width:100%;border:2px dashed var(--salvia);background:transparent;color:var(--petroleo);border-radius:16px;padding:10px;font:600 1rem Fredoka,sans-serif;cursor:pointer;margin-top:4px}
+.quitar{position:absolute;top:8px;right:10px;border:0;background:transparent;color:var(--suave);font-size:1rem;cursor:pointer}
 .logro .num{position:absolute;top:-10px;left:-6px;width:34px;height:34px;border-radius:50%;background:var(--sol);color:#fff;display:grid;place-items:center;font-weight:700;box-shadow:0 2px 0 #d9ae2e}
 .logro h3{margin:0 0 6px 30px;font-size:1.05rem;color:var(--petroleo)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -152,7 +154,7 @@ footer img{width:110px;margin-top:10px}
 <section class="vista on" id="v-inicio">
   <div class="caja">
     <span class="etiqueta">¿De qué se trata?</span>
-    <p>Cada noche vas a anotar <b>3 cosas que hiciste y que valoras de ti</b>. A veces la mente se fija solo en lo que salió mal; este diario entrena la atención para notar también lo que sí hiciste. No tienes que sentirte feliz para escribir: es un hábito pequeño, de pocos minutos.</p>
+    <p>Cada noche vas a anotar <b>3 cosas que hiciste y que valoras de ti</b> (y más, si quieres). A veces la mente se fija solo en lo que salió mal; este diario entrena la atención para notar también lo que sí hiciste. No tienes que sentirte feliz para escribir: es un hábito pequeño, de pocos minutos.</p>
     <p class="lead">Vale lo pequeño y vale el esfuerzo, no solo el resultado: <i>«fue un poco difícil y lo hice igual»</i>.</p>
   </div>
   <div class="caja">
@@ -162,6 +164,15 @@ footer img{width:110px;margin-top:10px}
     <div class="chips" id="genero">
       <button class="chip" data-g="a">Orgullosa</button>
       <button class="chip" data-g="o">Orgulloso</button>
+    </div>
+    <div class="recordar">
+      <p class="peq" style="margin:16px 0 4px">🔔 ¿A qué hora quieres que te recuerde escribir?</p>
+      <input type="time" id="hora" value="21:00" style="width:auto;font:inherit;border:2px solid #eee2d0;border-radius:14px;padding:8px 12px;background:#fffdf9">
+      <div class="fila" style="margin-top:10px">
+        <button class="btn sec" id="recICS">📅 Agregar a mi calendario</button>
+        <a class="btn sec" id="recGoogle" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Google Calendar</a>
+      </div>
+      <p class="lead" id="recAviso" style="font-size:.85rem;margin-top:6px">Te llegará un aviso cada noche a esa hora, en el horario de tu celular.</p>
     </div>
     <div class="fila" style="margin-top:16px"><button class="btn pri" id="empezar">🌙 Ir a la noche de hoy</button></div>
   </div>
@@ -189,7 +200,11 @@ footer img{width:110px;margin-top:10px}
   <div class="caja">
     <span class="etiqueta">¿Cómo me sentí al reconocerlo?</span>
     <div class="escala" id="escala"></div>
-    <div class="escala-txt"><span>0 · nada</span><span>10 · muchísimo</span></div>
+    <div class="escala-txt"><span>0 · Me costó creérmelo</span><span>10 · Me sentí muy bien</span></div>
+    <div id="porqueBox" style="display:none;margin-top:12px">
+      <label class="peq">¿Qué hizo que te costara creértelo? <span class="lead">(opcional)</span></label>
+      <textarea id="porque" placeholder="Escríbelo con tus palabras, si quieres"></textarea>
+    </div>
   </div>
 
   <div class="caja">
@@ -207,7 +222,7 @@ footer img{width:110px;margin-top:10px}
     <span class="etiqueta">Mis 30 días</span>
     <p class="lead">Toca un día para escribir o releer esa noche.</p>
     <div class="cal" id="cal"></div>
-    <div class="leyenda" id="leyenda"><span>🌻 3 cosas</span><span>🌷 1–2 cosas</span><span>🌱 por escribir</span><span>🔒 aún no llega</span></div>
+    <div class="leyenda" id="leyenda"><span>🌻 3 o más</span><span>🌷 1–2 cosas</span><span>🌱 por escribir</span><span>🔒 aún no llega</span></div>
   </div>
 </section>
 
@@ -272,7 +287,7 @@ const ESC_O = ['#b9c7cf','#a9bbc5','#98aebb','#86a1b0','#7394a5','#5f879a','#dab
 /* Jardín: flores (orgullosa) o bosque (orgulloso) */
 const FLOR = ()=> estado.g==='o' ? {tres:'🌳',dos:'🌲',uno:'🌿'} : {tres:'🌻',dos:'🌷',uno:'🌼'};
 function tema(){ document.body.classList.toggle('masc', estado.g==='o'); const f=FLOR();
-  document.getElementById('leyenda').innerHTML = `<span>${f.tres} 3 cosas</span><span>${f.dos} 1–2 cosas</span><span>🌱 por escribir</span><span>🔒 aún no llega</span>`; }
+  document.getElementById('leyenda').innerHTML = `<span>${f.tres} 3 o más</span><span>${f.dos} 1–2 cosas</span><span>🌱 por escribir</span><span>🔒 aún no llega</span>`; }
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const DIAS_S = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const fechaDe = n=>{ const [y,m,d]=estado.inicio.split('-').map(Number); return new Date(y,m-1,d+n-1); };
@@ -297,7 +312,45 @@ inInicio.onchange = ()=>{ if(inInicio.value){ estado.inicio = inInicio.value; gu
 function pintarGenero(){ document.querySelectorAll('#genero .chip').forEach(c=>c.classList.toggle('sel',c.dataset.g===estado.g)); }
 document.querySelectorAll('#genero .chip').forEach(c=>c.onclick=()=>{ estado.g=c.dataset.g; guardar(); pintarGenero(); tema(); });
 pintarGenero(); tema();
-document.getElementById('empezar').onclick = ()=>{ actual = nocheDeHoy(); ver('noche'); };
+/* ===== Recordatorio: evento diario en el calendario del celular, a la hora que elija (hora local del teléfono) ===== */
+const inHora = document.getElementById('hora'); inHora.value = estado.hora || '21:00';
+inHora.onchange = ()=>{ if(inHora.value){ estado.hora = inHora.value; guardar(); } };
+function planRecordatorio(){
+  const [hh,mm] = (inHora.value||'21:00').split(':').map(Number), ahora = new Date();
+  let ini = fechaDe(1); if(ini < new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate())) ini = new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate());
+  ini.setHours(hh,mm,0,0); if(ini < ahora) ini.setDate(ini.getDate()+1);            // si la hora de hoy ya pasó, empieza mañana
+  const ult = fechaDe(30); ult.setHours(23,59,0,0);
+  const veces = Math.max(1, Math.round((new Date(ult.getFullYear(),ult.getMonth(),ult.getDate()) - new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()))/864e5)+1);
+  const p2 = x=>String(x).padStart(2,'0'), loc = d=>d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'T'+p2(d.getHours())+p2(d.getMinutes())+'00';
+  const fin = new Date(ini.getTime()+10*60000);
+  const enlace = location.origin+location.pathname+(TOKEN?'#'+TOKEN+'.'+(ULT.w||''):'');
+  return {ini, fin, veces, loc, enlace, texto:'Escribe 3 cosas de las que te sientes '+oa()+' hoy y agradécete por ellas.'};
+}
+document.getElementById('recICS').onclick = async ()=>{
+  const r = planRecordatorio(), e = s=>String(s).replace(/([,;\\])/g,'\\$1');
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sana tu Mentte//Mis 30 noches//ES','CALSCALE:GREGORIAN','BEGIN:VEVENT',
+    'UID:orgullo-'+Date.now()+'@sanatumentte','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
+    'DTSTART:'+r.loc(r.ini),'DTEND:'+r.loc(r.fin),'RRULE:FREQ=DAILY;COUNT='+r.veces,
+    'SUMMARY:🌙 Mis 30 noches',
+    'DESCRIPTION:'+e(r.texto+' '+r.enlace),'URL:'+r.enlace,
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+e('🌙 Es hora de tu diario: '+r.texto),'TRIGGER:PT0M','END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const file = new File([ics], 'recordatorio-mis-30-noches.ics', {type:'text/calendar'});
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file]}); avisoRec(); return; }catch(err){ if(err&&err.name==='AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 4000); avisoRec();
+};
+document.getElementById('recGoogle').addEventListener('click', ev=>{
+  const r = planRecordatorio(); let tz=''; try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(err){}
+  ev.currentTarget.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('🌙 Mis 30 noches')
+    +'&dates='+r.loc(r.ini)+'/'+r.loc(r.fin)+'&recur='+encodeURIComponent('RRULE:FREQ=DAILY;COUNT='+r.veces)
+    +'&details='+encodeURIComponent(r.texto+'\n'+r.enlace)+(tz?'&ctz='+encodeURIComponent(tz):'');
+  avisoRec();
+});
+function avisoRec(){ estado.hora = inHora.value; guardar();
+  document.getElementById('recAviso').innerHTML = '✅ Listo: abre el archivo o el calendario y toca <b>Agregar</b> o <b>Guardar</b>. Te recordará a las <b>'+inHora.value+'</b> cada noche. Si quieres otra hora, cámbiala y vuelve a agregarlo (borra el anterior en tu calendario).'; }
+document.getElementById('empezar').onclick =()=>{ actual = nocheDeHoy(); ver('noche'); };
 
 /* ===== Noche ===== */
 let actual = nocheDeHoy();
@@ -308,18 +361,26 @@ function pintarNoche(){
   document.getElementById('prev').disabled = n<=1;
   document.getElementById('next').disabled = n>=30 || esFutura(n+1);
   document.getElementById('logros').innerHTML = d.l.map((x,i)=>`
-    <div class="logro"><div class="num">${i+1}</div>
-      <h3>Hoy me siento ${oa()} de…</h3>
-      <textarea data-i="${i}" placeholder="${['Ej.: fui a la cita aunque me daba miedo','Ej.: me tomé un rato para descansar sin culpa','Ej.: le pedí ayuda a alguien'][i]}">${esc(x.t)}</textarea>
+    <div class="logro"><div class="num">${i+1}</div>${i>=3?`<button class="quitar" data-q="${i}" aria-label="Quitar">✕</button>`:''}
+      <h3>${i<3?'Hoy me siento '+oa()+' de…':'También me reconozco por…'}</h3>
+      <textarea data-i="${i}" placeholder="${['Ej.: fui a la cita aunque me daba miedo','Ej.: me tomé un rato para descansar sin culpa','Ej.: le pedí ayuda a alguien'][i]||'Otra cosa que quiero reconocerme'}">${esc(x.t)}</textarea>
       <div class="chips">${AREAS.map(([k,t])=>`<button class="chip${x.a===k?' sel':''}" data-i="${i}" data-a="${k}">${t}</button>`).join('')}</div>
       <input type="text" class="otro${x.a==='otro'?' on':''}" data-o="${i}" placeholder="✏️ Otro: escríbelo aquí" value="${esc(x.ao)}">
-    </div>`).join('');
+    </div>`).join('') + `<button class="mas" id="masLogro">＋ Quiero reconocerme por algo más</button>`;
+  /* Más de 3: se agrega otra tarjeta; las extra se pueden quitar */
+  document.getElementById('masLogro').onclick = ()=>{ d.l.push({t:'',a:''}); guardar(); pintarNoche();
+    const ts = document.querySelectorAll('#logros textarea'); ts[ts.length-1].focus(); };
+  document.querySelectorAll('#logros .quitar').forEach(b=>b.onclick=()=>{ d.l.splice(+b.dataset.q,1); guardar(); pintarNoche(); });
   document.querySelectorAll('#logros textarea').forEach(t=>t.oninput=()=>{ d.l[t.dataset.i].t=t.value; guardar(); pintarSemana(); });
   pintarSemana();
   document.querySelectorAll('#logros .chip').forEach(c=>c.onclick=()=>{ const x=d.l[c.dataset.i]; x.a = x.a===c.dataset.a?'':c.dataset.a; guardar(); pintarNoche(); });
   document.querySelectorAll('#logros input[data-o]').forEach(t=>t.oninput=()=>{ d.l[t.dataset.o].ao=t.value; guardar(); });
   document.getElementById('escala').innerHTML = (estado.g==='o'?ESC_O:ESC_A).map((c,i)=>`<button style="background:${c}" class="${d.s===i?'sel':''}" data-s="${i}">${i}</button>`).join('');
   document.querySelectorAll('#escala button').forEach(b=>b.onclick=()=>{ d.s=+b.dataset.s; guardar(); pintarNoche(); });
+  /* Si le costó creérselo (0–3), pregunta opcional de por qué: dato útil para sesión */
+  const pq = document.getElementById('porque'); pq.value = d.pq||'';
+  document.getElementById('porqueBox').style.display = (d.s!=null && d.s<=3) ? 'block' : 'none';
+  pq.oninput = ()=>{ d.pq = pq.value; guardar(); };
   document.getElementById('cualidades').innerHTML = CUALIDADES.map(q=>`<button class="chip${d.q.includes(q)?' sel':''}">${q}</button>`).join('');
   document.querySelectorAll('#cualidades .chip').forEach(c=>c.onclick=()=>{ const q=c.textContent; d.q = d.q.includes(q)? d.q.filter(x=>x!==q) : [...d.q,q]; guardar(); pintarNoche(); });
   const qo = document.getElementById('cualOtro'); qo.value = d.qo||''; qo.classList.toggle('on', d.q.includes('✏️ Otro'));
@@ -417,7 +478,7 @@ document.getElementById('otroRecuerdo').onclick = otroRecuerdo;
 /* ===== Código SANA1 compartido (k:'c', clave orgullo) ===== */
 function mensajeSana(){
   const res = []; for(let n=1;n<=30;n++){ const d=estado.dias[n]; if(!d||!cuantos(n)) continue; const f=fechaDe(n);
-    res.push({label:'Noche '+n+' · '+f.getDate()+' '+MESES[f.getMonth()], val:d.l.filter(x=>x.t&&x.t.trim()).map(x=>'• '+x.t.trim()).join('\n')+(d.s!=null?'\nMe sentí: '+d.s+'/10':'')+(d.q.length?'\nCualidades: '+d.q.map(q=>q==='✏️ Otro'?d.qo:q).filter(Boolean).join(', '):'')}); }
+    res.push({label:'Noche '+n+' · '+f.getDate()+' '+MESES[f.getMonth()], val:d.l.filter(x=>x.t&&x.t.trim()).map(x=>'• '+x.t.trim()).join('\n')+(d.s!=null?'\nMe sentí: '+d.s+'/10':'')+(d.s!=null&&d.s<=3&&d.pq&&d.pq.trim()?'\nMe costó creérmelo porque: '+d.pq.trim():'')+(d.q.length?'\nCualidades: '+d.q.map(q=>q==='✏️ Otro'?d.qo:q).filter(Boolean).join(', '):'')}); }
   const o = {v:1,k:'c',c:'orgullo',f:hoyISO(),res,s:estado}; if(TOKEN) o.t = TOKEN;
   const by = new TextEncoder().encode(JSON.stringify(o)); let bin=''; for(let i=0;i<by.length;i+=0x8000) bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));
   return '🌙 Mis 30 noches: me reconozco y me agradezco\nSANA1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -462,7 +523,7 @@ function crearPDF(){
     pdf.setFontSize(10.5);
     const lineas = items.map(x=>pdf.splitTextToSize(limpio(x.t), AN-14));
     const qs = d.q.map(q=>q==='✏️ Otro'?d.qo:q).filter(Boolean).map(limpio);
-    const extra = [d.s!=null?'Me sentí: '+d.s+'/10':'', qs.length?'Cualidades: '+qs.join(', '):''].filter(Boolean).join('   ·   ');
+    const extra = [d.s!=null?'Me sentí: '+d.s+'/10':'', qs.length?'Cualidades: '+qs.join(', '):'', d.s!=null&&d.s<=3&&d.pq&&d.pq.trim()?'Me costó creérmelo porque: '+limpio(d.pq):''].filter(Boolean).join('   ·   ');
     const exL = extra ? pdf.splitTextToSize(extra, AN-10) : [];
     const alto = 10 + lineas.reduce((a,l)=>a+l.length*4.8+1.4,0) + exL.length*4.4 + 4;
     if(y + alto > H - M - 6){ pdf.addPage(); y = M; }

@@ -232,7 +232,13 @@ const RE_CUERPO=['Corazón acelerado','Respiración rápida o entrecortada','Ten
 const RE_REACC=['Lo evité','Me alejé o me aislé','Lo hablé con alguien','Lloré','Me distraje','Discutí o reaccioné con enojo','Hice algo para calmarme'];
 const RE_DUR=['Unos minutos','1 a 2 horas','Medio día','Todo el día','Varios días'];
 const RE_INSTR='Llénalo lo antes posible después de notar un cambio en cómo te sientes; no hace falta esperar a que la emoción sea muy intensa. Puedes hacerlo varias veces en la semana. No hay respuestas correctas ni incorrectas: es para conocerte mejor y trabajarlo con tu psicóloga.';
-const RE_SEGURIDAD='Si en algún momento tienes pensamientos de hacerte daño o de que no vale la pena seguir, no estás sola ni solo: llama a la Línea 123 (Colombia, gratuita, 24/7) o acude a Urgencias. Este registro no reemplaza la atención de emergencia.';
+/* Línea de crisis según la zona horaria del celular (sin pedir ubicación). Si no se reconoce el país, texto general. */
+function lineaCrisis(){ let z=''; try{ z=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+  const L=[[/^America\/Bogota$/,'la Línea 123 (Colombia)'],[/^America\/(New_York|Chicago|Denver|Phoenix|Los_Angeles|Anchorage|Detroit|Indiana|Kentucky|Boise|Adak)|^Pacific\/Honolulu$/,'la línea 988 (Estados Unidos: llama o escribe; marca 2 para español)'],
+    [/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns)$/,'la línea 988 (Canadá)'],[/^America\/(Mexico_City|Monterrey|Merida|Cancun|Chihuahua|Hermosillo|Mazatlan|Tijuana|Matamoros|Bahia_Banderas)$/,'la línea 911 (México)'],
+    [/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/,'la línea 024 (España)'],[/^America\/Guayaquil$/,'la línea 911 (Ecuador)'],[/^America\/Lima$/,'la Línea 113, opción 5 (Perú)'],[/^America\/Santiago$/,'la línea *4141 (Chile)']];
+  const m=L.find(([r])=>r.test(z)); return m?m[1]:'la línea de emergencias de tu país'; }
+const RE_SEGURIDAD='Si en algún momento tienes pensamientos de hacerte daño o de que no vale la pena seguir, no estás sola ni solo: llama a '+lineaCrisis()+' o acude a Urgencias. Este registro no reemplaza la atención de emergencia.';
 const RE_OTRA={k:'otra',n:'Otra',ic:'💬',c:'#5d7a7f',bg:'#eef2f1',em:[]};   // emoción escrita por el paciente
 function reFam(k){ return k==='otra'? RE_OTRA : (RE_FAM.find(f=>f.k===k)||RE_OTRA); }
 function reFamDe(nombre){ return RE_FAM.find(f=>f.em.includes(nombre))||null; }
@@ -404,23 +410,65 @@ const A={tipo:partes[0], clave:partes[1], token:partes[2]||'', tel:(partes[3]||'
 let paso=-1, R=[];
 const KEY='sana_'+A.token;
 try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&Array.isArray(d.r)){ R=d.r; } }catch(_){}
-function guardar(){ try{ localStorage.setItem(KEY,JSON.stringify({r:R})); }catch(_){} }
+function guardar(){ if(A.token==='vista') return; try{ localStorage.setItem(KEY,JSON.stringify({r:R})); }catch(_){} }
 const $=s=>document.querySelector(s);
 
 function def(){
   if(A.tipo==='e') return {titulo:'Mi registro de emociones',eyebrow:'Registro semanal',intro:RE_INSTR,escena:'emociones',especial:true,pasos:[]};
   if(A.tipo==='d') return {titulo:'Mi chequeo diario',eyebrow:'Cada día',intro:'',escena:'faro',especial:true,pasos:[]};
   if(A.tipo==='i'&&INTERACTIVOS[A.clave]){ const it=INTERACTIVOS[A.clave]; return {titulo:it.titulo,eyebrow:it.enfoque,intro:it.intro,escena:it.escena,pasos:it.campos.map(c=>({k:'txt',q:c}))}; }
-  if(A.tipo==='t'&&ESCALAS[A.clave]){ const E=ESCALAS[A.clave]; return {titulo:E.titulo,eyebrow:'Cuestionario',intro:'Responde con lo primero que sientas más cercano a tu experiencia. No hay respuestas buenas ni malas.',escena:'jardin',instr:E.instr,pasos:E.items.map(q=>({k:'opc',q,opciones:E.opciones}))}; }
+  if(A.tipo==='t'){ const L=String(A.clave||'').split('+').filter(k=>ESCALAS[k]); if(L.length){ const varios=L.length>1;
+    return {titulo:varios?'Tus cuestionarios':ESCALAS[L[0]].titulo,eyebrow:varios?`${L.length} cuestionarios`:'Cuestionario',intro:(varios?`Son ${L.length} cuestionarios cortos, uno tras otro. `:'')+'Responde con lo primero que sientas más cercano a tu experiencia. No hay respuestas buenas ni malas.',escena:'jardin',test:true,
+      pasos:L.flatMap(k=>{ const E=ESCALAS[k]; return E.items.map(q=>({k:'opc',q,opciones:E.opciones,instr:E.instr,sec:varios?E.titulo:''})); })}; } }
   if(A.tipo==='r'&&RECURSOS[+A.clave]){ const r=RECURSOS[+A.clave]; return {titulo:r.titulo,eyebrow:'Para leer con calma',intro:'Lee cada tarjeta con calma. Al final puedes contarle a tu psicóloga qué te llevas.',escena:'papel',slides:r.slides,
     pasos:r.slides.map(s=>({k:'slide',q:s})).concat([{k:'txt',q:'¿Qué idea te quedó más de esta lectura? (opcional)',opcional:true}])}; }
   return null;
 }
 const D=def();
 /* ---------- Registro semanal de emociones (tipo «e») ---------- */
-let RG=[], rgModo='home', rgEdit=null, rgSel=[];
-try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&Array.isArray(d.reg)) RG=d.reg; }catch(_){}
-function rgGuardar(){ try{ localStorage.setItem(KEY,JSON.stringify({reg:RG})); }catch(_){} }
+let RG=[], rgModo='home', rgEdit=null, rgSel=[], RGini='', RGhora='', rgDia='';
+try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&Array.isArray(d.reg)){ RG=d.reg; RGini=d.ini||''; RGhora=d.hora||''; } }catch(_){}
+function rgGuardar(){ try{ localStorage.setItem(KEY,JSON.stringify({reg:RG,ini:RGini,hora:RGhora})); }catch(_){} }
+/* ---- Calendario de la semana: Día 1…7 con su fecha real (empieza el día que abre el enlace o el de su primer registro) ---- */
+const RG_DS=['dom','lun','mar','mié','jue','vie','sáb'], RG_MS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function rgIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function rgInicio(){ if(!RGini){ const f=RG.map(r=>r.f).filter(Boolean).sort()[0]; RGini=f&&f<reHoy()?f:reHoy(); rgGuardar(); } return RGini; }
+function rgFecha(n){ const [y,m,d]=rgInicio().split('-').map(Number); return new Date(y,m-1,d+n-1); }
+function rgTira(){
+  const h=reHoy(); let t='';
+  for(let n=1;n<=7;n++){ const f=rgFecha(n), fi=rgIso(f), c=RG.filter(r=>r.f===fi).length, fut=fi>h;
+    t+=`<button type="button" class="rg-dia${fi===h?' hoy':''}${fut?' fut':''}${c?' con':''}${rgDia===fi?' sel':''}" data-dia="${fi}" ${fut?'disabled':''}>
+      <span class="n">Día ${n}</span><span class="e">${fut?'🔒':c?'🌟':'🌱'}</span><span class="f">${RG_DS[f.getDay()]} ${f.getDate()} ${RG_MS[f.getMonth()]}</span>${c?`<span class="c">${c}</span>`:''}</button>`; }
+  const hechos=[1,2,3,4,5,6,7].filter(n=>RG.some(r=>r.f===rgIso(rgFecha(n)))).length;
+  return `<div class="rg-tira">${t}</div><p class="re-sub" style="margin:6px 0 0">🌟 días con registro: <b>${hechos} de 7</b> · 🌱 sin registro · 🔒 aún no llega. Toca un día para ver o agregar.</p>`;
+}
+function rgCss(){ if(document.getElementById('rg-css')) return; const s=document.createElement('style'); s.id='rg-css'; s.textContent=`
+.rg-tira{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:12px 0 0}
+.rg-dia{border:0;border-radius:14px;padding:8px 2px;background:#fff;box-shadow:0 2px 0 #e7decf;cursor:pointer;position:relative;font-family:Nunito,sans-serif;color:#165a6c;text-align:center}
+.rg-dia .n{display:block;font-weight:800;font-size:.72rem}.rg-dia .e{display:block;font-size:1.3rem;line-height:1.35}.rg-dia .f{display:block;font-size:.62rem;color:#6d7880}
+.rg-dia .c{position:absolute;top:-6px;right:-4px;background:#c9987c;color:#fff;border-radius:99px;font-size:.66rem;font-weight:800;padding:1px 6px}
+.rg-dia.con{background:#fdf3d7}.rg-dia.hoy{outline:3px solid #dabb81}.rg-dia.sel{background:#165a6c;color:#fff}.rg-dia.sel .f{color:#e7decf}.rg-dia.fut{opacity:.45;cursor:default}
+.rg-fin{background:#e7f1f0;border:2px solid #dabb81;border-radius:16px;padding:12px 14px;margin:12px 0;text-align:center}
+.rg-rec{background:#fff;border-radius:14px;padding:10px 12px;margin:14px 0;box-shadow:0 2px 0 #e7decf}
+@media (max-width:420px){.rg-dia .f{font-size:.56rem}.rg-dia .e{font-size:1.1rem}}`; document.head.appendChild(s); }
+/* ---- Recordatorio en el calendario del celular (hora local del teléfono), una vez al día hasta el Día 7 ---- */
+function rgPlanRec(){ const [hh,mm]=(($('#rgHora')||{}).value||'21:00').split(':').map(Number), ahora=new Date();
+  let ini=new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate(),hh,mm); if(ini<ahora) ini.setDate(ini.getDate()+1);
+  const ult=rgFecha(7), veces=Math.max(1,Math.round((ult-new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()))/864e5)+1);
+  const p2=x=>String(x).padStart(2,'0'), loc=d=>d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'T'+p2(d.getHours())+p2(d.getMinutes())+'00';
+  return {ini,fin:new Date(ini.getTime()+10*60000),veces,loc,enlace:location.href,texto:'Tómate un momento para registrar cómo te sentiste hoy.'}; }
+async function rgRecICS(){ const r=rgPlanRec(), e=s=>String(s).replace(/([,;\\])/g,'\\$1');
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sana tu Mentte//Registro semanal//ES','BEGIN:VEVENT','UID:registro-'+Date.now()+'@sanatumentte',
+    'DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART:'+r.loc(r.ini),'DTEND:'+r.loc(r.fin),'RRULE:FREQ=DAILY;COUNT='+r.veces,
+    'SUMMARY:🌿 Mi registro de emociones','DESCRIPTION:'+e(r.texto+' '+r.enlace),'URL:'+r.enlace,
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+e('🌿 '+r.texto),'TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const file=new File([ics],'recordatorio-registro-emociones.ics',{type:'text/calendar'});
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file]}); rgRecOk(); return; }catch(err){ if(err&&err.name==='AbortError') return; } }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },4000); rgRecOk(); }
+function rgRecGoogle(ev){ const r=rgPlanRec(); let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(_){}
+  ev.currentTarget.href='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('🌿 Mi registro de emociones')+'&dates='+r.loc(r.ini)+'/'+r.loc(r.fin)
+    +'&recur='+encodeURIComponent('RRULE:FREQ=DAILY;COUNT='+r.veces)+'&details='+encodeURIComponent(r.texto+'\n'+r.enlace)+(tz?'&ctz='+encodeURIComponent(tz):''); rgRecOk(); }
+function rgRecOk(){ RGhora=$('#rgHora').value; rgGuardar(); $('#rgRecAv').innerHTML='✅ Abre el archivo o el calendario y toca <b>Agregar</b>. Te recordará a las <b>'+esc(RGhora)+'</b> hasta el Día 7.'; }
 function escenaEmociones(selExtra){
   const cnt={}; RG.forEach(r=>(r.em||[]).forEach(e=>{ cnt[e.fam]=(cnt[e.fam]||0)+1; })); (selExtra||[]).forEach(e=>{ cnt[e.fam]=(cnt[e.fam]||0)+1; });
   const V='viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"';
@@ -438,7 +486,7 @@ function rgBarra(p,t){ const bar=$('#bar'); if(p==null){ bar.innerHTML=''; $('#c
 function renderReg(){
   reCss(); const b=$('#body');
   if(rgModo==='wiz'){
-    reWizard(b, rgEdit!=null? RG[rgEdit] : null, {
+    reWizard(b, rgEdit!=null? RG[rgEdit] : (rgDia? {f:rgDia,sit:'',em:[],fis:[],fisOtro:'',rea:[],hice:'',dur:'',pen:'',cree:5} : null), {
       onStep:(p,t,E)=>{ rgBarra(p,t); $('#scene').innerHTML=escenaEmociones(E.em); },
       onCancel:()=>{ rgModo='home'; rgEdit=null; renderReg(); },
       onSave:(E)=>{ if(rgEdit!=null) RG[rgEdit]=E; else RG.push(E); RG.sort((a,c)=>(a.f||'').localeCompare(c.f||'')); rgGuardar(); rgModo='home'; rgEdit=null; renderReg();
@@ -459,21 +507,36 @@ function renderReg(){
       <div class="note">${esc(RE_SEGURIDAD)}</div>
       <div class="nav"><button class="btn sec" id="volver">← Volver a mis registros</button><button class="btn sec" id="nueva">Empezar una semana nueva</button></div>`;
     $('#volver').onclick=()=>{ rgModo='home'; renderReg(); };
-    $('#nueva').onclick=()=>{ const n=$('#nueva'); if(n.dataset.ok){ RG=[]; rgGuardar(); rgModo='home'; renderReg(); } else { n.dataset.ok='1'; n.textContent='¿Seguro? Toca otra vez para borrar esta semana'; } };
+    $('#nueva').onclick=()=>{ const n=$('#nueva'); if(n.dataset.ok){ RG=[]; RGini=''; rgDia=''; rgGuardar(); rgModo='home'; renderReg(); } else { n.dataset.ok='1'; n.textContent='¿Seguro? Toca otra vez para borrar esta semana'; } };
     $('#copiar').onclick=()=>{ const ok=()=>{ $('#okc').textContent='✓ Copiado. Ahora pégalo en WhatsApp.'; };
       try{ navigator.clipboard.writeText(msg).then(ok,()=>{ $('details').open=true; $('#okc').textContent='Selecciona el texto de abajo y cópialo.'; }); }catch(_){ $('details').open=true; } };
     return;
   }
+  rgCss();
+  const fin7=reHoy()>=rgIso(rgFecha(7)) && RG.length;
+  const listaIdx=RG.map((r,i)=>i).filter(i=>!rgDia||RG[i].f===rgDia);
+  const tituloDia=rgDia? (()=>{ const [y,m,d]=rgDia.split('-').map(Number), f=new Date(y,m-1,d); return RG_DS[f.getDay()]+' '+d+' '+RG_MS[m-1]; })() : '';
   b.innerHTML=`<div class="eyebrow">Registro semanal</div><h1>Mi registro de emociones</h1>
-    <p class="lead">${esc(RE_INSTR)}</p><div id="rgOk" class="ok"></div>
-    ${RG.length? `<h2 style="font-size:1.3rem;margin-top:14px">Esta semana llevas ${RG.length} registro${RG.length>1?'s':''}</h2><div class="re-wrap" id="rgLista">${RG.map((r,i)=>reTarjeta(r,i,true)).join('')}</div>`
+    <p class="lead">${esc(RE_INSTR)}</p>${rgTira()}<div id="rgOk" class="ok"></div>
+    ${fin7?`<div class="rg-fin"><b style="color:#165a6c;font-size:1.1rem">🌟 ¡Completaste tu semana!</b><br><span class="re-sub">Es momento de enviársela a tu psicóloga.</span></div>`:''}
+    ${rgDia? `<h2 style="font-size:1.2rem;margin-top:14px">${esc(tituloDia)}: ${listaIdx.length? listaIdx.length+' registro'+(listaIdx.length>1?'s':'') : 'sin registros'} <button type="button" class="re-mini" id="rgTodos">· ver toda la semana</button></h2>
+        ${listaIdx.length?`<div class="re-wrap" id="rgLista">${listaIdx.map(i=>reTarjeta(RG[i],i,true)).join('')}</div>`:''}`
+    : RG.length? `<h2 style="font-size:1.3rem;margin-top:14px">Esta semana llevas ${RG.length} registro${RG.length>1?'s':''}</h2>${reResumen(RG)}<div class="re-wrap" id="rgLista">${RG.map((r,i)=>reTarjeta(r,i,true)).join('')}</div>`
       : `<div class="steps"><div class="stp"><b class="n">1</b><span>Cuando notes un cambio en cómo te sientes, abre este enlace y toca «Nuevo registro».</span></div>
         <div class="stp"><b class="n">2</b><span>Son 6 pasos cortos: qué pasó, qué sentiste, tu cuerpo, qué hiciste y qué pensaste.</span></div>
         <div class="stp"><b class="n">3</b><span>Al final de la semana se lo envías a tu psicóloga.</span></div></div>`}
-    <div class="nav"><button class="btn pri" id="nuevo">＋ Nuevo registro</button>${RG.length?'<button class="btn teal" id="enviar">Ver mi semana y enviar →</button>':''}</div>
+    <div class="nav"><button class="btn pri" id="nuevo">＋ Nuevo registro${rgDia&&rgDia!==reHoy()?' para este día':''}</button>${RG.length?'<button class="btn teal" id="enviar">Ver mi semana y enviar →</button>':''}</div>
+    <div class="rg-rec"><b style="color:#165a6c">🔔 ¿A qué hora quieres que te recuerde?</b>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px"><input type="time" id="rgHora" value="${esc(RGhora||'21:00')}" style="width:auto;padding:8px 10px;border:2px solid #e7decf;border-radius:12px;font:inherit">
+        <button type="button" class="btn sec" id="rgICS">📅 Agregar a mi calendario</button><a class="btn sec" id="rgGoogle" target="_blank" rel="noopener" style="text-decoration:none">Google Calendar</a></div>
+      <p class="foot" id="rgRecAv" style="text-align:left;margin:6px 0 0">Te llegará un aviso cada día a esa hora, en el horario de tu celular.</p></div>
     <p class="foot" style="text-align:left">💡 Abre siempre este mismo enlace, desde el mismo celular y navegador (no en modo incógnito): tus registros quedan guardados ahí hasta que los envíes.</p>
     <div class="note">${esc(RE_SEGURIDAD)}</div>`;
   $('#nuevo').onclick=()=>{ rgModo='wiz'; rgEdit=null; renderReg(); };
+  document.querySelectorAll('[data-dia]').forEach(x=>x.onclick=()=>{ rgDia= rgDia===x.dataset.dia? '' : x.dataset.dia; renderReg(); });
+  if($('#rgTodos')) $('#rgTodos').onclick=()=>{ rgDia=''; renderReg(); };
+  $('#rgICS').onclick=rgRecICS; $('#rgGoogle').addEventListener('click',rgRecGoogle);
+  $('#rgHora').onchange=()=>{ RGhora=$('#rgHora').value; rgGuardar(); };
   if($('#enviar')) $('#enviar').onclick=()=>{ rgModo='enviar'; renderReg(); };
   document.querySelectorAll('[data-edit]').forEach(x=>x.onclick=()=>{ rgEdit=+x.dataset.edit; rgModo='wiz'; renderReg(); });
   document.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{ if(x.dataset.ok){ RG.splice(+x.dataset.del,1); rgGuardar(); renderReg(); } else { x.dataset.ok='1'; x.textContent='¿Borrar? toca otra vez'; } });
@@ -700,8 +763,8 @@ function render(){
   if(paso<0){
     b.innerHTML=`<div class="eyebrow">${esc(D.eyebrow)}</div><h1>${esc(D.titulo)}</h1><p class="lead">${esc(D.intro)}</p>
       <div class="steps"><div class="stp"><b class="n">1</b><span>Tómate tu tiempo. Puedes volver atrás cuando quieras.</span></div>
-      <div class="stp"><b class="n">2</b><span>Escribe con tus palabras: aquí no hay respuestas correctas.</span></div>
-      <div class="stp"><b class="n">3</b><span>Al final envías tus respuestas a tu psicóloga.</span></div></div>
+      <div class="stp"><b class="n">2</b><span>${D.test?'Toca la opción que más se parezca a lo que vives.':'Escribe con tus palabras: aquí no hay respuestas correctas.'}</span></div>
+      <div class="stp"><b class="n">3</b><span>${A.token==='vista'?'Vista previa: así lo ve tu paciente; al final no se envía nada.':'Al final envías tus respuestas a tu psicóloga.'}</span></div></div>
       <div class="nav"><span></span><button class="btn pri" id="go">${R.length?'Seguir donde iba →':'Comenzar →'}</button></div>`;
     $('#go').onclick=()=>{ paso=0; render(); }; $('#go').focus(); return;
   }
@@ -718,7 +781,7 @@ function render(){
     const ta=$('#ta'); ta.focus();
     ta.addEventListener('input',()=>{ R[paso]=ta.value; guardar(); $('#cnt').textContent=ta.value.length+' / 1000'; clearTimeout(ta._t); ta._t=setTimeout(pintarEscena,350); });
   } else {
-    b.innerHTML=`<div class="eyebrow">Pregunta ${paso+1} de ${tot}</div>${D.instr?`<div class="instr">${esc(D.instr)}</div>`:''}<h2>${esc(p.q)}</h2>
+    const ins=p.instr||D.instr; b.innerHTML=`<div class="eyebrow">${p.sec?esc(p.sec)+' · ':''}Pregunta ${paso+1} de ${tot}</div>${ins?`<div class="instr">${esc(ins)}</div>`:''}<h2>${esc(p.q)}</h2>
       <div class="opts" role="radiogroup">${p.opciones.map(([val,t])=>`<button type="button" role="radio" aria-checked="${R[paso]===val}" class="opt${R[paso]===val?' sel':''}" data-v="${val}"><span class="dot"></span><span>${esc(t)}</span></button>`).join('')}</div>
       <div class="nav"><button class="btn sec" id="prev">← Anterior</button><button class="btn pri" id="next" ${R[paso]==null?'disabled':''}>${paso===tot-1?'Terminar →':'Siguiente →'}</button></div>`;
     document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{ R[paso]=o.dataset.v; guardar(); document.querySelectorAll('.opt').forEach(x=>{ x.classList.toggle('sel',x===o); x.setAttribute('aria-checked',x===o); });
@@ -735,11 +798,13 @@ function final(){
   const b=$('#body');
   if(faltan.length){ b.innerHTML=`<div class="eyebrow">Casi listo</div><h2>Te faltan ${faltan.length} pregunta(s)</h2><p class="lead">Vuelve a la pregunta ${faltan[0]+1} para completarla.</p>
     <div class="nav"><button class="btn pri" id="ir">Ir a la pregunta ${faltan[0]+1}</button></div>`; $('#ir').onclick=()=>{ paso=faltan[0]; render(); }; return; }
-  const riesgo=A.tipo==='t'&&ESCALAS[A.clave].riesgoItem!=null&&+R[ESCALAS[A.clave].riesgoItem]>0;
+  let off=0, riesgo=false; if(A.tipo==='t') String(A.clave).split('+').filter(k=>ESCALAS[k]).forEach(k=>{ const E=ESCALAS[k]; if(E.riesgoItem!=null&&+R[off+E.riesgoItem]>0) riesgo=true; off+=E.items.length; });
+  if(A.token==='vista'){ b.innerHTML=`<div class="eyebrow">Vista previa</div><h1>Así termina para tu paciente</h1><p class="lead">Aquí tu paciente copia sus respuestas o las envía por WhatsApp. En la vista previa no se envía nada.</p>
+    <div class="nav"><button class="btn sec" id="prev">← Revisar las respuestas</button></div>`; $('#prev').onclick=()=>{ paso=D.pasos.length-1; render(); }; pintarEscena(); return; }
   const codigo='SANA1:'+b64u(JSON.stringify({v:1,t:A.token,k:A.tipo,c:A.clave,r:D.pasos.map((p,i)=>p.k==='slide'?null:(R[i]==null?'':R[i])),f:new Date().toISOString().slice(0,10)}));
   const msg=`🌿 Respuestas de «${D.titulo}»\n${codigo}`;
   b.innerHTML=`<div class="eyebrow">¡Lo lograste!</div><h1>Gracias por tomarte este momento</h1>
-    ${riesgo?`<div class="note">Gracias por contarlo con honestidad; tu psicóloga lo va a leer. Si en este momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>`:''}
+    ${riesgo?`<div class="note">Gracias por contarlo con honestidad; tu psicóloga lo va a leer. Si en este momento sientes que podrías hacerte daño, no esperes: llama a ${lineaCrisis()} o acude a urgencias.</div>`:''}
     ${tieneTexto||A.tipo!=='r'?`<p class="lead">Envíale tus respuestas a tu psicóloga en dos pasos:</p>
     <div class="steps">
       <div class="stp"><b class="n">1</b><div style="flex:1"><b>Copia tus respuestas</b><div class="nav" style="margin-top:8px"><button class="btn teal" id="copiar">📋 Copiar mis respuestas</button></div><div id="okc" class="ok" style="margin-top:6px"></div></div></div>
