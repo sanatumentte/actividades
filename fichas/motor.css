@@ -28,6 +28,7 @@ main.ancho{max-width:1000px}
 figure{margin:0;display:grid;gap:8px;scroll-margin-top:70px}
 figure[hidden],.chips a[hidden]{display:none}
 .hint{display:flex;gap:8px;align-items:flex-start;font-weight:700;color:var(--petroleo);font-size:.92rem;background:#fff;border:1px solid var(--beige);border-left:4px solid var(--verde);border-radius:12px;padding:8px 12px}
+.nota{font-size:.85rem;color:#5b4a3a;background:#fbf3ea;border:1px solid #f0dcc6;border-left:4px solid #e39b6b;border-radius:12px;padding:8px 12px;margin-top:8px;line-height:1.4}
 /* Página del PDF como imagen, con los campos encima (coordenadas en puntos del PDF: --W × --H) */
 .pg{position:relative;container-type:inline-size;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(22,90,108,.12);background:#fff;aspect-ratio:var(--W)/var(--H)}
 .pg img{display:block;width:100%;height:100%}
@@ -40,6 +41,7 @@ figure[hidden],.chips a[hidden]{display:none}
 .pg textarea.f.clear{background:transparent;border-color:transparent}
 .pg textarea.f.clear:hover{border-color:rgba(22,90,108,.3)}
 .pg textarea.f.clear:placeholder-shown{border-color:rgba(22,90,108,.28)}
+.pg textarea.f.lines:placeholder-shown{background:rgba(4,117,120,.06);outline:1.5px dashed rgba(22,90,108,.3)}
 .pg textarea.f.lines{border:none;background:transparent;line-height:var(--lh,calc(20*var(--u)));padding:0 calc(3*var(--u));font-size:max(calc(var(--fs,11)*var(--u)),8px)}
 .pg button.f{background:transparent;border:0;padding:0;cursor:pointer;border-radius:calc(4*var(--u));transition:background .15s}
 .pg button.f:hover{background:rgba(4,117,120,.08)}

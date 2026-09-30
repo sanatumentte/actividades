@@ -9,6 +9,12 @@
      · Con opciones.html → sección rediseñada; los campos son elementos con class="f" y el mismo id.
    Campos: ta (recuadro) · inp (línea) · chk (casilla) · hl (frase para resaltar) · oval (óvalo/círculo)
            · nivel (una sola opción del grupo g) · pinta (círculo para colorear) */
+/* Línea de crisis según la zona horaria del celular (sin pedir ubicación). Si no se reconoce el país, texto general. */
+function lineaCrisis(){ let z=''; try{ z=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+  const L=[[/^America\/Bogota$/,'la Línea 123 (Colombia)'],[/^America\/(New_York|Chicago|Denver|Phoenix|Los_Angeles|Anchorage|Detroit|Indiana|Kentucky|Boise|Adak)|^Pacific\/Honolulu$/,'la línea 988 (Estados Unidos: llama o escribe; marca 2 para español)'],
+    [/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns)$/,'la línea 988 (Canadá)'],[/^America\/(Mexico_City|Monterrey|Merida|Cancun|Chihuahua|Hermosillo|Mazatlan|Tijuana|Matamoros|Bahia_Banderas)$/,'la línea 911 (México)'],
+    [/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/,'la línea 024 (España)'],[/^America\/Guayaquil$/,'la línea 911 (Ecuador)'],[/^America\/Lima$/,'la Línea 113, opción 5 (Perú)'],[/^America\/Santiago$/,'la línea *4141 (Chile)']];
+  const m=L.find(([r])=>r.test(z)); return m?m[1]:'la línea de emergencias de tu país'; }
 const PAG=[], FICHAS=[];
 const CFG={W:648,H:792};
 /* Medidas (puntos) de las páginas de cada PDF de origen: img/<pdf>/pNN.jpg */
@@ -26,6 +32,11 @@ const inp=(id,lab,x,y,w,h,o)=>Object.assign({k:'in',id,lab,x,y,w,h:h||16},o||{})
 const nivel=(id,lab,g,x,y,w,h,o)=>Object.assign({k:'nivel',id,lab,g,x,y,w,h},o||{});
 /* Varias líneas iguales (una por renglón): lineas('p3a','Mis síntomas',x,[y1,y2…],w) */
 const lineas=(pre,lab,x,ys,w,o)=>ys.map((y,i)=>inp(pre+i,lab,x,y-15,w,15,Object.assign({g:lab},o||{})));
+/* Renglones: agrupa las líneas de escritura (y de cada línea) en bloques y pone un recuadro con renglones por bloque.
+   labels[i] = la pregunta del bloque i. */
+const renglones=(pre,labels,ys,x,w,o)=>{ const g=[]; ys.slice().sort((a,b)=>a-b).forEach(y=>{ const b=g[g.length-1]; if(b&&y-b[b.length-1]<45) b.push(y); else g.push([y]); });
+  return g.map((b,i)=>{ const sp=b.length>1?(b[b.length-1]-b[0])/(b.length-1):22, top=b[0]-sp*.82;
+    return ta(pre+i,labels[i]||labels[labels.length-1],x,top,w,b[b.length-1]-top,Object.assign({cls:'lines',lh:sp,fs:Math.min(12,sp*.55),ph:' '},o||{})); }); };
 /* Recorte de una zona de una imagen de página (x, y, ancho, alto y tamaño de la página, en píxeles de la imagen) */
 const recorte=(src,x,y,w,h,PW,PH)=>`<span class="rec" style="aspect-ratio:${w}/${h}"><img src="${src}" alt="" loading="lazy" style="width:${PW/w*100}%;left:${-x/w*100}%;top:${-y/h*100}%"></span>`;
 /* Carta que se voltea al tocarla (frente y reverso en HTML); extra = botones debajo */
@@ -66,7 +77,7 @@ function iniciar(){
     <div class="fila"><a class="btn" id="wa" href="#" target="_blank" rel="noopener" style="background:#25a35a;color:#fff">📲 Enviar a mi psicóloga por WhatsApp</a>
       <button class="btn sec" id="copiar" type="button">📋 Copiar para enviar a mi psicóloga</button></div>
     <div class="ok" id="okc" aria-live="polite"></div><div class="code" id="code" hidden></div>
-    <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>
+    <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a ${lineaCrisis()} o acude a urgencias.</div>
     <div class="fila"><button class="btn sec" id="borrar" type="button">Borrar esta cartilla</button><span class="ok" id="okb"></span></div></section>
   <p class="foot">Tus respuestas no se guardan en internet: solo las recibe tu psicóloga cuando se las envías.</p>
 </main>`);
@@ -111,9 +122,9 @@ function iniciar(){
   }
   const cont=$('#paginas');
   cont.innerHTML=PAG.map(p=>{ const W=p.W||CFG.W, Hh=p.H||CFG.H;
-    const hint=p.hint?`<div class="hint">${esc(p.hint)}</div>`:'';
-    if(p.html) return `<section class="sec ${p.cls||""}" id="p${p.n}">${hint}${p.html}</section>`;
-    return `<figure id="p${p.n}"${p.grupo?` data-grupo="${p.grupo}"`:""}>${hint}<div class="pg" style="--W:${W};--H:${Hh}"><img src="${p.img||'p'+String(p.n).padStart(2,'0')+'.jpg'}" alt="Página ${p.n}: ${esc(p.t)}" loading="${p.n<3?'eager':'lazy'}">${p.f.map(campo).join('')}</div></figure>`; }).join('');
+    const hint=p.hint?`<div class="hint">${esc(p.hint)}</div>`:'', nota=p.nota?`<div class="nota">ℹ️ ${esc(p.nota)}</div>`:'';
+    if(p.html) return `<section class="sec ${p.cls||""}" id="p${p.n}">${hint}${p.html}${nota}</section>`;
+    return `<figure id="p${p.n}"${p.grupo?` data-grupo="${p.grupo}"`:""}>${hint}<div class="pg" style="--W:${W};--H:${Hh}"><img src="${p.img||'p'+String(p.n).padStart(2,'0')+'.jpg'}" alt="Página ${p.n}: ${esc(p.t)}" loading="${p.n<3?'eager':'lazy'}">${p.f.map(campo).join('')}</div>${nota}</figure>`; }).join('');
   /* Secciones rediseñadas: poner lo guardado en sus campos */
   PAG.filter(p=>p.html).forEach(p=>p.f.forEach(f=>{ const el=document.getElementById(f.id); if(!el) return;
     if(f.k==='ta'||f.k==='in') el.value=S[f.id]||''; else el.setAttribute('aria-pressed',activo(f,S)); }));
