@@ -44,6 +44,22 @@
   .opt.sel{border-color:var(--verde);background:#e8f3f1}
   .opt .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--salvia);flex:none;display:grid;place-items:center}
   .opt.sel .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--verde)}
+  /* Tests: 2–3 preguntas por página (menos «Siguiente») */
+  .qcard{background:#fffdf9;border:1px solid var(--beige);border-radius:18px;padding:14px 14px 12px;margin:12px 0;transition:border-color .2s,background .2s}
+  .qcard.hecha{border-color:#b9d6d2;background:#f4faf8}
+  .qcard h3{margin:0 0 10px;font-size:1.05rem;line-height:1.4;color:var(--tinta);display:flex;gap:10px;align-items:flex-start}
+  .qcard .qn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--arena);color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:800;margin-top:1px}
+  .qcard.hecha .qn{background:var(--verde)}
+  .opts.fila{display:flex;flex-wrap:wrap;gap:6px}
+  .opts.fila .opt{width:auto;flex:1 1 auto;padding:9px 12px;gap:8px;border-radius:12px;font-size:.92rem;justify-content:center}
+  .opts.fila .opt .dot{width:16px;height:16px}
+  .opts.fila .opt.sel .dot::after{width:7px;height:7px}
+  .animo{font-size:.85rem;color:var(--verde);font-weight:700;margin:2px 0 0}
+  .opts.fila.num{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+  .opts.fila.num .opt{flex-direction:column;gap:2px;padding:8px 4px;text-align:center}
+  .opts.fila.num .opt .dot{display:none}
+  .opts.fila.num .opt b{font-size:1.15rem;line-height:1.1}
+  .opts.fila.num .opt small{font-size:.66rem;color:var(--suave,#6d7880);line-height:1.15;min-height:1.5em}
   .nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px;flex-wrap:wrap}
   .btn{border:none;border-radius:999px;padding:13px 26px;font:inherit;font-weight:800;cursor:pointer;transition:transform .1s,background .2s}
   .btn:active{transform:translateY(1px)}
@@ -741,11 +757,20 @@ function renderDiario(){
   if($('#dxEnv')) $('#dxEnv').onclick=()=>{ dxModo='enviar'; renderDiario(); };
 }
 
+/* Páginas: las preguntas de opción seguidas (del mismo test) se agrupan de a 3, o de a 2 si tienen más de 5 opciones */
+function grupos(){ if(grupos.c) return grupos.c; const G=[], tramos=[];
+  D.pasos.forEach((p,i)=>{ const t=tramos[tramos.length-1], q=t&&D.pasos[t[0]];
+    if(p.k==='opc'&&q&&q.k==='opc'&&(q.sec||'')===(p.sec||'')) t.push(i); else tramos.push([i]); });
+  tramos.forEach(t=>{ const tam=(D.pasos[t[0]].opciones||[]).length>5?2:3, pags=Math.ceil(t.length/tam), base=Math.floor(t.length/pags), extra=t.length%pags;
+    let k=0; for(let g=0;g<pags;g++){ const n=base+(g<extra?1:0); G.push(t.slice(k,k+n)); k+=n; } });   /* reparto parejo: 7 → 3·2·2, no 3·3·1 */
+  return grupos.c=G; }
+function grupoDe(i){ return Math.max(0,grupos().findIndex(g=>g.includes(i))); }
 function pintarBarra(){
   const tot=D?D.pasos.length:0, bar=$('#bar');
   if(!D||paso<0||paso>=tot){ bar.innerHTML=''; $('#count').textContent=''; return; }
-  const seg=Math.min(tot,12); bar.innerHTML=[...Array(seg)].map((_,i)=>`<i class="${(i+1)/seg<=(paso+1)/tot+1e-9?'on':''}"></i>`).join('');
-  $('#count').textContent=`${paso+1} / ${tot}`;
+  const G=grupos(), gi=grupoDe(paso), n=G.length, seg=Math.min(n,12);
+  bar.innerHTML=[...Array(seg)].map((_,i)=>`<i class="${(i+1)/seg<=(gi+1)/n+1e-9?'on':''}"></i>`).join('');
+  $('#count').textContent=`${gi+1} / ${n}`;
 }
 function pintarEscena(){
   if(!D){ $('#scene').innerHTML=escena('papel',0); return; }
@@ -784,11 +809,25 @@ function render(){
     const ta=$('#ta'); ta.focus();
     ta.addEventListener('input',()=>{ R[paso]=ta.value; guardar(); $('#cnt').textContent=ta.value.length+' / 1000'; clearTimeout(ta._t); ta._t=setTimeout(pintarEscena,350); });
   } else {
-    const ins=p.instr||D.instr; b.innerHTML=`<div class="eyebrow">${p.sec?esc(p.sec)+' · ':''}Pregunta ${paso+1} de ${tot}</div>${ins?`<div class="instr">${esc(ins)}</div>`:''}<h2>${esc(p.q)}</h2>
-      <div class="opts" role="radiogroup">${p.opciones.map(([val,t])=>`<button type="button" role="radio" aria-checked="${R[paso]===val}" class="opt${R[paso]===val?' sel':''}" data-v="${val}"><span class="dot"></span><span>${esc(t)}</span></button>`).join('')}</div>
-      <div class="nav"><button class="btn sec" id="prev">← Anterior</button><button class="btn pri" id="next" ${R[paso]==null?'disabled':''}>${paso===tot-1?'Terminar →':'Siguiente →'}</button></div>`;
-    document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{ R[paso]=o.dataset.v; guardar(); document.querySelectorAll('.opt').forEach(x=>{ x.classList.toggle('sel',x===o); x.setAttribute('aria-checked',x===o); });
-      $('#next').disabled=false; setTimeout(()=>{ if(paso<tot){ paso++; render(); } },280); });
+    /* Página con 2–3 preguntas: se avanza sola al responder todas; «Página X de Y» para que se vea el final */
+    const G=grupos(), gi=grupoDe(paso), idx=G[gi], n=G.length, ult=gi===n-1; paso=idx[0];
+    const ins=p.instr||D.instr, todas=()=>idx.every(i=>R[i]!=null);
+    const irA=g=>{ paso= g<0? -1 : g>=n? tot : G[g][0]; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+    const falta=n-gi-1;
+    b.innerHTML=`<div class="eyebrow">${p.sec?esc(p.sec)+' · ':''}Página ${gi+1} de ${n}</div>${ins?`<div class="instr">${esc(ins)}</div>`:''}
+      ${idx.map(i=>{ const q=D.pasos[i]; return `<div class="qcard${R[i]!=null?' hecha':''}" data-q="${i}"><h3><span class="qn">${i+1}</span><span>${esc(q.q)}</span></h3>
+        ${(()=>{ const num=q.opciones.every(([v,t])=>/^\d+( · .+)?$/.test(t)); /* escala numérica (1–5): una sola fila con el número grande */
+          return `<div class="opts fila${num?' num':''}" role="radiogroup" style="--n:${q.opciones.length}">${q.opciones.map(([val,t])=>`<button type="button" role="radio" aria-checked="${R[i]===val}" class="opt${R[i]===val?' sel':''}" data-v="${val}"><span class="dot"></span>${num?`<b>${esc(t.split(' · ')[0])}</b><small>${esc(t.split(' · ')[1]||'')}</small>`:`<span>${esc(t)}</span>`}</button>`).join('')}</div>`; })()}</div>`; }).join('')}
+      <p class="animo">${ult?'✨ ¡Es la última página!':falta===1?'🌿 Solo queda 1 página más':falta<=3?`🌿 Quedan ${falta} páginas`:''}</p>
+      <div class="nav"><button class="btn sec" id="prev">← Anterior</button><button class="btn pri" id="next" ${todas()?'':'disabled'}>${ult?'Terminar →':'Siguiente →'}</button></div>`;
+    document.querySelectorAll('.qcard').forEach(card=>{ const i=+card.dataset.q;
+      card.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{ const nuevo=R[i]==null; R[i]=o.dataset.v; guardar();
+        card.querySelectorAll('.opt').forEach(x=>{ x.classList.toggle('sel',x===o); x.setAttribute('aria-checked',x===o); }); card.classList.add('hecha');
+        $('#next').disabled=!todas();
+        if(nuevo&&todas()) setTimeout(()=>{ if(idx.every(k=>R[k]!=null)) irA(gi+1); },450);
+        else if(nuevo){ const sig=document.querySelector('.qcard:not(.hecha)'); if(sig) sig.scrollIntoView({behavior:'smooth',block:'center'}); } }); });
+    $('#prev').onclick=()=>irA(gi-1); $('#next').onclick=()=>irA(gi+1);
+    return;
   }
   $('#prev').onclick=()=>{ paso--; render(); };
   $('#next').onclick=()=>{ paso++; render(); };
