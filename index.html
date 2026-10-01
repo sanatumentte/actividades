@@ -836,7 +836,8 @@ function render(){
       card.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{ const nuevo=R[i]==null; R[i]=o.dataset.v; guardar();
         card.querySelectorAll('.opt').forEach(x=>{ x.classList.toggle('sel',x===o); x.setAttribute('aria-checked',x===o); }); card.classList.add('hecha');
         $('#next').disabled=!todas();
-        /* Sin movimientos automáticos: al marcar, la pantalla se queda quieta (se avanza con «Siguiente») */
+        /* Al marcar, la pantalla no se mueve dentro de la página; al completar la página sí pasa sola a la siguiente */
+        if(nuevo&&todas()) setTimeout(()=>{ if(idx.every(k=>R[k]!=null)) irA(gi+1); },450);
  }); });
     $('#prev').onclick=()=>irA(gi-1); $('#next').onclick=()=>irA(gi+1);
     return;
