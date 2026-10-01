@@ -2,15 +2,15 @@
 <html lang="es"><head><meta charset="utf-8"><title>Mis ejercicios · Sana tu Mentte</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Caveat:wght@600&family=Nunito:wght@400;600;700;800&display=swap">
-<link rel="stylesheet" href="motor.css"></head><body>
-<script src="motor.js"></script>
+<script>document.write('<link rel="stylesheet" href="motor.css?v='+Math.floor(Date.now()/600000)+'">')</script></head><body>
+<script>document.write('<script src="motor.js?v='+Math.floor(Date.now()/600000)+'"><\/script>')</script>
 <script>
 /* Fichas de ejercicios: ?f=clave1,clave2 carga esas fichas (en ese orden) en un solo enlace.
    El #hash lo arma la plataforma: #<token>.<WhatsApp>[.<últimas respuestas>][.p] */
 (async()=>{
   const L=(new URLSearchParams(location.search).get('f')||'').split(/[ ,+]/).map(s=>s.trim()).filter(s=>/^[a-z0-9-]+$/.test(s));
   if(!L.length){ document.body.innerHTML='<main><section class="intro"><h1>Enlace incompleto</h1><p>Pídele a tu psicóloga que te envíe de nuevo el enlace del ejercicio.</p></section></main>'; return; }
-  for(const k of L) await new Promise(ok=>{ const s=document.createElement('script'); s.src=k+'.js'; s.onload=ok; s.onerror=ok; document.body.appendChild(s); });
+  for(const k of L) await new Promise(ok=>{ const s=document.createElement('script'); s.src=k+'.js?v='+Math.floor(Date.now()/600000); s.onload=ok; s.onerror=ok; document.body.appendChild(s); });
   iniciar();
 })();
 </script></body></html>

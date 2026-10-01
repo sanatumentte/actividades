@@ -42,7 +42,8 @@ function arbolSVG(S){
 const leyenda=S=>`<div class="ar-ley">${PARTES.map(([k,ic,n,sub])=>{ const L=items(S,k); return `<div><b>${ic} ${n} · ${sub}</b>${L.length?`<ul>${L.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:'<p class="ar-vacio">Aún sin respuesta</p>'}</div>`; }).join('')}</div>`;
 const css=`<style>
   .ar-arbol{background:linear-gradient(160deg,#fff,#eef6f4);border:2px solid #81a9a7}
-  .ar-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}#arSVG{max-width:900px;width:100%;margin:0 auto}
+  .ar-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}#arSVG{width:100%;margin:0 auto}
+  .sec.ar-arbol{width:min(96vw,1000px);max-width:none;margin-left:calc((100% - min(96vw,1000px))/2)}
   .ar-big{display:block;margin:0 auto 10px;border:2px solid #81a9a7;background:#fff;color:#165a6c;border-radius:999px;padding:8px 16px;font:inherit;font-weight:800;cursor:pointer}
   .ar-full{position:fixed;inset:0;z-index:99;background:#eef6f4;overflow:auto;padding:12px;display:flex;flex-direction:column;align-items:center}.ar-full svg{width:min(100%,calc((100vh - 70px)*760/970))!important;height:auto}
   .ar-full button{position:sticky;top:0;align-self:flex-end;border:none;background:#165a6c;color:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-weight:800;cursor:pointer;z-index:2}
