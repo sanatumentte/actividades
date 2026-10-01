@@ -836,8 +836,8 @@ function render(){
       card.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{ const nuevo=R[i]==null; R[i]=o.dataset.v; guardar();
         card.querySelectorAll('.opt').forEach(x=>{ x.classList.toggle('sel',x===o); x.setAttribute('aria-checked',x===o); }); card.classList.add('hecha');
         $('#next').disabled=!todas();
-        if(nuevo&&todas()) setTimeout(()=>{ if(idx.every(k=>R[k]!=null)) irA(gi+1); },450);
-        else if(nuevo){ const sig=document.querySelector('.qcard:not(.hecha)'); if(sig) sig.scrollIntoView({behavior:'smooth',block:'center'}); } }); });
+        /* Sin movimientos automáticos: al marcar, la pantalla se queda quieta (se avanza con «Siguiente») */
+ }); });
     $('#prev').onclick=()=>irA(gi-1); $('#next').onclick=()=>irA(gi+1);
     return;
   }
