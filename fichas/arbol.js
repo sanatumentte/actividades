@@ -42,7 +42,10 @@ function arbolSVG(S){
 const leyenda=S=>`<div class="ar-ley">${PARTES.map(([k,ic,n,sub])=>{ const L=items(S,k); return `<div><b>${ic} ${n} · ${sub}</b>${L.length?`<ul>${L.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:'<p class="ar-vacio">Aún sin respuesta</p>'}</div>`; }).join('')}</div>`;
 const css=`<style>
   .ar-arbol{background:linear-gradient(160deg,#fff,#eef6f4);border:2px solid #81a9a7}
-  .ar-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+  .ar-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}#arSVG{max-width:900px;width:100%;margin:0 auto}
+  .ar-big{display:block;margin:0 auto 10px;border:2px solid #81a9a7;background:#fff;color:#165a6c;border-radius:999px;padding:8px 16px;font:inherit;font-weight:800;cursor:pointer}
+  .ar-full{position:fixed;inset:0;z-index:99;background:#eef6f4;overflow:auto;padding:12px;display:flex;flex-direction:column;align-items:center}.ar-full svg{width:min(100%,calc((100vh - 70px)*760/970))!important;height:auto}
+  .ar-full button{position:sticky;top:0;align-self:flex-end;border:none;background:#165a6c;color:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-weight:800;cursor:pointer;z-index:2}
   @media (max-width:760px){.ar-grid{grid-template-columns:1fr}}
   .ar-ley{display:grid;gap:8px;font-size:.9rem}.ar-ley b{color:#165a6c}.ar-ley ul{margin:2px 0 0;padding-left:20px}.ar-vacio{color:#9aa;margin:0;font-size:.85rem}
   .ar-parte{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start;border-top:1px dashed #e7decf;padding-top:14px}
@@ -53,7 +56,7 @@ const css=`<style>
   @media print{.ar-grid{grid-template-columns:1.2fr 1fr}.ar-arbol{border:none}}
 </style>`;
 H('Mi árbol','🌳 Así va tu árbol: se llena solo con tus respuestas.',
-  css+`<h2>Mi árbol de la vida</h2><div class="ar-grid"><div id="arSVG"></div><div id="arLey"></div></div>`,[],{cls:'ar-arbol',chip:'Mi árbol'});
+  css+`<h2>Mi árbol de la vida</h2><button type="button" class="ar-big" onclick="(function(){const o=document.createElement('div');o.className='ar-full';o.innerHTML='<button type=button>✕ Cerrar</button>'+document.getElementById('arSVG').innerHTML;o.querySelector('button').onclick=()=>o.remove();document.body.appendChild(o);})()">🔍 Ver mi árbol en pantalla completa</button><div class="ar-grid"><div id="arSVG"></div><div id="arLey"></div></div>`,[],{cls:'ar-arbol',chip:'Mi árbol'});
 H('Las partes de mi árbol','✍️ Responde cada parte. En las hojas, los frutos, las ramas y las tormentas, escribe una cosa por línea: cada una aparece en tu árbol.',
   `<h2>Las partes de mi árbol</h2>${PARTES.map(([k,ic,n,sub,q,ph])=>`<div class="ar-parte"><div class="ar-ic">${ic}</div><div><h3>${n}</h3><div class="ar-sub">${sub}</div><p>${q}</p>
     <textarea class="f" id="ar_${k}" rows="4" placeholder="${ph}"></textarea></div></div>`).join('')}`,
