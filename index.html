@@ -428,6 +428,11 @@ const partes=decodeURIComponent((location.hash||'').slice(1)).split('.');
 const A={tipo:partes[0], clave:partes[1], token:partes[2]||'', tel:(partes[3]||'').replace(/\D/g,'')};
 let paso=-1, R=[];
 const KEY='sana_'+A.token;
+/* El registro semanal viejo (tipo e) abre el nuevo RegistroSemanal.html con el mismo enlace; lo ya anotado se pasa al nuevo */
+if(A.tipo==='e'){ if(A.token==='vista') location.replace('RegistroSemanal.html#vista'); else {
+  try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'), K2='sana_semanal_v1:'+A.token;
+    if(d&&Array.isArray(d.reg)&&d.reg.length&&!localStorage.getItem(K2)) localStorage.setItem(K2,JSON.stringify({inicio:d.ini||d.reg[0].f||new Date().toISOString().slice(0,10),reg:d.reg,semanas:[],env:[],_t:Date.now()})); }catch(_){}
+  location.replace('RegistroSemanal.html#'+A.token+'.'+A.tel); } }
 try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&Array.isArray(d.r)){ R=d.r; } }catch(_){}
 function guardar(){ if(A.token==='vista') return; try{ localStorage.setItem(KEY,JSON.stringify({r:R})); }catch(_){} }
 const $=s=>document.querySelector(s);
