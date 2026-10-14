@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de ingreso · Sana tu Mentte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Serif+Display&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --petroleo:#165a6c; --verde:#047578; --salvia:#81a9a7; --arena:#dabb81;
+  --beige:#e7decf; --crema:#f5e8da; --terracota:#c9987c; --blanco:#fff;
+  --texto:#24403f; --suave:#5d7472; --alerta:#b4533a; --alerta-suave:#fbe9e3;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--crema);
+  background-image:
+    radial-gradient(circle at 8% 10%, rgba(129,169,167,.28) 0 120px, transparent 121px),
+    radial-gradient(circle at 95% 30%, rgba(218,187,129,.25) 0 150px, transparent 151px),
+    radial-gradient(circle at 12% 88%, rgba(201,152,124,.2) 0 130px, transparent 131px);
+  background-attachment:fixed;
+  font-family:'Nunito',sans-serif; color:var(--texto); line-height:1.5; font-size:16px;
+}
+.wrap{max-width:640px; margin:0 auto; padding:18px 16px 60px}
+header{text-align:center; margin-bottom:6px}
+header img{width:120px; height:auto}
+.vista{background:var(--arena); color:var(--petroleo); text-align:center; font-weight:800; padding:8px 12px; border-radius:12px; margin-bottom:10px}
+.progreso{display:flex; gap:5px; margin:12px 0 16px}
+.progreso span{flex:1; height:7px; border-radius:9px; background:var(--beige); transition:.3s}
+.progreso span.on{background:var(--verde)}
+.card{background:var(--blanco); border-radius:24px; padding:24px 20px; box-shadow:0 8px 28px rgba(22,90,108,.10); display:none; animation:fade .35s ease}
+.card.activa{display:block}
+@keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+.paso{font-family:'Caveat',cursive; font-size:1.5rem; color:var(--terracota); margin:0}
+h1{font-family:'DM Serif Display',serif; color:var(--petroleo); font-size:2.1rem; margin:.1em 0 .3em; line-height:1.1}
+h2{font-family:'DM Serif Display',serif; color:var(--petroleo); font-size:1.65rem; margin:.1em 0 .4em; line-height:1.15}
+.guia{color:var(--suave); margin:0 0 10px}
+.emoji{font-size:2.4rem; display:block; margin-bottom:2px}
+.bloque{border-top:2px dashed var(--beige); margin-top:18px; padding-top:4px}
+.bloque:first-of-type{border-top:none}
+label.t{display:block; font-weight:700; color:var(--petroleo); margin:16px 0 6px}
+.req{color:var(--terracota)}
+.ayuda{display:block; font-weight:400; color:var(--suave); font-size:.88rem}
+input[type=text],input[type=tel],input[type=email],input[type=date],select,textarea{
+  width:100%; border:2px solid var(--beige); border-radius:14px; padding:12px 14px;
+  font:inherit; color:var(--texto); background:#fffdf9; outline:none; transition:border .2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--salvia)}
+textarea{min-height:84px; resize:vertical}
+.mal{border-color:var(--alerta) !important; background:var(--alerta-suave) !important}
+.err{color:var(--alerta); font-weight:700; font-size:.9rem; margin-top:6px; min-height:0}
+.fila{display:flex; gap:8px}
+.fila > *{min-width:0}
+.tel select{flex:0 0 132px}
+.tel input{flex:1}
+.dos{display:grid; grid-template-columns:1fr 1fr; gap:0 12px}
+@media(max-width:480px){.dos{grid-template-columns:1fr}}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{border:2px solid var(--beige); background:#fffdf9; border-radius:999px; padding:9px 14px;
+  font:inherit; font-weight:600; color:var(--texto); cursor:pointer; transition:.2s}
+.chip.on{background:var(--verde); border-color:var(--verde); color:#fff}
+.otro{margin-top:8px; display:none}
+.otro.ver{display:block}
+.escala{display:flex; gap:8px}
+.escala button{flex:1; border:2px solid var(--beige); background:#fffdf9; border-radius:16px; padding:10px 0;
+  font:inherit; font-weight:800; font-size:1.25rem; color:var(--petroleo); cursor:pointer}
+.escala button.on{background:var(--verde); border-color:var(--verde); color:#fff}
+.escala-ext{display:flex; justify-content:space-between; font-size:.82rem; color:var(--suave); margin-top:4px}
+.check{display:flex; gap:10px; align-items:flex-start; background:#f3f7f6; border-radius:16px; padding:14px; margin-top:16px; cursor:pointer}
+.check input{width:22px; height:22px; flex:none; accent-color:var(--verde); margin-top:2px}
+.legal{font-size:.88rem; color:var(--suave)}
+.nav{display:flex; gap:10px; justify-content:space-between; margin-top:22px}
+.btn{border:none; border-radius:999px; padding:13px 22px; font:inherit; font-weight:800; cursor:pointer; transition:.2s}
+.btn.pri{background:var(--verde); color:#fff; flex:1}
+.btn.pri:hover{background:var(--petroleo)}
+.btn.sec{background:var(--beige); color:var(--petroleo)}
+.btn:disabled{opacity:.6; cursor:wait}
+.aviso{background:var(--alerta-suave); border:2px solid #efc3b5; border-radius:18px; padding:16px; margin-top:14px; color:#7a3424}
+.aviso b{color:var(--alerta)}
+.aviso ul{margin:8px 0 0; padding-left:20px}
+.ok{text-align:center}
+.ok .big{font-size:3.4rem}
+.envios{display:flex; flex-direction:column; gap:10px; margin-top:16px}
+.envios a,.envios button{text-align:center; text-decoration:none}
+.btn.wa{background:#25d366; color:#fff}
+.candado{font-size:.85rem; color:var(--suave); text-align:center; margin-top:14px}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="fichas/img/logo-sana.png" alt="Sana tu Mentte" onerror="this.style.display='none'"></header>
+  <div id="bannerVista" class="vista hidden">👁 Vista previa: así lo ve tu paciente (no se envía nada)</div>
+  <div class="progreso" id="progreso"></div>
+
+  <!-- 0 · Bienvenida -->
+  <section class="card" data-paso="0">
+    <span class="emoji">🌿</span>
+    <h1>Tu ficha de ingreso</h1>
+    <p class="guia">Hola, qué bueno que estás aquí. Responde con calma y a tu ritmo. Solo lo marcado con <b class="req">*</b> es necesario para empezar; lo demás es opcional y siempre puedes dejarlo para conversarlo en sesión.</p>
+    <p class="guia">Te tomará unos 3 minutos. Lo que cuentes se trata con confidencialidad. ☕</p>
+    <p class="candado">🔒 Tus respuestas se cifran en tu celular antes de enviarse: solo tu psicóloga puede leerlas.</p>
+    <div class="nav"><button class="btn pri" data-sig>Empezar ✨</button></div>
+  </section>
+
+  <!-- 1 · Sobre ti -->
+  <section class="card" data-paso="1">
+    <p class="paso">Paso 1 de 4</p>
+    <h2>🌸 Sobre ti</h2>
+    <label class="t">Nombre y apellido <span class="req">*</span></label>
+    <input type="text" id="nombre" autocomplete="name" data-req>
+    <div class="dos">
+      <div>
+        <label class="t">Tipo de documento <span class="req">*</span></label>
+        <select id="tipoDoc" data-req>
+          <option value="">Elegir…</option>
+          <option value="CC">Cédula de ciudadanía</option>
+          <option value="CE">Cédula de extranjería</option>
+          <option value="TI">Tarjeta de identidad</option>
+          <option value="PPT">Permiso por Protección Temporal</option>
+          <option value="PA">Pasaporte</option>
+          <option value="DE">Documento extranjero</option>
+          <option value="RC">Registro civil</option>
+        </select>
+      </div>
+      <div>
+        <label class="t">Número de documento <span class="req">*</span></label>
+        <input type="text" id="documento" inputmode="text" autocomplete="off" data-req>
+      </div>
+    </div>
+    <label class="t">Fecha de nacimiento 📆 <span class="req">*</span></label>
+    <input type="date" id="fechaNac" data-req>
+    <label class="t">Estado civil <span class="req">*</span></label>
+    <div class="chips" data-chips="estadoCivil" data-uno data-req>
+      <button type="button" class="chip">Soltero/a</button><button type="button" class="chip">En una relación</button>
+      <button type="button" class="chip">Casado/a</button><button type="button" class="chip">Unión libre</button>
+      <button type="button" class="chip">Separado/a o divorciado/a</button><button type="button" class="chip">Viudo/a</button>
+      <button type="button" class="chip" data-otro>✏️ Otro</button>
+    </div>
+    <input type="text" class="otro" data-otro-de="estadoCivil" placeholder="Escríbelo aquí">
+    <label class="t">Profesión u ocupación <span class="req">*</span></label>
+    <input type="text" id="ocupacion" placeholder="Ej. médica, abogado, estudiante" data-req>
+    <div class="err" data-err></div>
+    <div class="nav"><button class="btn sec" data-ant>←</button><button class="btn pri" data-sig>Siguiente</button></div>
+  </section>
+
+  <!-- 2 · Contacto y emergencia -->
+  <section class="card" data-paso="2">
+    <p class="paso">Paso 2 de 4</p>
+    <h2>📍 Contacto</h2>
+    <div class="dos">
+      <div>
+        <label class="t">País donde estás <span class="req">*</span></label>
+        <select id="pais" data-req></select>
+        <input type="text" id="paisOtro" class="otro" placeholder="¿Cuál país?">
+      </div>
+      <div>
+        <label class="t">Ciudad <span class="req">*</span></label>
+        <input type="text" id="ciudad" autocomplete="address-level2" data-req>
+      </div>
+    </div>
+    <label class="t">Dirección de residencia <span class="req">*</span></label>
+    <input type="text" id="direccion" autocomplete="street-address" data-req>
+    <label class="t">Tu WhatsApp <span class="req">*</span><span class="ayuda">Elige tu país y escribe tu número sin el indicativo.</span></label>
+    <div class="fila tel" data-tel="telefono"></div>
+    <label class="t">Correo electrónico 💌 <span class="req">*</span></label>
+    <input type="email" id="email" autocomplete="email" data-req>
+    <div class="bloque">
+      <label class="t">🚨 Contacto de emergencia <span class="req">*</span><span class="ayuda">Una persona de confianza a quien llamar solo si fuera necesario.</span></label>
+      <div class="dos">
+        <input type="text" id="emergNombre" placeholder="Nombre y apellido" data-req>
+        <input type="text" id="emergRel" placeholder="Parentesco (mamá, pareja, amiga…)" data-req>
+      </div>
+      <label class="t">Teléfono del contacto <span class="req">*</span></label>
+      <div class="fila tel" data-tel="emergTel"></div>
+    </div>
+    <div class="err" data-err></div>
+    <div class="nav"><button class="btn sec" data-ant>←</button><button class="btn pri" data-sig>Siguiente</button></div>
+  </section>
+
+  <!-- 3 · Lo que te trae -->
+  <section class="card" data-paso="3">
+    <p class="paso">Paso 3 de 4</p>
+    <h2>💭 Lo que te trae</h2>
+    <label class="t">¿Qué te trae a consulta? <span class="req">*</span><span class="ayuda">En pocas palabras, lo que más te preocupa hoy.</span></label>
+    <textarea id="motivo" data-req data-riesgo></textarea>
+    <div id="avisoRiesgo" class="aviso hidden"></div>
+    <label class="t">¿Cuánto afecta hoy tu día a día? <span class="req">*</span></label>
+    <div class="escala" id="afectacion" data-req><button type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button></div>
+    <div class="escala-ext"><span>1 = casi nada</span><span>5 = no puedo hacer mi vida normal</span></div>
+    <label class="t">¿Con quién cuentas cuando lo necesitas?<span class="ayuda">Marca todas las que apliquen.</span></label>
+    <div class="chips" data-chips="apoyo">
+      <button type="button" class="chip">Pareja</button><button type="button" class="chip">Familia</button>
+      <button type="button" class="chip">Amistades</button><button type="button" class="chip">Iglesia</button>
+      <button type="button" class="chip" data-solo>Nadie por ahora</button><button type="button" class="chip" data-otro>✏️ Otro</button>
+    </div>
+    <input type="text" class="otro" data-otro-de="apoyo" placeholder="Escríbelo aquí">
+    <div class="err" data-err></div>
+    <div class="nav"><button class="btn sec" data-ant>←</button><button class="btn pri" data-sig>Siguiente</button></div>
+  </section>
+
+  <!-- 4 · Para conocerte -->
+  <section class="card" data-paso="4">
+    <p class="paso">Paso 4 de 4</p>
+    <h2>✨ Para conocerte</h2>
+    <label class="t">¿Cómo te expresas mejor y qué disfrutas?<span class="ayuda">Marca todas las que quieras.</span></label>
+    <div class="chips" data-chips="expresion">
+      <button type="button" class="chip">✍️ Escribir</button><button type="button" class="chip">🎨 Dibujar</button>
+      <button type="button" class="chip">🎬 Películas</button><button type="button" class="chip">📚 Libros</button>
+      <button type="button" class="chip">🎧 Podcast</button><button type="button" class="chip" data-otro>✏️ Otro</button>
+    </div>
+    <input type="text" class="otro" data-otro-de="expresion" placeholder="Escríbelo aquí">
+    <label class="t">¿Te gustaría un enfoque espiritual (bíblico) en las sesiones? <span class="req">*</span></label>
+    <div class="chips" data-chips="espiritual" data-uno data-req>
+      <button type="button" class="chip">Sí</button><button type="button" class="chip">No</button><button type="button" class="chip">Prefiero hablarlo en sesión</button>
+    </div>
+    <label class="t">¿Cómo nos conociste? <span class="req">*</span></label>
+    <div class="chips" data-chips="enterado" data-uno data-req>
+      <button type="button" class="chip">TikTok</button><button type="button" class="chip">Instagram</button>
+      <button type="button" class="chip">Facebook</button><button type="button" class="chip" data-otro>✏️ Otro</button>
+    </div>
+    <input type="text" class="otro" data-otro-de="enterado" placeholder="Escríbelo aquí">
+
+    <label class="check"><input type="checkbox" id="autoriza">
+      <span class="legal"><b>Autorizo el tratamiento de mis datos <span class="req">*</span></b><br>
+      Autorizo a Camila Salazar Ramírez (@sanatumentte), responsable del tratamiento, a usar mis datos solo para mi atención psicológica y para contactarme. Sé que mis datos de salud son sensibles y que responder esas preguntas es voluntario. Puedo conocer, actualizar, rectificar o pedir la supresión de mis datos, y revocar esta autorización, escribiendo a sanatumentte@gmail.com. Mis datos no se compartirán sin mi consentimiento, salvo obligación legal.<br><br>
+      Esta ficha es la base de tu historia clínica, protegida por el secreto profesional.</span>
+    </label>
+    <div class="err" data-err></div>
+    <div class="nav"><button class="btn sec" data-ant>←</button><button class="btn pri" id="enviar">Enviar 💚</button></div>
+  </section>
+  <!-- 5 · Final -->
+  <section class="card ok" data-paso="5">
+    <div class="big" id="okIcono">✅</div>
+    <h2 id="okTitulo">¡Gracias! Tu ficha llegó</h2>
+    <p class="guia" id="okTexto">Camila ya la tiene para preparar tu primera sesión. Nos vemos pronto 💚</p>
+    <div class="aviso">
+      <b>Este formulario no es un servicio de urgencias.</b> Si en algún momento estás en riesgo o piensas en hacerte daño, busca ayuda ahora:
+      <ul id="lineas"></ul>
+    </div>
+    <div id="planB">
+      <p class="guia" style="margin-top:16px" id="planBTexto">¿Quieres asegurarte? También puedes enviarla por WhatsApp:</p>
+      <div class="envios">
+        <a class="btn wa" id="btnWa" target="_blank" rel="noopener">📲 Enviar a mi psicóloga por WhatsApp</a>
+        <button class="btn sec" id="btnCopiar">📋 Copiar para enviar a mi psicóloga</button>
+      </div>
+    </div>
+    <p class="candado">🔒 Lo que se envía va cifrado: nadie más puede leerlo.</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* URL del Apps Script que guarda las fichas cifradas en la hoja de Camila */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzKaThhBKIqxDXSLS0DWluRrFbKjINR8Etw74Su5amFslbVqw1ZrjijT-h1oHv0Tg6/exec';
+const LINEAS = [
+  '🇨🇴 Colombia: <a href="tel:106">Línea 106</a> (salud mental) · emergencias <a href="tel:123">123</a>',
+  '🇺🇸 Estados Unidos: <a href="tel:988">988</a> (marca 2 para español)',
+  '🇲🇽 México: Línea de la Vida <a href="tel:8009112000">800 911 2000</a> · emergencias <a href="tel:911">911</a>',
+  '🇪🇸 España: <a href="tel:024">024</a> · emergencias <a href="tel:112">112</a>',
+  '🌎 Otro país: el número de emergencias local, o alguien de confianza'
+];
+const PAISES = [
+  ['CO','🇨🇴','Colombia','57',10,10],['MX','🇲🇽','México','52',10,10],['US','🇺🇸','Estados Unidos','1',10,10],
+  ['ES','🇪🇸','España','34',9,9],['EC','🇪🇨','Ecuador','593',9,9],['PE','🇵🇪','Perú','51',9,9],
+  ['VE','🇻🇪','Venezuela','58',10,10],['CL','🇨🇱','Chile','56',9,9],['AR','🇦🇷','Argentina','54',10,11],
+  ['PA','🇵🇦','Panamá','507',8,8],['CR','🇨🇷','Costa Rica','506',8,8],['DO','🇩🇴','Rep. Dominicana','1',10,10],
+  ['CA','🇨🇦','Canadá','1',10,10],['GT','🇬🇹','Guatemala','502',8,8],['BO','🇧🇴','Bolivia','591',8,8],
+  ['UY','🇺🇾','Uruguay','598',8,9],['PY','🇵🇾','Paraguay','595',9,9],['IT','🇮🇹','Italia','39',9,10],
+  ['DE','🇩🇪','Alemania','49',10,11],['GB','🇬🇧','Reino Unido','44',10,10],['XX','🌎','Otro país','',6,13]
+];
+const RIESGO = ['suicid','matarme','quitarme la vida','acabar con mi vida','acabar con todo','no quiero vivir','no quiero seguir',
+  'ganas de morir','quiero morir','quisiera morir','morirme','hacerme dano','lastimarme','autolesion','cortarme',
+  'desaparecer','mejor no estar','no vale la pena vivir','no despertar','sin salida'];
+
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>Array.from(el.querySelectorAll(s));
+const params = new URLSearchParams(location.hash.slice(1));
+const VISTA = location.hash==='#vista' || params.has('vista');
+const PK = params.get('k')||'';
+const WA = (params.get('w')||'').replace(/\D/g,'');
+const BORRADOR = 'sana_ingreso_borrador';
+let paso = 0, CODIGO = '';
+const cards = $$('.card');
+const TOTAL = 4;
+
+if(VISTA) $('#bannerVista').classList.remove('hidden');
+$('#lineas').innerHTML = LINEAS.map(l=>'<li>'+l+'</li>').join('');
+
+/* ---------- Países e indicativos ---------- */
+$('#pais').innerHTML = '<option value="">Elegir…</option>' + PAISES.map(p=>`<option value="${p[0]}">${p[1]} ${p[2]}</option>`).join('');
+$$('[data-tel]').forEach(box=>{
+  const id = box.dataset.tel;
+  box.innerHTML = `<select id="${id}Pais">${PAISES.map(p=>`<option value="${p[0]}">${p[1]} ${p[3]?'+'+p[3]:'Otro'}</option>`).join('')}</select>
+    <input type="text" id="${id}Cod" class="hidden" placeholder="+ indicativo" inputmode="numeric" style="flex:0 0 110px">
+    <input type="tel" id="${id}" inputmode="tel" autocomplete="${id==='telefono'?'tel-national':'off'}" placeholder="Número" data-req>`;
+  $('#'+id+'Pais').addEventListener('change',()=>{ box.dataset.tocado='1'; $('#'+id+'Cod').classList.toggle('hidden', $('#'+id+'Pais').value!=='XX'); guardar(); });
+});
+$('#pais').addEventListener('change',()=>{
+  const v = $('#pais').value;
+  $('#paisOtro').classList.toggle('ver', v==='XX');
+  // El país donde está define el indicativo por defecto, si no lo han cambiado a mano
+  $$('[data-tel]').forEach(box=>{ if(!box.dataset.tocado && v){ $('#'+box.dataset.tel+'Pais').value=v; $('#'+box.dataset.tel+'Cod').classList.toggle('hidden', v!=='XX'); } });
+});
+function paisDe(c){ return PAISES.find(p=>p[0]===c)||PAISES[0]; }
+/* Número completo con indicativo, solo dígitos (57300…). Devuelve '' si no es válido. */
+function telCompleto(id){
+  const p = paisDe($('#'+id+'Pais').value);
+  let cod = p[3], n = $('#'+id).value.replace(/\D/g,'');
+  if(p[0]==='XX'){ cod = $('#'+id+'Cod').value.replace(/\D/g,''); if(!cod) return ''; }
+  n = n.replace(/^00/,'');
+  if(cod && n.startsWith(cod) && n.length > p[5]) n = n.slice(cod.length);   // escribieron el indicativo
+  if(p[0]!=='US' && p[0]!=='CA' && p[0]!=='DO' && p[0]!=='IT') n = n.replace(/^0+/,'');
+  if(n.length < p[4] || n.length > p[5]) return '';
+  if(p[0]==='CO' && !/^[36]/.test(n)) return '';
+  return cod + n;
+}
+
+/* ---------- Chips (con ✏️ Otro) ---------- */
+$$('[data-chips]').forEach(grupo=>{
+  const uno = grupo.hasAttribute('data-uno');
+  $$('.chip',grupo).forEach(ch=> ch.addEventListener('click',()=>{
+    const on = !ch.classList.contains('on');
+    if(uno || ch.hasAttribute('data-solo')) $$('.chip',grupo).forEach(x=>x.classList.remove('on'));
+    else $$('.chip[data-solo]',grupo).forEach(x=>x.classList.remove('on'));
+    ch.classList.toggle('on', on);
+    const otro = $(`[data-otro-de="${grupo.dataset.chips}"]`);
+    if(otro) otro.classList.toggle('ver', !!$('.chip[data-otro].on',grupo));
+    grupo.classList.remove('mal');
+    guardar();
+  }));
+});
+function chipsValor(nombre){
+  const g = $(`[data-chips="${nombre}"]`);
+  const vals = $$('.chip.on',g).filter(c=>!c.hasAttribute('data-otro')).map(c=>c.textContent.trim());
+  const otro = $(`[data-otro-de="${nombre}"]`);
+  if($('.chip[data-otro].on',g) && otro && otro.value.trim()) vals.push(otro.value.trim());
+  return vals;
+}
+$$('#afectacion button').forEach(b=> b.addEventListener('click',()=>{
+  $$('#afectacion button').forEach(x=>x.classList.toggle('on', x===b));
+  $('#afectacion').classList.remove('mal'); guardar();
+}));
+
+/* ---------- Aviso de riesgo (si escriben algo que suene a peligro) ---------- */
+function normTxt(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function hayRiesgo(){ const t = $$('[data-riesgo]').map(e=>normTxt(e.value)).join(' '); return RIESGO.some(k=>t.includes(k)); }
+function revisarRiesgo(){
+  const box = $('#avisoRiesgo');
+  if(!hayRiesgo()){ box.classList.add('hidden'); return; }
+  box.innerHTML = `<b>Gracias por contarlo. 💚</b> Camila lo leerá antes de tu sesión, pero este formulario no es inmediato.
+    Si sientes que estás en riesgo o piensas en hacerte daño, busca ayuda <b>ahora</b>:<ul>${LINEAS.map(l=>'<li>'+l+'</li>').join('')}</ul>`;
+  box.classList.remove('hidden');
+}
+$$('[data-riesgo]').forEach(e=> e.addEventListener('blur', revisarRiesgo));
+
+/* ---------- Pasos ---------- */
+$('#progreso').innerHTML = Array.from({length:TOTAL},()=>'<span></span>').join('');
+function mostrar(n){
+  paso = n;
+  cards.forEach(c=> c.classList.toggle('activa', +c.dataset.paso===n));
+  $$('#progreso span').forEach((s,i)=> s.classList.toggle('on', i < Math.min(n,TOTAL)));
+  window.scrollTo(0,0);
+}
+function validarPaso(n){
+  const card = cards.find(c=>+c.dataset.paso===n); const errs=[];
+  $$('.mal',card).forEach(e=>e.classList.remove('mal'));
+  $$('[data-req]',card).forEach(el=>{
+    let ok = true;
+    if(el.dataset.chips) ok = chipsValor(el.dataset.chips).length>0;
+    else if(el.id==='afectacion') ok = !!$('#afectacion button.on');
+    else if(el.type==='tel') ok = !!telCompleto(el.id);
+    else ok = el.value.trim()!=='';
+    if(!ok) el.classList.add('mal');
+  });
+  if($('.mal',card)) errs.push('Completa lo marcado en rojo.');
+  if(n===1 && $('#nombre').value.trim().split(/\s+/).filter(x=>x.length>1).length<2){ $('#nombre').classList.add('mal'); errs.push('Escribe tu nombre y apellido.'); }
+  if(n===1 && $('#fechaNac').value){ const a=(Date.now()-new Date($('#fechaNac').value))/315576e5; if(a<5||a>110){ $('#fechaNac').classList.add('mal'); errs.push('Revisa tu fecha de nacimiento.'); } }
+  if(n===2){
+    if(!telCompleto('emergTel')){ $('#emergTel').classList.add('mal'); errs.push('Revisa el número del contacto: elige el país y escríbelo sin el indicativo.'); }
+    else if(telCompleto('emergTel')===telCompleto('telefono')){ $('#emergTel').classList.add('mal'); errs.push('El contacto de emergencia debe ser otra persona, con otro número.'); }
+    if($('#pais').value==='XX' && !$('#paisOtro').value.trim()){ $('#paisOtro').classList.add('mal'); errs.push('Escribe tu país.'); }
+    if(!telCompleto('telefono')){ $('#telefono').classList.add('mal'); errs.push('Revisa tu número: elige el país y escríbelo sin el indicativo.'); }
+    if($('#email').value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('#email').value.trim())){ $('#email').classList.add('mal'); errs.push('Revisa tu correo.'); }
+  }
+  if(n===4 && !$('#autoriza').checked) errs.push('Para enviar, marca la autorización de datos.');
+  $('[data-err]',card).textContent = [...new Set(errs)].join(' ');
+  return !errs.length;
+}
+$$('[data-sig]').forEach(b=> b.addEventListener('click',()=>{ if(paso===0 || VISTA || validarPaso(paso)) mostrar(paso+1); }));
+$$('[data-ant]').forEach(b=> b.addEventListener('click',()=> mostrar(paso-1)));
+
+/* ---------- Datos ---------- */
+const CAMPOS = ['nombre','tipoDoc','documento','fechaNac','ocupacion','pais','paisOtro','ciudad','direccion','email',
+  'emergNombre','emergRel','motivo',
+  'telefono','telefonoPais','telefonoCod','emergTel','emergTelPais','emergTelCod'];
+const GRUPOS = ['estadoCivil','apoyo','espiritual','expresion','enterado'];
+function recoger(){
+  const d = {v:1, enviado:new Date().toISOString()};
+  ['nombre','tipoDoc','documento','fechaNac','ocupacion','ciudad','direccion','emergNombre','emergRel','motivo'].forEach(k=> d[k]=$('#'+k).value.trim());
+  d.nombre = d.nombre.replace(/\s+/g,' ');
+  d.documento = d.documento.replace(/[.\s]/g,'');
+  d.email = $('#email').value.trim().toLowerCase();
+  const pa = paisDe($('#pais').value); d.pais = pa[0]==='XX' ? $('#paisOtro').value.trim() : pa[2];
+  d.telefono = telCompleto('telefono'); d.emergTel = telCompleto('emergTel');
+  GRUPOS.forEach(g=> d[g]=chipsValor(g));
+  d.estadoCivil = d.estadoCivil[0]||''; d.espiritual = d.espiritual[0]||''; d.enterado = d.enterado[0]||'';
+  const af = $('#afectacion button.on'); d.afectacion = af ? +af.textContent : null;
+  d.riesgo = hayRiesgo();
+  return d;
+}
+
+/* ---------- Borrador en este celular (se borra al enviar) ---------- */
+function guardar(){
+  try{
+    const b = {}; CAMPOS.forEach(k=>{ const e=$('#'+k); if(e) b[k]=e.value; });
+    GRUPOS.forEach(g=> b['g_'+g] = $$(`[data-chips="${g}"] .chip`).map(c=>c.classList.contains('on')?1:0));
+    GRUPOS.forEach(g=>{ const o=$(`[data-otro-de="${g}"]`); if(o) b['o_'+g]=o.value; });
+    const af=$('#afectacion button.on'); b.af = af?af.textContent:'';
+    localStorage.setItem(BORRADOR, JSON.stringify(b));
+  }catch(_){}
+}
+function cargarBorrador(){
+  let b; try{ b = JSON.parse(localStorage.getItem(BORRADOR)||'null'); }catch(_){ b=null; }
+  if(!b) return;
+  CAMPOS.forEach(k=>{ const e=$('#'+k); if(e && b[k]!=null) e.value=b[k]; });
+  GRUPOS.forEach(g=>{ (b['g_'+g]||[]).forEach((on,i)=>{ const c=$$(`[data-chips="${g}"] .chip`)[i]; if(c) c.classList.toggle('on',!!on); });
+    const o=$(`[data-otro-de="${g}"]`); if(o){ o.value=b['o_'+g]||''; o.classList.toggle('ver', !!$(`[data-chips="${g}"] .chip[data-otro].on`)); } });
+  $('#paisOtro').classList.toggle('ver', $('#pais').value==='XX');
+  $$('[data-tel]').forEach(box=>{ const id=box.dataset.tel; $('#'+id+'Cod').classList.toggle('hidden', $('#'+id+'Pais').value!=='XX'); if(b[id+'Pais']) box.dataset.tocado='1'; });
+  if(b.af) $$('#afectacion button').forEach(x=>x.classList.toggle('on', x.textContent===b.af));
+}
+document.addEventListener('input', guardar);
+document.addEventListener('change', guardar);
+if(!VISTA) cargarBorrador();
+
+/* ---------- Cifrado: solo la app de Camila tiene la llave para abrirlo ---------- */
+const b64u = a=>{ let s=''; a=new Uint8Array(a); for(let i=0;i<a.length;i+=0x8000) s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
+const unb64u = s=> Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c=>c.charCodeAt(0));
+async function cifrar(obj){
+  const S = crypto.subtle;
+  const pub = await S.importKey('raw', unb64u(PK), {name:'ECDH', namedCurve:'P-256'}, false, []);
+  const eph = await S.generateKey({name:'ECDH', namedCurve:'P-256'}, true, ['deriveBits']);
+  const bits = await S.deriveBits({name:'ECDH', public:pub}, eph.privateKey, 256);
+  const key = await S.importKey('raw', await S.digest('SHA-256', bits), 'AES-GCM', false, ['encrypt']);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await S.encrypt({name:'AES-GCM', iv}, key, new TextEncoder().encode(JSON.stringify(obj))));
+  const ephRaw = new Uint8Array(await S.exportKey('raw', eph.publicKey));
+  const out = new Uint8Array(ephRaw.length + iv.length + ct.length);
+  out.set(ephRaw,0); out.set(iv,ephRaw.length); out.set(ct,ephRaw.length+iv.length);
+  return 'SANAING1.' + b64u(out);
+}
+
+/* ---------- Enviar ---------- */
+function prepararPlanB(enviadoOk){
+  const msg = 'Hola Camila 🌿 Te envío mi ficha de ingreso (va cifrada 🔒):\n\n' + CODIGO;
+  if(WA) $('#btnWa').href = 'https://wa.me/'+WA+'?text='+encodeURIComponent(msg); else $('#btnWa').classList.add('hidden');
+  $('#btnCopiar').onclick = ()=>{
+    (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject()).then(
+      ()=>{ $('#btnCopiar').textContent='✓ Copiado. Pégalo en el chat con tu psicóloga'; },
+      ()=>{ prompt('Copia este texto y envíalo a tu psicóloga:', msg); });
+  };
+  if(!enviadoOk){
+    $('#okIcono').textContent='📲'; $('#okTitulo').textContent='Último paso: envíala por WhatsApp';
+    $('#okTexto').textContent='No pudimos enviarla automáticamente. Toca el botón verde y envía el mensaje a Camila tal como aparece.';
+    $('#planBTexto').textContent='';
+  }
+}
+$('#enviar').addEventListener('click', async()=>{
+  if(VISTA){ mostrar(5); $('#planB').classList.add('hidden'); return; }
+  if(!validarPaso(4)) return;
+  for(let n=1;n<=3;n++) if(!validarPaso(n)){ mostrar(n); return; }
+  if(!PK || !window.crypto || !crypto.subtle){ $('[data-paso="4"] [data-err]').textContent='Este enlace está incompleto. Pídele a tu psicóloga que te lo envíe de nuevo.'; return; }
+  const b = $('#enviar'); b.disabled = true; b.textContent = 'Enviando de forma segura 🔒…';
+  let ok = false;
+  try{
+    CODIGO = await cifrar(recoger());
+    if(SCRIPT_URL){
+      const r = await fetch(SCRIPT_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:CODIGO});
+      const d = await r.json(); ok = !!(d && d.ok);
+    }
+  }catch(e){ console.error(e); }
+  if(!CODIGO){ b.disabled=false; b.textContent='Enviar 💚'; $('[data-paso="4"] [data-err]').textContent='No se pudo preparar el envío. Intenta de nuevo.'; return; }
+  try{ localStorage.removeItem(BORRADOR); }catch(_){}
+  prepararPlanB(ok);
+  mostrar(5);
+});
+
+mostrar(0);
+</script>
+</body>
+</html>
