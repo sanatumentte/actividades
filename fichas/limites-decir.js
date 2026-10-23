@@ -1,4 +1,6 @@
 /* Límites 3: cómo decir un límite con DEAR MAN (DBT, eficacia interpersonal) y qué hacer si lo cruzan (Nuevos límites p21–24, redacción propia). */
+/* Si el enlace trae solo esta ficha, abre la bitácora nueva (varios límites con fecha + estadísticas) con el mismo token. */
+if((new URLSearchParams(location.search).get('f')||'').trim()==='limites-decir') location.replace('../MisLimitesDearMan.html'+location.hash);
 FICHA({clave:'limites-decir',titulo:'Cómo decir un límite (DEAR MAN)',corto:'Decir un límite',carp:['relaciones','autoestima']});
 { const D=[['D','Describe','Los hechos, sin juicios.','Cuando llegas sin avisar a mi casa…'],['E','Expresa','Cómo te sientes, hablando desde el «yo».','me siento incómoda porque no tengo tiempo para mí.'],
     ['A','Afirma','Pide lo que quieres o di que no, claro y corto.','Te pido que me escribas antes de venir.'],['R','Refuerza','Lo bueno que traerá para los dos.','Así podré recibirte con gusto y estar más tranquila.']],
