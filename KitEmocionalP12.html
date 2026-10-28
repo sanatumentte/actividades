@@ -40,9 +40,12 @@ h3{font:600 1.05rem Fredoka,sans-serif;color:var(--mor2);margin:14px 0 6px}
 .txt .sep{color:var(--mor);font-size:3.5cqw;letter-spacing:1cqw}
 .txt .f{font:600 3.3cqw Quicksand,sans-serif;color:#a08aa8}
 .txt .btn{font-size:3.8cqw;padding:2cqw 5cqw}
-.portada .txt{left:12%;right:12%;top:37%;bottom:10%;justify-content:center;gap:4cqw}
+.portada .txt{left:12%;right:12%;top:37%;bottom:16%;justify-content:center;gap:4cqw}
 .portada .abrelo{font:700 16cqw/1 Fredoka,sans-serif;color:var(--mor);letter-spacing:.02em}
 .portada .cuando{font:600 9.5cqw/1.12 Fredoka,sans-serif;color:var(--mor);text-wrap:balance}
+.marca{position:absolute;left:0;right:0;bottom:11.5%;text-align:center;font:600 3.4cqw Quicksand,sans-serif;letter-spacing:.06em;color:#a08aa8}
+.portada.sesion .cuando{font:700 11cqw/1.1 Fredoka,sans-serif;color:var(--mor)}
+.portada.sesion .f{font-size:4.2cqw}
 .play{position:absolute;left:50%;bottom:5.5%;transform:translateX(-50%);white-space:nowrap;font-size:3.6cqw;padding:2cqw 5cqw;box-shadow:0 2px 8px #0002}
 .editar{position:absolute;top:3%;right:4%;display:flex;gap:4px;z-index:2}
 .editar button{border:0;background:#fffc;border-radius:99px;padding:5px 9px;cursor:pointer;font-size:.9rem}
@@ -193,7 +196,6 @@ if(ENL[3]){ try{ const b=ENL[3].replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+
   if(o&&typeof o==='object'){ const antes=JSON.stringify(estado); estado = unir(estado, o); ACTUALIZADA = !EN_SESION && antes!==JSON.stringify(base()) && antes!==JSON.stringify(estado);
     try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} } }catch(e){} }
 if(VISTA){ const h=hoyISO();
-  estado.sesion=[{id:'ej1',f:h,ej:'¿Y si…?',frase:'Un pensamiento no es un hecho: puedo preguntarme qué es lo más probable.',ayudo:'Escribir lo peor, lo mejor y lo más probable.',cuando:'Cuando me llegan los «¿y si algo sale mal?»'}];
   estado.escritos=[{id:'emb-recordar',t:'Sentir miedo por mi bebé no significa que algo vaya mal. Significa que lo amo.'}];
   estado.usos=[{id:'u1',f:h,carta:'embarazo',antes:7,desp:4,uso:['Respiré','¿Y si…?'],ayudo:'Sí'}]; }
 const guardar = ()=>{ if(VISTA) return; estado._t = Date.now(); try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} };
@@ -207,7 +209,7 @@ const nomCarta = id=>{ const c=cartaPor(id); return c?c.cuando.replace(/^Cuando 
 const fondo = (tipo,color)=>`background-image:url(${IMG}${tipo}-${color}.jpg)`;
 /* Portadas sin símbolos: todas iguales (fondo de su color + texto), así las cartas que crea el paciente se ven como las demás */
 function portada(c){
-  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div></div></div>`;
+  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div></div><div class="marca">@sanatumentte</div></div>`;
 }
 const pagTexto = (color, html, edit)=>`<div class="pag" style="${fondo('b',color)}">${edit||''}<div class="txt fit">${html}</div></div>`;
 const botonesEd = (tipo,id,soloEditar,soloQuitar)=>`<div class="editar">${soloQuitar?'':`<button data-ed="${tipo}" data-id="${id}" title="Editar">✏️</button>`}${soloEditar?'':`<button data-del="${tipo}" data-id="${id}" title="Quitar">🗑</button>`}</div>`;
@@ -267,7 +269,7 @@ function pintarInicio(){
   app.innerHTML = `${aviso?`<div class="nota">${aviso}</div>`:''}
     <h2>Ábrelo cuando lo necesites</h2>
     <div class="sobres">${todasCartas().map(c=>`<button class="sobre" data-ir="carta" data-id="${c.id}">${portada(c)}</button>`).join('')}
-      <button class="sobre" data-ir="sesion"><div class="pag portada" style="${fondo('c','menta')}"><div class="txt"><div class="abrelo">🌱</div><div class="cuando">Lo que me llevo de sesión</div><div class="f" style="margin-top:2cqw">${estado.sesion.length} aprendizaje${estado.sesion.length===1?'':'s'}</div></div></div></button>
+      <button class="sobre" data-ir="sesion"><div class="pag portada sesion" style="${fondo('c','menta')}"><div class="txt"><div class="cuando">Lo que me llevo de sesión</div><div class="f" style="margin-top:2cqw">${estado.sesion.length} aprendizaje${estado.sesion.length===1?'':'s'}</div></div><div class="marca">@sanatumentte</div></div></button>
     </div>
     <div class="fila" style="margin-top:14px"><button class="btn" data-ir="nueva">➕ Nueva carta</button><button class="btn sec" data-ir="stats">📊 Mis estadísticas</button></div>
     ${envio()}`;

@@ -40,9 +40,12 @@ h3{font:600 1.05rem 'Bree Serif',serif;color:var(--mor2);margin:14px 0 6px}
 .txt .sep{color:var(--mor);font-size:3.5cqw;letter-spacing:1cqw}
 .txt .f{font:600 3.3cqw Poppins,sans-serif;color:#5e7f80}
 .txt .btn{font-size:3.8cqw;padding:2cqw 5cqw}
-.portada .txt{left:15%;right:15%;top:19%;bottom:23%;justify-content:center;gap:4cqw}
+.portada .txt{left:15%;right:15%;top:19%;bottom:27%;justify-content:center;gap:4cqw}
 .portada .abrelo{font:400 16cqw/1 'Bree Serif',serif;color:var(--mor);letter-spacing:.02em}
 .portada .cuando{font:500 8.4cqw/1.15 Poppins,sans-serif;color:var(--ver);text-wrap:balance}
+.marca{position:absolute;left:0;right:0;bottom:23.5%;text-align:center;font:500 3.4cqw Poppins,sans-serif;letter-spacing:.06em;color:#6b7f80}
+.portada.sesion .cuando{font:400 11cqw/1.1 'Bree Serif',serif;color:var(--mor)}
+.portada.sesion .f{font-size:4.2cqw}
 .play{position:absolute;left:50%;bottom:5.5%;transform:translateX(-50%);white-space:nowrap;font-size:3.6cqw;padding:2cqw 5cqw;box-shadow:0 2px 8px #0002}
 .editar{position:absolute;top:3%;right:4%;display:flex;gap:4px;z-index:2}
 .editar button{border:0;background:#fffc;border-radius:99px;padding:5px 9px;cursor:pointer;font-size:.9rem}
@@ -169,11 +172,7 @@ if(ENL[3]){ try{ const b=ENL[3].replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+
   const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
   if(o&&typeof o==='object'){ const antes=JSON.stringify(estado); estado = unir(estado, o); ACTUALIZADA = !EN_SESION && antes!==JSON.stringify(base()) && antes!==JSON.stringify(estado);
     try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} } }catch(e){} }
-if(VISTA){ const h=hoyISO();
-  estado.sesion=[{id:'ej1',f:h,ej:'¿Y si…?',frase:'Un pensamiento no es un hecho: puedo preguntarme qué es lo más probable.',ayudo:'Escribir lo peor, lo mejor y lo más probable.',cuando:'Cuando me llegan los «¿y si algo sale mal?»'}];
-  estado.cartas=[{id:'ej',cuando:'Cuando tu lucha sea con el trabajo',color:'salvia'},{id:'ej2',cuando:'Cuando tu lucha sea con la ansiedad',color:'cielo'}];
-  estado.extras={ej:{frases:[{id:'f1',tit:'Cuando siento que no doy más',t:'Esto es cansancio, no fracaso. Hoy hago una cosa a la vez.'}],canciones:[],imagenes:[]}};
-  estado.usos=[{id:'u1',f:h,carta:'ej',antes:7,desp:4,uso:['Respiré','¿Y si…?'],ayudo:'Sí'}]; }
+if(VISTA){ const h=hoyISO(); }
 const guardar = ()=>{ if(VISTA) return; estado._t = Date.now(); try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} };
 const extras = id => { const e = estado.extras[id] = estado.extras[id] || {}; e.frases=e.frases||[]; e.canciones=e.canciones||[]; e.imagenes=e.imagenes||[]; return e; };
 const todasCartas = ()=>[...KIT, ...estado.cartas.map(c=>({...c, tarjetas:[], canciones:[], propia:true}))];
@@ -192,7 +191,7 @@ function fondo(tipo,color){
 }
 /* Portadas sin símbolos: todas iguales (fondo de su color + texto), así las cartas que crea el paciente se ven como las demás */
 function portada(c){
-  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div></div></div>`;
+  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div></div><div class="marca">@sanatumentte</div></div>`;
 }
 const pagTexto = (color, html, edit)=>`<div class="pag" style="${fondo('b',color)}">${edit||''}<div class="txt fit">${html}</div></div>`;
 const botonesEd = (tipo,id,soloEditar,soloQuitar)=>`<div class="editar">${soloQuitar?'':`<button data-ed="${tipo}" data-id="${id}" title="Editar">✏️</button>`}${soloEditar?'':`<button data-del="${tipo}" data-id="${id}" title="Quitar">🗑</button>`}</div>`;
@@ -251,9 +250,8 @@ function pintarInicio(){
     : ACTUALIZADA ? '✨ <b>Tu kit se actualizó</b> con lo nuevo que trabajaste con tu psicóloga.' : VISTA ? '👁 <b>Vista previa</b> con un ejemplo: no se guarda nada.' : '';
   app.innerHTML = `${aviso?`<div class="nota">${aviso}</div>`:''}
     <h2>Ábrelo cuando lo necesites</h2>
-    ${todasCartas().length?'':'<div class="vacioCaja" style="padding:24px 16px;margin-bottom:12px">Crea tu primera carta: ¿con qué es tu lucha?<br><br><button class="btn" data-ir="nueva">➕ Crear mi primera carta</button></div>'}
-    <div class="sobres">${todasCartas().map(c=>`<button class="sobre" data-ir="carta" data-id="${c.id}">${portada(c)}</button>`).join('')}
-      <button class="sobre" data-ir="sesion"><div class="pag portada" style="${fondo('c','salvia')}"><div class="txt"><div class="abrelo">🌱</div><div class="cuando">Lo que me llevo de sesión</div><div class="f" style="margin-top:2cqw">${estado.sesion.length} aprendizaje${estado.sesion.length===1?'':'s'}</div></div></div></button>
+    <div class="sobres">${todasCartas().length?'':`<button class="sobre" data-ir="nueva">${portada({cuando:'Cuando tu lucha sea con…',color:'salvia'})}</button>`}${todasCartas().map(c=>`<button class="sobre" data-ir="carta" data-id="${c.id}">${portada(c)}</button>`).join('')}
+      <button class="sobre" data-ir="sesion"><div class="pag portada sesion" style="${fondo('c','salvia')}"><div class="txt"><div class="cuando">Lo que me llevo de sesión</div><div class="f" style="margin-top:2cqw">${estado.sesion.length} aprendizaje${estado.sesion.length===1?'':'s'}</div></div><div class="marca">@sanatumentte</div></div></button>
     </div>
     <div class="fila" style="margin-top:14px"><button class="btn" data-ir="nueva">➕ Nueva carta</button><button class="btn sec" data-ir="stats">📊 Mis estadísticas</button></div>
     <div class="fila"><button class="chip${estado.fe?' sel':''}" id="feBtn">🙏 Incluir mi fe (versículos y oración)</button></div>
