@@ -40,10 +40,9 @@ h3{font:600 1.05rem Fredoka,sans-serif;color:var(--mor2);margin:14px 0 6px}
 .txt .sep{color:var(--mor);font-size:3.5cqw;letter-spacing:1cqw}
 .txt .f{font:600 3.3cqw Quicksand,sans-serif;color:#a08aa8}
 .txt .btn{font-size:3.8cqw;padding:2cqw 5cqw}
-.portada .txt{top:36%;justify-content:flex-start;gap:1.5cqw}
-.portada .abrelo{font:700 9cqw Fredoka,sans-serif;color:var(--mor)}
-.portada .cuando{font:600 6.6cqw/1.1 Fredoka,sans-serif;color:var(--mor)}
-.portada .ico{font-size:17cqw;margin-top:2cqw}
+.portada .txt{left:12%;right:12%;top:37%;bottom:10%;justify-content:center;gap:4cqw}
+.portada .abrelo{font:700 16cqw/1 Fredoka,sans-serif;color:var(--mor);letter-spacing:.02em}
+.portada .cuando{font:600 9.5cqw/1.12 Fredoka,sans-serif;color:var(--mor);text-wrap:balance}
 .play{position:absolute;left:50%;bottom:5.5%;transform:translateX(-50%);white-space:nowrap;font-size:3.6cqw;padding:2cqw 5cqw;box-shadow:0 2px 8px #0002}
 .editar{position:absolute;top:3%;right:4%;display:flex;gap:4px;z-index:2}
 .editar button{border:0;background:#fffc;border-radius:99px;padding:5px 9px;cursor:pointer;font-size:.9rem}
@@ -206,9 +205,9 @@ const nomCarta = id=>{ const c=cartaPor(id); return c?c.cuando.replace(/^Cuando 
 
 /* ===== Piezas con el diseño ===== */
 const fondo = (tipo,color)=>`background-image:url(${IMG}${tipo}-${color}.jpg)`;
+/* Portadas sin símbolos: todas iguales (fondo de su color + texto), así las cartas que crea el paciente se ven como las demás */
 function portada(c){
-  if(c.portada) return `<div class="pag"><img src="${IMG}${c.portada}.jpg" alt="${esc(c.cuando)}" loading="lazy"></div>`;
-  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div><div class="ico">${esc(c.ic||'💛')}</div></div></div>`;
+  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div></div></div>`;
 }
 const pagTexto = (color, html, edit)=>`<div class="pag" style="${fondo('b',color)}">${edit||''}<div class="txt fit">${html}</div></div>`;
 const botonesEd = (tipo,id,soloEditar,soloQuitar)=>`<div class="editar">${soloQuitar?'':`<button data-ed="${tipo}" data-id="${id}" title="Editar">✏️</button>`}${soloEditar?'':`<button data-del="${tipo}" data-id="${id}" title="Quitar">🗑</button>`}</div>`;
@@ -377,22 +376,41 @@ function pintarFrase(c){
     guardar(); ir({v:'ver',id:c.id,que:'frases',i:ed.id?0:extras(c.id).frases.length-1}); };
 }
 
-/* 🫁 Respirar: la bolita crece al inhalar (4) y se achica al exhalar (6); vibra al cambiar y suena una melodía suave (se puede silenciar) */
+/* 🫁 Respirar: la bolita crece al inhalar (4) y se achica al exhalar (6); vibra al cambiar y suena música de meditación (se puede silenciar) */
 let RESP = null, AUDIO = null, SONIDO = true;
 try{ SONIDO = localStorage.getItem('sana_kit_sonido')!=='0'; }catch(e){}
-function musica(){ /* acorde suave de fondo + una nota que sube al inhalar y baja al exhalar */
+const ACORDES = [[73.42,146.83,220,329.63,369.99],[61.74,123.47,185,293.66,329.63],[49,98,146.83,246.94,369.99],[55,110,164.81,246.94,329.63]]; /* Re mayor: uno por respiración */
+function musica(){ /* acordes suaves con eco: suben y se aclaran al inhalar, bajan y se apagan al exhalar */
   if(AUDIO) return AUDIO; const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return null;
-  const ctx = new AC(), master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-  const filtro = ctx.createBiquadFilter(); filtro.type='lowpass'; filtro.frequency.value=900; filtro.connect(master);
-  [130.81,196.00,261.63,329.63].forEach((f,i)=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f; g.gain.value=[.22,.14,.10,.06][i]; o.connect(g); g.connect(filtro); o.start(); });
-  const voz = ctx.createOscillator(), vg = ctx.createGain(); voz.type='triangle'; voz.frequency.value=392; vg.gain.value=.05; voz.connect(vg); vg.connect(filtro); voz.start();
-  AUDIO = {ctx, master, voz}; return AUDIO;
+  const ctx = new AC(), comp = ctx.createDynamicsCompressor(), master = ctx.createGain(), nivel = ctx.createGain(), filtro = ctx.createBiquadFilter(),
+    eco = ctx.createConvolver(), seco = ctx.createGain(), mojado = ctx.createGain();
+  master.gain.value = 0; nivel.gain.value = .05; filtro.type='lowpass'; filtro.frequency.value=315; filtro.Q.value=.5; seco.gain.value=.7; mojado.gain.value=.6;
+  const sr = ctx.sampleRate, n = Math.floor(sr*3.5), ir = ctx.createBuffer(2,n,sr);
+  for(let c=0;c<2;c++){ const d=ir.getChannelData(c); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.5)*.5; }
+  eco.buffer = ir;
+  filtro.connect(seco); filtro.connect(eco); eco.connect(mojado); seco.connect(nivel); mojado.connect(nivel); nivel.connect(master); master.connect(comp); comp.connect(ctx.destination);
+  const re = new Float32Array(8), im = new Float32Array(8); for(let k=1;k<8;k++) im[k] = 1/(k*k*.7+.3);
+  AUDIO = {ctx, master, nivel, filtro, onda: ctx.createPeriodicWave(re,im), acorde:-1, voces:null, v:.05, fc:315}; return AUDIO;
 }
-function sonido(fase, seg){ const a = SONIDO && musica(); if(!a) return; const t=a.ctx.currentTime; a.ctx.resume&&a.ctx.resume();
-  a.master.gain.cancelScheduledValues(t); a.master.gain.setTargetAtTime(fase==='fin'?0:.35, t, fase==='fin'?.8:.4);
-  if(fase==='in'){ a.voz.frequency.cancelScheduledValues(t); a.voz.frequency.setValueAtTime(a.voz.frequency.value,t); a.voz.frequency.linearRampToValueAtTime(523.25,t+seg); }
-  if(fase==='out'){ a.voz.frequency.cancelScheduledValues(t); a.voz.frequency.setValueAtTime(a.voz.frequency.value,t); a.voz.frequency.linearRampToValueAtTime(392,t+seg); } }
-function silencio(){ if(AUDIO){ const t=AUDIO.ctx.currentTime; AUDIO.master.gain.cancelScheduledValues(t); AUDIO.master.gain.setTargetAtTime(0,t,.3); } }
+function curva(p, desde, hasta, seg, t){ const k=40, c=new Float32Array(k);
+  for(let i=0;i<k;i++) c[i] = desde+(hasta-desde)*(1-Math.cos(Math.PI*i/(k-1)))/2;
+  try{ (p.cancelAndHoldAtTime||p.cancelScheduledValues).call(p,t); p.setValueCurveAtTime(c,t,seg); }catch(e){ p.setTargetAtTime(hasta,t,seg/3); } }
+function soltarAcorde(a, t, d){ if(!a.voces) return; const v=a.voces; a.voces=null;
+  v.g.gain.cancelScheduledValues(t); v.g.gain.setValueAtTime(v.g.gain.value,t); v.g.gain.linearRampToValueAtTime(0,t+d); v.osc.forEach(o=>o.stop(t+d+.1)); }
+function acorde(a){ const t=a.ctx.currentTime, g=a.ctx.createGain(), osc=[]; soltarAcorde(a,t,3);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(1,t+2.5); g.connect(a.filtro); a.acorde=(a.acorde+1)%ACORDES.length;
+  ACORDES[a.acorde].forEach((f,j)=>[-7,0,7].forEach(c=>{ const o=a.ctx.createOscillator(), v=a.ctx.createGain(); o.setPeriodicWave(a.onda); o.frequency.value=f; o.detune.value=c;
+    v.gain.value=(j?.55:.9)*.09; o.connect(v); v.connect(g); o.start(t); osc.push(o); }));
+  a.voces = {g, osc}; }
+function campanita(a, f){ const t=a.ctx.currentTime; /* aguda al inhalar, más grave al exhalar */
+  [[1,1],[2.76,.25]].forEach(([r,v])=>{ const o=a.ctx.createOscillator(), g=a.ctx.createGain(); o.frequency.value=f*r;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.07*v,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+3.5); o.connect(g); g.connect(a.master); o.start(t); o.stop(t+3.6); }); }
+function sonido(fase, seg, sigue){ const a = SONIDO && musica(); if(!a) return; const t=a.ctx.currentTime; a.ctx.resume&&a.ctx.resume();
+  a.master.gain.cancelScheduledValues(t); a.master.gain.setTargetAtTime(fase==='fin'?0:1.5, t, fase==='fin'?1.3:.6);
+  if(fase==='fin'){ soltarAcorde(a,t,6); a.v=.05; a.fc=315; curva(a.nivel.gain,a.nivel.gain.value,.05,1,t); return; }
+  if(!sigue){ if(fase==='in'||!a.voces) acorde(a); campanita(a, fase==='in'?880:587.33); } else if(!a.voces) acorde(a);
+  const v = fase==='in'?1:.05, fc = fase==='in'?1295:315; curva(a.nivel.gain,a.v,v,seg,t); curva(a.filtro.frequency,a.fc,fc,seg,t); a.v=v; a.fc=fc; }
+function silencio(){ if(AUDIO){ const t=AUDIO.ctx.currentTime; AUDIO.master.gain.cancelScheduledValues(t); AUDIO.master.gain.setTargetAtTime(0,t,.3); soltarAcorde(AUDIO,t,1.5); } }
 function pararResp(){ if(RESP){ clearTimeout(RESP.t); RESP=null; try{ navigator.vibrate&&navigator.vibrate(0); }catch(e){} } silencio(); }
 function pintarResp(){
   const puedeVibrar = 'vibrate' in navigator;
@@ -407,7 +425,7 @@ function pintarResp(){
   enlazar();
   let veces = 6, vibrar = puedeVibrar;
   document.querySelectorAll('#rVeces .chip').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#rVeces .chip').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); veces=+b.dataset.n; });
-  rSon.onclick = ()=>{ SONIDO=!SONIDO; try{ localStorage.setItem('sana_kit_sonido', SONIDO?'1':'0'); }catch(e){} rSon.classList.toggle('sel',SONIDO); rSon.textContent=SONIDO?'🔊 Música suave':'🔇 Sin sonido'; if(!SONIDO) silencio(); else if(RESP) sonido(RESP.fase,1); };
+  rSon.onclick = ()=>{ SONIDO=!SONIDO; try{ localStorage.setItem('sana_kit_sonido', SONIDO?'1':'0'); }catch(e){} rSon.classList.toggle('sel',SONIDO); rSon.textContent=SONIDO?'🔊 Música suave':'🔇 Sin sonido'; if(!SONIDO) silencio(); else if(RESP) sonido(RESP.fase,1,true); };
   rVib.onclick = ()=>{ vibrar=!vibrar; rVib.classList.toggle('sel',vibrar); };
   rIni.onclick = ()=>{ if(RESP){ pararResp(); reset(); return; } empezar(); };
   const bola=document.getElementById('bola'), fase=document.getElementById('fase');
@@ -566,7 +584,6 @@ function pintarNueva(id){
   app.innerHTML = `${volverA('Mi kit',{v:'inicio'})}<h2>${id?'Cambiar mi carta':'Nueva carta'}</h2>
     <div class="caja"><label>Título</label><input type="text" id="cT" value="${esc(c.cuando)}">
       <label>Color</label><div class="chips colores">${Object.entries(COLORES).map(([k,v])=>`<button class="chip${k===c.color?' sel':''}" data-c="${k}" style="background:${v}" title="${k}"></button>`).join('')}</div>
-      <label>Ícono</label><div class="chips" id="cIc">${ICS.map(i=>`<button class="chip${i===c.ic?' sel':''}">${i}</button>`).join('')}</div>
       <div class="hint" style="margin-top:12px">👁 Vista previa</div><div id="cPrev" style="max-width:240px"></div>
       <div class="fila"><button class="btn" id="cOk">${id?'Guardar':'Crear y abrir'}</button></div></div>`;
   enlazar();
