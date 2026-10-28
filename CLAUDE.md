@@ -15,6 +15,16 @@ Cuando Camila pida hacer interactivo un PDF sin cambiar el diseño, sigue el mis
 7. El enlace de la cartilla es `#<token>.<WhatsApp de Camila>[.<respuestas anteriores en base64url>]`. Casos Clínicos lo arma solo: «📤 Enviar a…» asigna la cartilla al paciente, y «✍️ Llenar en sesión» la abre con lo último que ese paciente había enviado para seguir donde quedaron.
 8. Pruébalo con datos de ejemplo (capturas de las páginas con ejercicios, en escritorio y a 390 px) y muéstrale a Camila una vista previa antes de subir nada: ella aprueba primero.
 
+## «Agrega registro» o «seguimiento»
+
+Cuando Camila diga «agrega registro» o «seguimiento» sobre un material, hazlo como en `fichas/autocompasion.js`:
+
+1. Un botón al final, «💾 Guardar … y empezar otro(a)». Guarda lo que se llenó con su fecha en una lista dentro del estado de la ficha (`S.<pre>_reg`), deja los campos en blanco y se pueden guardar todos los que quiera.
+2. Una sección «Mi mes de …» (campo tipo `x`), con flechas para cambiar de mes. Muestra cuántos registros y días, el promedio antes → después (si hay una escala 0–10), una gráfica de cada registro y las frases o respuestas clave en tarjetas con fecha, cada una con «✕ Borrar».
+3. En el resumen que llega con SANA1, cada registro va como una línea `• dd/mm: Etiqueta: valor | Etiqueta: valor`; así Casos Clínicos la muestra en su propia tarjeta.
+
+Muéstrale una vista previa antes de subir.
+
 ## Reglas
 
 - Escribe todo en español, con el tono cálido de la página.
