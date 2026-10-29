@@ -559,14 +559,22 @@ function mensajeSana(){
   /* El estado guarda hasta 62 días para las estadísticas del mes sin alargar demasiado el mensaje */
   const lim=new Date(); lim.setDate(lim.getDate()-62); const s=Object.assign({},estado,{reg:estado.reg.filter(r=>r.f>=iso(lim))});
   /* La semana (reg) ya va dentro de s.reg: solo se manda el rango (w) y el código va comprimido («SANA1:z…») para que llegue completo */
-  const o = {v:1,k:'c',c:'semanal',f:hoyISO(),res,w:[ini,fin],s}; if(TOKEN) o.t = TOKEN;
+  /* El token va primero y el texto por día (res) no va en el comprimido: la app lo arma desde s.reg (antes iba repetido y el código se cortaba con muchos registros) */
+  const o = TOKEN ? {v:1,k:'c',c:'semanal',t:TOKEN} : {v:1,k:'c',c:'semanal'}; o.f=hoyISO(); o.w=[ini,fin]; o.s=s;
   if(window.LZString) return '🌈 Mi semana emocional\nSANA1:z'+LZString.compressToEncodedURIComponent(JSON.stringify(o));
-  o.reg = sem; delete o.w;
+  o.res = res; o.reg = sem; delete o.w;
   const by = new TextEncoder().encode(JSON.stringify(o)); let bin=''; for(let i=0;i<by.length;i+=0x8000) bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));
   return '🌈 Mi semana emocional\nSANA1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 const linkWA = ()=> 'https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent(mensajeSana());
-document.getElementById('whatsapp').addEventListener('click', e=>{ if(VISTA){ e.preventDefault(); avisoVista(document.getElementById('platAviso')); return; } e.currentTarget.href = linkWA(); });
+/* WhatsApp corta los enlaces muy largos: si la semana no cabe, se copia el mensaje y se abre el chat para pegarlo */
+const WA_MAX = 5000;
+document.getElementById('whatsapp').addEventListener('click', e=>{ if(VISTA){ e.preventDefault(); avisoVista(document.getElementById('platAviso')); return; }
+  const msg = mensajeSana(), av = document.getElementById('platAviso');
+  if(encodeURIComponent(msg).length <= WA_MAX){ e.currentTarget.href = linkWA(); return; }
+  e.currentTarget.href = 'https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent('🌈 Te envío mi semana emocional (la pego en el siguiente mensaje)');
+  av.style.display='block';
+  try{ navigator.clipboard.writeText(msg).then(()=>{ av.innerHTML='✅ Tu semana es larga y se <b>copió</b>. En el chat de WhatsApp mantén presionado y elige <b>Pegar</b> para enviarla completa.'; }, ()=>copiarMensaje(av)); }catch(_){ copiarMensaje(av); } });
 document.getElementById('plataforma').onclick = ()=> VISTA ? avisoVista(document.getElementById('platAviso')) : copiarMensaje(document.getElementById('platAviso'));
 function avisoVista(av){ av.style.display='block'; av.innerHTML='👁 Vista previa: aquí tu paciente te envía su semana. En la vista previa no se envía nada.'; }
 function copiarMensaje(av){ if(VISTA) return avisoVista(av); const msg = mensajeSana(); av.style.display='block';
