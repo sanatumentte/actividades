@@ -461,8 +461,8 @@ function pintarFinSemana(){
     <div id="semAviso" style="display:none;margin-top:10px;font-size:.92rem"></div>
     <div class="fila" style="margin-top:10px"><button class="btn sec" id="semStats">📊 Ver mis estadísticas</button></div></div>`;
   const marcar = ()=>{ estado.env = [...new Set([...(estado.env||[]), estado.inicio])]; guardar(); };
-  document.getElementById('semWa').onclick = e=>{ e.currentTarget.href = linkWA(); marcar(); };
-  document.getElementById('semCopiar').onclick = ()=>{ copiarMensaje(document.getElementById('semAviso')); marcar(); };
+  document.getElementById('semWa').onclick = e=>{ enviarWA(e, document.getElementById('semAviso')); marcar(); };
+  document.getElementById('semCopiar').onclick = ()=>{ copiarMensaje(document.getElementById('semAviso')); marcarEnvio(); marcar(); };
   document.getElementById('semStats').onclick = ()=>ver('stats');
 }
 
@@ -556,26 +556,30 @@ function mensajeSana(){
   const cp={}; sem.forEach(r=>{ const k=norm(r.pen); if(k){ cp[k]=cp[k]||[r.pen.trim(),0]; cp[k][1]++; } });
   const te=Object.entries(ce).sort((a,b)=>b[1]-a[1]).slice(0,5), tpn=Object.values(cp).filter(x=>x[1]>1).sort((a,b)=>b[1]-a[1]).slice(0,3);
   if(sem.length) res.push({label:'Resumen de la semana', val:sem.length+' momentos'+(te.length?'\nEmociones que más se repitieron: '+te.map(([n,v])=>n+' ('+v+')').join(', '):'')+(tpn.length?'\nPensamientos que se repitieron: '+tpn.map(x=>'«'+x[0]+'» ('+x[1]+')').join(', '):'')});
-  /* El estado guarda hasta 62 días para las estadísticas del mes sin alargar demasiado el mensaje */
-  const lim=new Date(); lim.setDate(lim.getDate()-62); const s=Object.assign({},estado,{reg:estado.reg.filter(r=>r.f>=iso(lim))});
-  /* La semana (reg) ya va dentro de s.reg: solo se manda el rango (w) y el código va comprimido («SANA1:z…») para que llegue completo */
-  /* El token va primero y el texto por día (res) no va en el comprimido: la app lo arma desde s.reg (antes iba repetido y el código se cortaba con muchos registros) */
-  const o = TOKEN ? {v:1,k:'c',c:'semanal',t:TOKEN} : {v:1,k:'c',c:'semanal'}; o.f=hoyISO(); o.w=[ini,fin]; o.s=s;
+  /* Código siempre corto: solo va la semana + lo que aún no se había enviado (máx. 14 días atrás). La app lo ANEXA a los registros que ya tiene (d:1) */
+  const env=new Set(estado.envIds||[]), lim=new Date(); lim.setDate(lim.getDate()-14);
+  const sel=estado.reg.filter(r=>(r.f>=ini&&r.f<=fin)||(!env.has(r.id)&&r.f>=iso(lim))); ENVIO_IDS=sel.map(r=>r.id);
+  const s=Object.assign({},estado,{reg:sel}); delete s.envIds;
+  /* El token va primero y el texto por día (res) no va en el comprimido: la app lo arma desde s.reg */
+  const o = TOKEN ? {v:1,k:'c',c:'semanal',t:TOKEN} : {v:1,k:'c',c:'semanal'}; o.f=hoyISO(); o.w=[ini,fin]; o.d=1; o.s=s;
   if(window.LZString) return '🌈 Mi semana emocional\nSANA1:z'+LZString.compressToEncodedURIComponent(JSON.stringify(o));
   o.res = res; o.reg = sem; delete o.w;
   const by = new TextEncoder().encode(JSON.stringify(o)); let bin=''; for(let i=0;i<by.length;i+=0x8000) bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));
   return '🌈 Mi semana emocional\nSANA1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
+let ENVIO_IDS=[];
+/* lo enviado ya no se vuelve a mandar en las semanas siguientes */
+function marcarEnvio(){ estado.envIds=[...new Set([...(estado.envIds||[]),...ENVIO_IDS])].slice(-400); guardar(); }
 const linkWA = ()=> 'https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent(mensajeSana());
-/* WhatsApp corta los enlaces muy largos: si la semana no cabe, se copia el mensaje y se abre el chat para pegarlo */
+/* WhatsApp corta los enlaces muy largos: si aun así no cabe, se copia el mensaje y se abre el chat para pegarlo */
 const WA_MAX = 5000;
-document.getElementById('whatsapp').addEventListener('click', e=>{ if(VISTA){ e.preventDefault(); avisoVista(document.getElementById('platAviso')); return; }
-  const msg = mensajeSana(), av = document.getElementById('platAviso');
-  if(encodeURIComponent(msg).length <= WA_MAX){ e.currentTarget.href = linkWA(); return; }
+function enviarWA(e, av){ const msg = mensajeSana(); marcarEnvio();
+  if(encodeURIComponent(msg).length <= WA_MAX){ e.currentTarget.href = 'https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent(msg); return; }
   e.currentTarget.href = 'https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent('🌈 Te envío mi semana emocional (la pego en el siguiente mensaje)');
   av.style.display='block';
-  try{ navigator.clipboard.writeText(msg).then(()=>{ av.innerHTML='✅ Tu semana es larga y se <b>copió</b>. En el chat de WhatsApp mantén presionado y elige <b>Pegar</b> para enviarla completa.'; }, ()=>copiarMensaje(av)); }catch(_){ copiarMensaje(av); } });
-document.getElementById('plataforma').onclick = ()=> VISTA ? avisoVista(document.getElementById('platAviso')) : copiarMensaje(document.getElementById('platAviso'));
+  try{ navigator.clipboard.writeText(msg).then(()=>{ av.innerHTML='✅ Tu semana es larga y se <b>copió</b>. En el chat de WhatsApp mantén presionado y elige <b>Pegar</b> para enviarla completa.'; }, ()=>copiarMensaje(av)); }catch(_){ copiarMensaje(av); } }
+document.getElementById('whatsapp').addEventListener('click', e=>{ if(VISTA){ e.preventDefault(); avisoVista(document.getElementById('platAviso')); return; } enviarWA(e, document.getElementById('platAviso')); });
+document.getElementById('plataforma').onclick = ()=>{ if(VISTA) return avisoVista(document.getElementById('platAviso')); copiarMensaje(document.getElementById('platAviso')); marcarEnvio(); };
 function avisoVista(av){ av.style.display='block'; av.innerHTML='👁 Vista previa: aquí tu paciente te envía su semana. En la vista previa no se envía nada.'; }
 function copiarMensaje(av){ if(VISTA) return avisoVista(av); const msg = mensajeSana(); av.style.display='block';
   const manual = ()=>{ av.innerHTML='Copia este texto y envíalo por WhatsApp a tu psicóloga:<textarea style="width:100%;min-height:90px;margin-top:6px" readonly>'+msg+'</textarea>'; };
