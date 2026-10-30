@@ -36,6 +36,7 @@ h3{font:600 1.05rem Fredoka,sans-serif;color:var(--mor2);margin:14px 0 6px}
 .txt .p{font:500 calc(4.8cqw*var(--z))/1.4 Quicksand,sans-serif;white-space:pre-wrap}
 .txt .vacio{font:500 calc(4.2cqw*var(--z))/1.4 Quicksand,sans-serif;color:#b49cbb;font-style:italic}
 .txt .ref{font:700 calc(3.6cqw*var(--z)) Quicksand,sans-serif;color:var(--mor);background:#e3cfe7;border-radius:99px;padding:.4cqw 3cqw}
+.txt .hl{font:700 1.08em/1.15 Fredoka,sans-serif;color:var(--mor2);background:linear-gradient(transparent 58%,#dcbde9 58%,#dcbde9 92%,transparent 92%);padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .txt .v{font:500 calc(4cqw*var(--z))/1.4 Quicksand,sans-serif}
 .txt .sep{color:var(--mor);font-size:3.5cqw;letter-spacing:1cqw}
 .txt .f{font:600 3.3cqw Quicksand,sans-serif;color:#a08aa8}
@@ -177,6 +178,8 @@ const base = ()=>({cartas:[], extras:{}, sesion:[], usos:[], escritos:[], ejerci
 const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const hoyISO = ()=>{ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* Palabras clave entre *asteriscos* (o **dobles**) se resaltan en negrilla con marcador */
+const marcar = s => esc(s).replace(/\*\*(.+?)\*\*|\*(.+?)\*/g, (m,a,b)=>`<b class="hl">${a||b}</b>`);
 const fechaBonita = f => { if(!f) return ''; const [y,m,d]=f.split('-'); return +d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+' '+y; };
 
 /* Unir dos versiones sin perder nada: listas por id (gana la más reciente de cada elemento) y borrados (del) */
@@ -218,11 +221,11 @@ const imgPag = (src,edit)=>`<div class="pag">${edit||''}<img src="${src}" alt=""
 function kitTarjetas(c){
   return (c.tarjetas||[]).map(t=> t.img
     ? `<div class="pag"><img src="${IMG}${t.img}.jpg" alt="" loading="lazy">${t.link?`<a class="btn play" href="${esc(t.link[0])}" target="_blank" rel="noopener">${esc(t.link[1])}</a>`:''}</div>`
-    : pagTexto(c.color, `${t.t?`<div class="t">${esc(t.t)}</div>`:''}${t.p?`<div class="p"${t.s?' style="--z:.78"':''}>${esc(t.p)}</div>`:''}${t.ref?`<div class="ref">${esc(t.ref)}</div>`:''}${t.v?`<div class="v">${esc(t.v)}</div>`:''}`));
+    : pagTexto(c.color, `${t.t?`<div class="t">${esc(t.t)}</div>`:''}${t.p?`<div class="p"${t.s?' style="--z:.78"':''}>${marcar(t.p)}</div>`:''}${t.ref?`<div class="ref">${esc(t.ref)}</div>`:''}${t.v?`<div class="v">${marcar(t.v)}</div>`:''}`));
 }
 function cardFrase(c,f){
   if(f.tipo==='control') return pagTexto(c.color, `${f.sit?`<div class="f">${esc(f.sit)}</div>`:''}<div class="t">En mis manos</div><div class="v">${(f.si||[]).map(x=>'✓ '+esc(x)).join('<br>')||'—'}</div><div class="sep">•••• ♥ ••••</div><div class="t">Lo entrego a Dios</div><div class="v">${(f.no||[]).map(esc).join(' · ')||'—'}</div>${f.hoy?`<div class="ref">Hoy: ${esc(f.hoy)}</div>`:''}`, botonesEd('frase',f.id,false,true));
-  return pagTexto(c.color, `${f.tit?`<div class="t">${esc(f.tit)}</div>`:''}<div class="p">${esc(f.t)}</div>${f.ref?`<div class="ref">${esc(f.ref)}</div>`:''}`, botonesEd('frase',f.id,false,!!f.tipo));
+  return pagTexto(c.color, `${f.tit?`<div class="t">${esc(f.tit)}</div>`:''}<div class="p">${marcar(f.t)}</div>${f.ref?`<div class="ref">${esc(f.ref)}</div>`:''}`, botonesEd('frase',f.id,false,!!f.tipo));
 }
 const misFrases = c=>extras(c.id).frases.map(f=>cardFrase(c,f));
 const misImagenes = c=>[...FINAL.map(p=>imgPag(IMG+p+'.jpg')), ...extras(c.id).imagenes.map(m=>imgPag(m.src, botonesEd('imagen',m.id,false,true)))];
@@ -235,9 +238,11 @@ function botonGuardarTarjeta(item){
 }
 /* El texto siempre cabe: se achica un poco y, si aún es largo, la tarjeta se puede deslizar */
 function ajustar(raiz){
-  (raiz||document).querySelectorAll('.txt.fit').forEach(t=>{ const pag=t.parentElement; let z=1;
-    pag.style.setProperty('--z',1); t.classList.remove('scroll');
-    while(t.scrollHeight>t.clientHeight+1 && z>0.62){ z-=0.04; pag.style.setProperty('--z',z.toFixed(2)); }
+  /* frases cortas: la letra arranca grande (hasta 1.8×) y baja hasta que llena el espacio sin salirse */
+  (raiz||document).querySelectorAll('.txt.fit').forEach(t=>{ const pag=t.parentElement; let z=1.8;
+    const sale=()=>t.scrollHeight>t.clientHeight+1||t.scrollWidth>t.clientWidth+1;
+    pag.style.setProperty('--z',z); t.classList.remove('scroll');
+    while(sale() && z>0.62){ z-=0.04; pag.style.setProperty('--z',z.toFixed(2)); }
     if(t.scrollHeight>t.clientHeight+1) t.classList.add('scroll'); });
 }
 
@@ -364,7 +369,7 @@ function pintarFrase(c){
   app.innerHTML = `${volverA('Volver',{v:'carta',id:c.id})}<h2>✍️ ${ed.id?'Editar mi frase':'Escribir mi frase'}</h2>
     <div class="caja">${ed.id?'':`<label>Elige una idea (o escribe tu propio título)</label><div class="chips" id="fGu">${G.map((g,i)=>`<button class="chip" data-i="${i}">${esc(g.t)}</button>`).join('')}</div><p class="hint" id="fGuia"></p>`}
       <label>Título</label><input type="text" id="fTit" value="${esc(ed.tit||'')}" placeholder="Ej.: Lo que quiero recordarme">
-      <label>Mi frase</label><textarea id="fTxt" placeholder="Escríbela con tus palabras">${esc(ed.t||'')}</textarea>
+      <label>Mi frase</label><div class="hint">Pon *entre asteriscos* las palabras que quieras resaltar.</div><textarea id="fTxt" placeholder="Escríbela con tus palabras">${esc(ed.t||'')}</textarea>
       <label>Versículo (opcional)</label><input type="text" id="fRef" value="${esc(ed.ref||'')}" placeholder="Ej.: Salmo 56:3">
       <div class="hint" style="margin-top:12px">👁 Así se verá</div><div id="fPrev" style="max-width:300px;margin:0 auto"></div>
       <div class="fila" style="justify-content:center"><button class="btn" id="fOk">⭐ Guardar en mis tarjetas</button></div></div>`;
@@ -578,7 +583,7 @@ function pintarSesion(){
       <label>Fecha</label><input type="date" id="sF" value="${esc(ed.f||hoyISO())}">
       <div class="fila"><button class="btn" id="sOk">Guardar</button></div></details>`;
   enlazar();
-  const tarj = s=>pagTexto('menta', `<div class="f">${esc(fechaBonita(s.f))} · ${esc(s.ej||'Sesión')}</div>${s.frase?`<div class="t" style="font-size:calc(5.4cqw*var(--z))">«${esc(s.frase)}»</div>`:''}${s.ayudo?`<div class="p" style="font-size:calc(4cqw*var(--z))"><b>Lo que me ayudó:</b> ${esc(s.ayudo)}</div>`:''}${s.cuando?`<div class="ref">Úsalo: ${esc(s.cuando)}</div>`:''}`, botonesEd('sesion',s.id));
+  const tarj = s=>pagTexto('menta', `<div class="f">${esc(fechaBonita(s.f))} · ${esc(s.ej||'Sesión')}</div>${s.frase?`<div class="t" style="font-size:calc(5.4cqw*var(--z))">«${marcar(s.frase)}»</div>`:''}${s.ayudo?`<div class="p" style="font-size:calc(4cqw*var(--z))"><b>Lo que me ayudó:</b> ${esc(s.ayudo)}</div>`:''}${s.cuando?`<div class="ref">Úsalo: ${esc(s.cuando)}</div>`:''}`, botonesEd('sesion',s.id));
   let i=0; const v=document.getElementById('visor');
   const mostrar=()=>{ v.innerHTML = L.length?tarj(L[i]):'<p class="hint">Aquí irán apareciendo las frases y lo que te ayudó de lo que trabajamos en sesión.</p>'; ajustar(v); enlazar(v);
     if(L.length>1){ vNum.textContent=`${i+1} / ${L.length}`; vAnt.disabled=i<=0; vSig.disabled=i>=L.length-1; } };
