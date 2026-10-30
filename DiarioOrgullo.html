@@ -130,6 +130,12 @@ footer img{width:110px;margin-top:10px}
 .pie{font-size:.8rem;color:var(--petroleo);margin:4px 0 0}
 #platAviso{display:none;margin-top:10px;font-size:.92rem}
 @media print{.tabs,.fila,.flechas,footer img{display:none}}
+/* Computador: ocupa la pantalla (en el celular no cambia nada) */
+@media (min-width:1024px){
+  html{font-size:17.5px}
+  .wrap,.tabs{max-width:min(1180px,92vw);padding-left:32px;padding-right:32px}
+}
+@media (min-width:1500px){ html{font-size:19px} }
 </style>
 </head>
 <body>

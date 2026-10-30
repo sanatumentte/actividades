@@ -152,6 +152,12 @@ footer img{width:110px;margin-top:10px}
 #platAviso{display:none;margin-top:10px;font-size:.92rem}
 @media(max-width:420px){.dsem .e{font-size:1.3rem}.barra .nom{width:118px;font-size:.82rem}.tabs{gap:4px;padding:8px 10px}.tab{min-width:0;font-size:.8rem;padding:9px 4px}}
 @media print{.tabs,.fila,.flechas,footer img,.agregar,.rango{display:none}}
+/* Computador: ocupa la pantalla (en el celular no cambia nada) */
+@media (min-width:1024px){
+  html{font-size:17.5px}
+  .wrap,.tabs{max-width:min(1180px,92vw);padding-left:32px;padding-right:32px}
+}
+@media (min-width:1500px){ html{font-size:19px} }
 </style>
 </head>
 <body>

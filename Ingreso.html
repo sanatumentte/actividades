@@ -87,6 +87,16 @@ textarea{min-height:84px; resize:vertical}
 .btn.wa{background:#25d366; color:#fff}
 .candado{font-size:.85rem; color:var(--suave); text-align:center; margin-top:14px}
 .hidden{display:none !important}
+/* Computador: ocupa la pantalla (en el celular no cambia nada) */
+@media (min-width:1024px){
+  html{font-size:17.5px}
+  .wrap{max-width:min(1180px,92vw);padding-left:32px;padding-right:32px}
+  .card{padding:30px 40px}
+  .chips{gap:10px}
+  textarea{min-height:150px}
+  .btn.pri{max-width:420px}
+}
+@media (min-width:1500px){ html{font-size:19px} }
 </style>
 </head>
 <body>

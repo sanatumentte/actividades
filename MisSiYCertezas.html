@@ -106,6 +106,16 @@ input[type=range]{width:100%; accent-color:var(--c,var(--verde)); margin:8px 0 2
   .doc .sec{break-inside:avoid; border:1px solid #e7decf; border-radius:10px; padding:8px 12px; margin:8px 0}
 }
 @media (max-width:420px){ h1{font-size:1.9rem} .dias input{width:58px} }
+/* Computador: ocupa la pantalla (en el celular no cambia nada) */
+@media (min-width:1024px){
+  html{font-size:17.5px}
+  .wrap{max-width:min(1180px,92vw);padding-left:32px;padding-right:32px}
+  .card{padding:30px 40px}
+  .chips{gap:10px}
+  textarea{min-height:150px}
+  .btn.pri{max-width:420px}
+}
+@media (min-width:1500px){ html{font-size:19px} }
 </style>
 </head>
 <body>
