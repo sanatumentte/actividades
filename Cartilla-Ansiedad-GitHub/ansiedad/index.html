@@ -100,6 +100,15 @@
   .cambios .menos{color:#b0413e;font-weight:700}
   .hoja .code{max-height:120px}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Computador: ocupa la pantalla: dos páginas lado a lado (en el celular no cambia nada) */
+@media (min-width:1200px){
+  main{max-width:min(1560px,96vw)}
+  main>.intro,main>.cartilla,main>.enviar{width:100%;max-width:1100px;justify-self:center}
+  #paginas{grid-template-columns:repeat(2,minmax(0,1fr));align-items:end}
+  #paginas>figure:last-child:nth-child(odd){grid-column:1/-1;width:min(100%,760px);justify-self:center}
+  main.ancho #paginas{grid-template-columns:1fr}
+  main.ancho #paginas>figure{width:min(100%,1000px);justify-self:center}
+}
 </style>
 </head>
 <body>
@@ -139,7 +148,7 @@
     </div>
     <div class="ok" id="okc" aria-live="polite"></div>
     <div class="code" id="code" hidden></div>
-    <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a la línea de emergencias de tu país (en Colombia, el 123) o acude a urgencias.</div>
+    <div class="note">Si en algún momento sientes que podrías hacerte daño, no esperes: llama a <span class="lineaCrisis">la línea de emergencias de tu país</span> o acude a urgencias.</div>
     <div class="fila"><button class="btn sec" id="borrar" type="button">Borrar esta cartilla</button><span class="ok" id="okb"></span></div>
   </section>
   <p class="foot">Tus respuestas no se guardan en internet: solo las recibe tu psicóloga cuando se las envías.</p>
@@ -508,4 +517,13 @@ if(EN_SESION){ $('#modoSesion').hidden=false; $('#ultima').hidden=true; }
 if(ACTUALIZADA){ const n=$('#modoSesion'); n.hidden=false; n.innerHTML='✨ <b>Tu cartilla se actualizó</b> con lo más reciente que trabajaste con tu psicóloga. Sigue desde aquí y, cuando termines, envíasela.'; }
 </script>
 
+<script>
+/* Línea de crisis según la zona horaria del celular (sin pedir ubicación). Si no se reconoce el país, texto general. */
+function lineaCrisis(){ let z=''; try{ z=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+  const L=[[/^America\/Bogota$/,'la Línea 123 (Colombia)'],[/^America\/(New_York|Chicago|Denver|Phoenix|Los_Angeles|Anchorage|Detroit|Indiana|Kentucky|Boise|Adak)|^Pacific\/Honolulu$/,'la línea 988 (Estados Unidos: llama o escribe; marca 2 para español)'],
+    [/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns)$/,'la línea 988 (Canadá)'],[/^America\/(Mexico_City|Monterrey|Merida|Cancun|Chihuahua|Hermosillo|Mazatlan|Tijuana|Matamoros|Bahia_Banderas)$/,'la línea 911 (México)'],
+    [/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/,'la línea 024 (España)'],[/^America\/Guayaquil$/,'la línea 911 (Ecuador)'],[/^America\/Lima$/,'la Línea 113, opción 5 (Perú)'],[/^America\/Santiago$/,'la línea *4141 (Chile)']];
+  const m=L.find(([r])=>r.test(z)); return m?m[1]:'la línea de emergencias de tu país'; }
+document.querySelectorAll('.lineaCrisis').forEach(e=>e.textContent=lineaCrisis());
+</script>
 </body></html>
