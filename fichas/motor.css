@@ -127,4 +127,13 @@ figure[hidden],.chips a[hidden]{display:none}
 .cambios .menos{color:#b0413e;font-weight:700}
 .hoja .code{max-height:120px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* Computador: ocupa la pantalla: dos páginas lado a lado (en el celular no cambia nada) */
+@media (min-width:1200px){
+  main{max-width:min(1560px,96vw)}
+  main>.intro,main>.cartilla,main>.enviar{width:100%;max-width:1100px;justify-self:center}
+  #paginas{grid-template-columns:repeat(2,minmax(0,1fr));align-items:end}
+  #paginas>figure:last-child:nth-child(odd){grid-column:1/-1;width:min(100%,760px);justify-self:center}
+  main.ancho #paginas{grid-template-columns:1fr}
+  main.ancho #paginas>figure{width:min(100%,1000px);justify-self:center}
+}
 @media print{.top,.cartilla,.enviar,.foot,.intro .chips,.hint,.noprint{display:none!important} body{background:#fff} main{max-width:none;padding:0} figure,.sec{break-inside:avoid;box-shadow:none}}
