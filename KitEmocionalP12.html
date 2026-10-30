@@ -122,7 +122,8 @@ textarea{min-height:70px;resize:vertical}
 @media (min-width:1024px){
   body{font-size:17.5px}
   main{max-width:min(1100px,92vw);padding:24px 32px 48px}
-  .sobres{max-width:min(800px,calc((100vh - 200px)*1.6));margin-inline:auto}
+  .sobres{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .sobres:has(>:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr));max-width:640px;margin-inline:auto}
   .menu{grid-template-columns:repeat(4,1fr);gap:14px}
   .menu.uno{grid-template-columns:1fr;max-width:340px}
   .modal .caja{max-width:760px;border-radius:20px;margin:auto}
