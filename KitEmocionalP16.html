@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mi kit emocional · Ábrelo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--mor:#9a6aa6;--mor2:#7d5590;--txt:#5d4a66;--beige:#eddac4;--fondo:#fbf6ef;--verde:#25a35a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--txt);font:16px/1.45 Nunito,sans-serif}
+header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid #eadfd2;position:sticky;top:0;z-index:5}
+header img{height:38px}
+header b{font:600 1.1rem Fredoka,sans-serif;color:var(--mor2)}
+header small{display:block;color:#9a8aa0;font-size:.8rem}
+main{max-width:520px;margin:0 auto;padding:14px 16px 40px}
+h2{font:600 1.25rem Fredoka,sans-serif;color:var(--mor2);margin:18px 0 8px}
+h3{font:600 1.05rem Fredoka,sans-serif;color:var(--mor2);margin:14px 0 6px}
+.hint{color:#8a7a90;font-size:.9rem;margin:4px 0 10px}
+.btn{border:0;border-radius:999px;padding:10px 16px;font:700 .95rem Nunito,sans-serif;cursor:pointer;background:var(--mor);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn.sec{background:#fff;color:var(--mor2);border:1.5px solid #d9c6df}
+.btn.sm{padding:6px 12px;font-size:.85rem}
+.btn.wa{background:var(--verde)}
+.btn:disabled{opacity:.45}
+.fila{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+/* Sobres (portadas) */
+.sobres{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sobre{display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;border-radius:14px;overflow:hidden;box-shadow:0 3px 10px #0001;text-align:left}
+/* Página con el diseño del kit */
+.pag{position:relative;width:100%;aspect-ratio:1238/1547;background-size:cover;background-position:center;container-type:inline-size;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px #0001;--z:1}
+.pag>img{width:100%;height:100%;object-fit:cover;display:block}
+.txt{position:absolute;left:16%;right:16%;top:23%;bottom:11%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2.2cqw;font-family:Quicksand,sans-serif;color:var(--mor2);overflow:hidden}
+.txt.scroll{justify-content:flex-start;overflow-y:auto}
+.txt .t{font:700 calc(6.2cqw*var(--z))/1.1 Fredoka,sans-serif;color:var(--mor)}
+.txt .p{font:500 calc(4.8cqw*var(--z))/1.4 Quicksand,sans-serif;white-space:pre-wrap}
+.txt .vacio{font:500 calc(4.2cqw*var(--z))/1.4 Quicksand,sans-serif;color:#b49cbb;font-style:italic}
+.txt .ref{font:700 calc(3.6cqw*var(--z)) Quicksand,sans-serif;color:var(--mor);background:#e3cfe7;border-radius:99px;padding:.4cqw 3cqw}
+.txt .v{font:500 calc(4cqw*var(--z))/1.4 Quicksand,sans-serif}
+.txt .sep{color:var(--mor);font-size:3.5cqw;letter-spacing:1cqw}
+.txt .f{font:600 3.3cqw Quicksand,sans-serif;color:#a08aa8}
+.txt .btn{font-size:3.8cqw;padding:2cqw 5cqw}
+.portada .txt{left:12%;right:12%;top:37%;bottom:16%;justify-content:center;gap:4cqw}
+.portada .abrelo{font:700 16cqw/1 Fredoka,sans-serif;color:var(--mor);letter-spacing:.02em}
+.portada .cuando{font:600 9.5cqw/1.12 Fredoka,sans-serif;color:var(--mor);text-wrap:balance}
+.marca{position:absolute;left:0;right:0;bottom:11.5%;text-align:center;font:600 3.4cqw Quicksand,sans-serif;letter-spacing:.06em;color:#a08aa8}
+.portada.sesion .cuando{font:700 11cqw/1.1 Fredoka,sans-serif;color:var(--mor)}
+.portada.sesion .f{font-size:4.2cqw}
+.play{position:absolute;left:50%;bottom:5.5%;transform:translateX(-50%);white-space:nowrap;font-size:3.6cqw;padding:2cqw 5cqw;box-shadow:0 2px 8px #0002}
+.editar{position:absolute;top:3%;right:4%;display:flex;gap:4px;z-index:2}
+.editar button{border:0;background:#fffc;border-radius:99px;padding:5px 9px;cursor:pointer;font-size:.9rem}
+/* Visor una a una */
+.visor{position:relative}
+.visorNav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.visorNav span{font-weight:700;color:var(--mor2)}
+/* Menú de la carta: qué quiero hacer ahora */
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opc{border:1.5px solid #e6d6ea;background:#fff;border-radius:18px;padding:14px 10px;cursor:pointer;text-align:center;font:700 .95rem Nunito,sans-serif;color:var(--txt)}
+.opc i{display:block;font-style:normal;font-size:1.9rem;margin-bottom:4px}
+.opc small{display:block;font-weight:600;color:#9a8aa0;font-size:.78rem;margin-top:2px}
+.sentido{font:700 .8rem Nunito,sans-serif;color:#a08aa8;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px}
+/* Secciones que se despliegan */
+details.seccion{background:#fff;border:1.5px solid #e6d6ea;border-radius:18px;margin:10px 0;overflow:hidden}
+details.seccion>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
+details.seccion>summary::-webkit-details-marker{display:none}
+details.seccion>summary i{font-style:normal;font-size:1.7rem}
+details.seccion>summary span{flex:1;font:600 1.1rem Fredoka,sans-serif;color:var(--mor2)}
+details.seccion>summary small{display:block;font:600 .8rem Nunito,sans-serif;color:#9a8aa0}
+details.seccion .flecha{color:var(--mor);transition:transform .2s}
+details.seccion[open] .flecha{transform:rotate(180deg)}
+.secIn{padding:0 12px 14px}
+.menu.uno{grid-template-columns:1fr;max-width:280px;margin:0 auto}
+.vacioCaja{background:#fff;border:1.5px dashed #dcc9e2;border-radius:16px;padding:40px 16px;text-align:center;color:#9a8aa0}
+.lista{display:flex;flex-direction:column;gap:1.4cqw;align-items:center;width:100%}
+.itm{border:0;background:#fffaf3;border-radius:99px;padding:1.4cqw 3.5cqw;font:600 3.8cqw Quicksand,sans-serif;color:var(--txt);cursor:pointer;user-select:none;-webkit-user-select:none}
+.itm.ok{text-decoration:line-through;opacity:.75}
+.itm.lila{background:#e3cfe7}
+/* Formularios */
+.caja{background:#fff;border:1.5px solid #eadfd2;border-radius:16px;padding:14px;margin:12px 0}
+label{display:block;font-weight:700;margin:10px 0 4px;color:var(--mor2)}
+input[type=text],input[type=url],input[type=date],textarea,select{width:100%;padding:10px;border:1.5px solid #e2d4e6;border-radius:12px;font:inherit;color:inherit;background:#fffdfb}
+textarea{min-height:70px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid #dcc9e2;background:#fff;border-radius:99px;padding:6px 11px;cursor:pointer;font:600 .88rem Nunito,sans-serif;color:var(--txt)}
+.chip.sel{background:var(--mor);border-color:var(--mor);color:#fff}
+.num .chip{min-width:38px;text-align:center}
+.disenos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.disenos .sobre{border:3px solid transparent;border-radius:14px}
+.disenos .sobre.sel{border-color:var(--mor)}
+.nota{background:#f3ecf6;border-radius:12px;padding:10px 12px;font-size:.9rem;margin:10px 0}
+.oculto{display:none!important}
+.volver{margin:4px 0 12px}
+.pasos{font:700 .85rem Nunito,sans-serif;color:#a08aa8;margin-bottom:4px}
+/* Respiración */
+.resp{display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px 0}
+.globo{width:260px;height:260px;display:grid;place-items:center;position:relative}
+.bola{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f3e3f6,#c9a3d3 60%,#a77bb4);box-shadow:0 0 0 14px #9a6aa61a,0 10px 30px #9a6aa640;transform:scale(1)}
+.fase{position:absolute;font:700 1.4rem Fredoka,sans-serif;color:#fff;text-shadow:0 1px 4px #0004;text-align:center;pointer-events:none}
+.fase small{display:block;font-size:1rem}
+/* Lo que depende de mí */
+.circulo{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:#e9dcef;display:flex;flex-direction:column;align-items:center;padding:6% 8%;margin:8px 0}
+.circulo .afuera{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:88%;margin-bottom:4px}
+.circulo .dentro{width:66%;scrollbar-width:none;aspect-ratio:1;border-radius:50%;background:var(--beige);border:3px solid var(--mor);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8%;gap:5px;margin:auto 0;overflow:auto}
+.circulo b{font:700 .8rem Fredoka,sans-serif;color:var(--mor2)}
+.pz{background:#fff;border-radius:99px;padding:2px 8px;font-size:.76rem;line-height:1.3;cursor:pointer;text-align:center}
+.dentro .pz{background:#fff8}
+/* Canciones */
+.cancion{background:#fff;border:1.5px solid #eadfd2;border-radius:16px;padding:10px;margin:10px 0}
+.cancion iframe{width:100%;border:0;border-radius:12px;display:block}
+.cancion .nom{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;color:var(--mor2);margin-bottom:6px}
+.cancion .nom button{border:0;background:#f3ecf6;border-radius:99px;padding:3px 8px;cursor:pointer}
+/* Estadísticas */
+.stat{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.stat div{background:#fff;border-radius:14px;padding:10px 6px;border:1.5px solid #eadfd2}
+.stat b{display:block;font:700 1.5rem Fredoka,sans-serif;color:var(--mor2)}
+.barra{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.9rem}
+.barra span:first-child{flex:0 0 42%}
+.barra i{display:block;height:12px;border-radius:99px;background:var(--mor)}
+.crisis{font-size:.85rem;color:#8a7a90;text-align:center;margin-top:22px}
+.modal{position:fixed;inset:0;background:#3a2a4055;display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.modal .caja{width:100%;max-width:520px;margin:0;border-radius:20px 20px 0 0;max-height:90vh;overflow:auto}
+</style>
+</head>
+<body>
+<header><img src="fichas/img/logo-sana.png" alt="Sana tu Mentte" onerror="this.remove()"><div><b>Mi kit emocional</b><small>Ábrelo cuando lo necesites 💛</small></div></header>
+<main id="app"></main>
+
+<script>
+var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",e={};function t(r,o){if(!e[r]){e[r]={};for(var n=0;n<r.length;n++)e[r][r.charAt(n)]=n}return e[r][o]}var i={compressToBase64:function(r){if(null==r)return"";var n=i._compress(r,6,function(r){return o.charAt(r)});switch(n.length%4){default:case 0:return n;case 1:return n+"===";case 2:return n+"==";case 3:return n+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(n){return t(o,r.charAt(n))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(r){return null==r?"":""==r?null:i._decompress(r.length,16384,function(o){return r.charCodeAt(o)-32})},compressToUint8Array:function(r){for(var o=i.compress(r),n=new Uint8Array(2*o.length),e=0,t=o.length;e<t;e++){var s=o.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null==o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;e<t;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return n.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return t(n,r.charAt(o))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},u={},a="",p="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1)if(a=r.charAt(i),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=f++,u[a]=!0),p=c+a,Object.prototype.hasOwnProperty.call(s,p))c=p;else{if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++),s[p]=f++,c=String(a)}if(""!==c){if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==o-1){d.push(n(m));break}v++}return d.join("")},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return r.charCodeAt(o)})},_decompress:function(o,n,e){var t,i,s,u,a,p,c,l=[],f=4,h=4,d=3,m="",v=[],g={val:e(0),position:n,index:1};for(t=0;t<3;t+=1)l[t]=t;for(s=0,a=Math.pow(2,2),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 2:return""}for(l[3]=c,i=c,v.push(c);;){if(g.index>o)return"";for(s=0,a=Math.pow(2,d),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(c=s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 2:return v.join("")}if(0==f&&(f=Math.pow(2,d),d++),l[c])m=l[c];else{if(c!==h)return null;m=i+i.charAt(0)}v.push(m),l[h++]=i+m.charAt(0),i=m,0==--f&&(f=Math.pow(2,d),d++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module?module.exports=LZString:"undefined"!=typeof angular&&null!=angular&&angular.module("LZString",[]).factory("LZString",function(){return LZString});
+/* ===== Plantilla de mujeres: diseño del kit de Canva (rayas, flor lila, cuadro beige; blancos kit-p12/b-|c-<color>.jpg).
+   Sin cartas fijas: ella (o su psicóloga en sesión) crea cada carta y elige su color, que repiten su portada y sus tarjetas ===== */
+const IMG = 'kit-p12/';
+const COLORES = {amarillo:'#fce597', lila:'#d9c1d8', menta:'#a9c9c1', rosa:'#f6c8d2'};
+const pags = (a,b)=>Array.from({length:b-a+1},(_,i)=>'p'+String(a+i).padStart(2,'0'));
+/* Kit de P16: contenido aprobado por Camila (2026-10-29). Tarjetas = sus frases + apoyos + versículos (RVR1960) con consuelo;
+   ejercicios = lo que se hace en el momento (✍️ Hacer). Ella puede agregar frases, canciones y cartas. */
+const SEG = {t:'Si piensas que no quieres seguir', s:1, p:'Abre tu Plan de seguridad (botón 🛟 abajo) o llama o escribe al 988 (marca 2 para español). Si es urgente, llama al 911.'};
+const RESPIRA = {t:'🫁 Respira conmigo', p:'Inhala mientras el círculo crece y exhala mientras se achica.', ir:'resp', b:'🫁 Respirar ahora'};
+const KIT = [
+  {id:'ex', cuando:'Cuando extrañes a tu ex', color:'rosa',
+   tarjetas:[
+    {p:'Cuando tenga el deseo de volver a Egipto, recuerdo que tengo una tierra prometida.'},
+    {p:'Tu corazón no es Egipto para estar aceptando cualquier plaga.'},
+    {p:'Aunque lo extrañe, siento que fue lo mejor.'},
+    {p:'Tuve el valor de preguntarle a Dios. Eso admiro de mí.'},
+    {t:'Puedo llorar', p:'Llorar está permitido. Dejo que salga… y luego elijo qué hago.'},
+    {t:'Extrañar no es volver', p:'Puedo extrañarlo y aun así saber que fue lo mejor para mí.'},
+    {t:'No me eligió ≠ no valgo', p:'Que él no me eligiera habla de su decisión, no de mi valor.'},
+    {ref:'1 Pedro 2:9', v:'Mas vosotros sois linaje escogido, real sacerdocio, nación santa, pueblo adquirido por Dios, para que anunciéis las virtudes de aquel que os llamó de las tinieblas a su luz admirable.', c:'Para Dios ya soy escogida. Eso no depende de nadie más.'},
+    RESPIRA, SEG],
+   ejercicios:[
+    {id:'recuerdo', ic:'💭', t:'Es un recuerdo', sub:'Cuando llega su recuerdo', guardar:'ahora', pasos:[
+      [{k:'rec',l:'1. ¿Qué recuerdo llegó?',ph:'Estoy teniendo el recuerdo de…'}],
+      [{k:'siento',l:'2. ¿Qué siento ahora y dónde lo noto en mi cuerpo?'}],
+      [{k:'ahora',l:'3. Respiro despacio. ¿Qué elijo hacer ahora?'}]]},
+    {id:'fotos', ic:'📱', t:'Antes de abrir sus fotos', sub:'Me detengo un momento', guardar:'otra', pasos:[
+      [{k:'busco',l:'1. ¿Qué estoy buscando al mirar sus fotos?'}],
+      [{k:'acerca',l:'2. ¿Esto me acerca o me aleja de lo que quiero para mí?'}],
+      [{k:'otra',l:'3. ¿Qué hago en su lugar?',ayuda:'Por ejemplo: escribirle a mi hermana, escuchar mi canción, salir a caminar.'}]]}],
+   canciones:[{n:'Date la vuelta · Morat',u:'https://www.youtube.com/watch?v=oSQZ8FJPOK4'}]},
+  {id:'familia', cuando:'Cuando tu lucha sea con mi familia', color:'menta',
+   tarjetas:[
+    {p:'Cuando hablé con mis papás me sentí más segura.'},
+    {p:'Hablar con mi mamá me animó.'},
+    {p:'Me gusta sentirme escuchada sin ser juzgada. Por eso puedo buscar a alguien que me escuche: mi hermana, mi mamá, mi primo o mi mejor amigo.'},
+    {t:'Sentirme lejos no me hace mala hija', p:'Lo que siento puede cambiar, y mi familia sigue siendo importante para mí.'},
+    {ref:'Eclesiastés 4:9-10', v:'Mejores son dos que uno… Porque si cayeren, el uno levantará a su compañero.', c:'Pedir apoyo no es ser débil: es dejar que me levanten.'},
+    RESPIRA, SEG],
+   ejercicios:[
+    {id:'gesto', ic:'📞', t:'Un gesto pequeño', sub:'Hacia mi familia', guardar:'gesto', pasos:[
+      [{k:'quien',l:'1. ¿A quién de mi familia quiero acercarme hoy?'}],
+      [{k:'gesto',l:'2. ¿Qué gesto pequeño puedo hacer?',ayuda:'Un mensaje, una llamada corta, una foto…'}]]},
+    {id:'despues', ic:'📝', t:'Después de hablarles', sub:'Escribo cómo me sentí', guardar:'bien', pasos:[
+      [{k:'como',l:'1. ¿Cómo me sentí al hablar con ellos?',ayuda:'Sin juzgarme.'}],
+      [{k:'bien',l:'2. ¿Qué me hizo bien de esa conversación?'}]]}],
+   canciones:[]},
+  {id:'proposito', cuando:'Cuando tu lucha sea con no saber mi propósito', color:'amarillo',
+   tarjetas:[
+    {t:'Es un pensamiento', p:'Me digo: «Estoy teniendo el pensamiento de que todo va a salir mal».'},
+    {t:'¿Y si…?', p:'Cada vez que piense en algo negativo, puedo pensar en lo que podría pasar de bueno o en lo más probable.', ir:'ysi', b:'✍️ Hacer el ejercicio ahora'},
+    {t:'Solo por hoy', p:'No tengo que resolver todo mi futuro hoy. Elijo un paso para este día.'},
+    {t:'Lo que me importa', p:'¿Qué es valioso para mí, aunque aún no sepa el camino?', ir:'ej', que:'importa', b:'✍️ Escribirlo ahora'},
+    {ref:'Mateo 6:34', v:'Así que, no os afanéis por el día de mañana, porque el día de mañana traerá su afán. Basta a cada día su propio mal.', c:'Hoy solo me toca hoy. Mañana Dios también estará.'},
+    {ref:'Proverbios 3:5-6', v:'Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.', c:'No tengo que ver todo el camino para dar el siguiente paso.'},
+    {ref:'Salmo 139:13-14', v:'Porque tú formaste mis entrañas; tú me hiciste en el vientre de mi madre. Te alabaré; porque formidables, maravillosas son tus obras…', c:'Quien me formó sabe para qué me hizo, aunque hoy yo no lo vea claro.'},
+    RESPIRA, SEG],
+   ejercicios:[
+    {id:'importa', ic:'🧭', t:'Lo que me importa', sub:'Aunque no sepa el camino', guardar:'valor', pasos:[
+      [{k:'valor',l:'1. ¿Qué es valioso para mí, aunque aún no sepa el camino?',ayuda:'Por ejemplo: mi fe, mi familia, cantar, ayudar a otros…'}],
+      [{k:'paso',l:'2. ¿Qué paso pequeño puedo dar hoy hacia eso?'}]]}],
+   canciones:[]},
+  {id:'blanco', cuando:'Cuando tu lucha sea con la mente en blanco', color:'lila',
+   tarjetas:[
+    {p:'Tranquila, más adelante vas a recordar.'},
+    {p:'Tómalo con calma, no todo se puede solucionar en un solo momento.'},
+    {p:'Cuando escribo mis pensamientos, puedo ordenarlos y ponerle nombre a lo que siento.'},
+    {t:'No tengo que recordarlo todo', p:'Lo importante está escrito en este kit. Puedo abrirlo las veces que quiera.'},
+    {t:'Estoy aquí', p:'Vuelvo al presente con mis sentidos: 5 cosas que veo, 4 que toco, 3 que oigo, 2 que huelo y 1 que saboreo.', ir:'ej', que:'aqui', b:'🌿 Hacerlo ahora'},
+    {t:'Abrazo de la mariposa', p:'Cruzo los brazos sobre el pecho y doy toquecitos suaves, un lado y otro, mientras respiro.'},
+    {ref:'Salmo 121:1-2', v:'Alzaré mis ojos a los montes; ¿de dónde vendrá mi socorro? Mi socorro viene de Jehová, que hizo los cielos y la tierra.', c:'Aunque mi mente esté en blanco, no estoy sola.'},
+    RESPIRA, SEG],
+   ejercicios:[
+    {id:'aqui', ic:'🌿', t:'Estoy aquí (5-4-3-2-1)', sub:'Volver al presente', final:'Estoy aquí, en este lugar.', pasos:[
+      [{k:'ve',l:'1. Respiro una vez, despacio. Nombro 5 cosas que veo'}],
+      [{k:'toca',l:'2. Nombro 4 cosas que toco'},{k:'oye',l:'Y 3 cosas que oigo'}],
+      [{k:'huele',l:'3. Nombro 2 cosas que huelo'},{k:'sabe',l:'Y 1 cosa que saboreo'}]]}],
+   canciones:[]},
+  {id:'dios', cuando:'Cuando tu lucha sea con sentirme lejos de Dios', color:'rosa',
+   tarjetas:[
+    {p:'Cuando siento culpa, recuerdo que Dios me perdonó y ya le entregué mi vida a Él.'},
+    {p:'Dios quiere que le sea honesta, que descanse en Él y que confíe más.'},
+    {p:'Dios comprende mi dolor y todo lo que me pasa.'},
+    {t:'¿Dios está enojado conmigo?', p:'Es un pensamiento. Puedo ponerlo a prueba con su Palabra.', ir:'ej', que:'enojado', b:'✍️ Ponerlo a prueba'},
+    {t:'Le hablo con honestidad', p:'Le cuento lo que siento, sin esconder mi dolor.', ir:'ej', que:'honesta', b:'🙏 Escribirle ahora'},
+    {ref:'Miqueas 7:19', v:'Él volverá a tener misericordia de nosotros; sepultará nuestras iniquidades, y echará en lo profundo del mar todos nuestros pecados.', c:'Lo que le entregué, Dios no lo saca para reprochármelo.'},
+    {ref:'1 Juan 2:1', v:'Hijitos míos, estas cosas os escribo para que no pequéis; y si alguno hubiere pecado, abogado tenemos para con el Padre, a Jesucristo el justo.', c:'Jesús está de mi lado, no en mi contra.'},
+    {ref:'1 Reyes 19:12', v:'Y tras el fuego un silbo apacible y delicado.', c:'Como con Elías, Dios se acerca con suavidad, no con enojo.'},
+    {ref:'Salmo 42:5', v:'¿Por qué te abates, oh alma mía, y te turbas dentro de mí? Espera en Dios; porque aún he de alabarle, salvación mía y Dios mío.', c:'Aunque hoy no lo sienta cerca, puedo esperar en Él.'},
+    RESPIRA, SEG],
+   ejercicios:[
+    {id:'enojado', ic:'⚖️', t:'¿Dios está enojado conmigo?', sub:'Lo pongo a prueba', guardar:'frase', pasos:[
+      [{k:'pen',l:'1. ¿Qué pienso de Dios ahora?',ph:'Estoy teniendo el pensamiento de que…'}],
+      [{k:'dice',l:'2. ¿Qué dice su Palabra?',ayuda:'Puedes mirar Miqueas 7:19 y 1 Juan 2:1 en tus tarjetas.'}],
+      [{k:'frase',l:'3. Una frase más justa que quiero creer'}]]},
+    {id:'honesta', ic:'🙏', t:'Le hablo con honestidad', sub:'Mi oración', guardar:'ora', pasos:[
+      [{k:'ora',l:'Escríbele a Dios lo que sientes, sin esconder tu dolor.',ayuda:'Como Elías: con honestidad.'}]]}],
+   canciones:[]}
+];
+/* Lo que se lleva de sesión (ella y Camila pueden editar o agregar) */
+const SESION_P16 = [
+  {id:'s11a', f:'', ej:'Sesión 11 · Lo que Dios dice de mí', frase:'1 Pedro 2:9: soy linaje escogido', ayudo:'Sentí paz y alivio; puedo mostrarle mi dolor a Dios sin esconderme', cuando:'Cuando pienso que no valgo o que Dios está enojado conmigo'},
+  {id:'s11b', f:'', ej:'Sesión 11 · Mi diálogo', frase:'Tranquila, más adelante vas a recordar', ayudo:'Me calma cuando siento la mente en blanco', cuando:'Cuando se me olvidan las cosas'},
+  {id:'s10', f:'', ej:'Sesión 10 · Elías (1 Reyes 19)', frase:'Dios me pide que sea honesta con Él, que descanse y que confíe', ayudo:'Entender que Dios comprende mi dolor', cuando:'Cuando tengo miedo o me siento muy cansada'},
+  {id:'s8', f:'', ej:'Sesión 8 · Mi apoyo', frase:'Puedo escribirle a mi hermana', ayudo:'Me dice cosas que me animan', cuando:'Cuando me siento mal en el trabajo'},
+  {id:'s7', f:'', ej:'Sesión 7 · Bañarme', frase:'Bañarme me ayuda a relajarme', ayudo:'Me tranquiliza', cuando:'Cuando me siento muy cargada'},
+  {id:'s5', f:'', ej:'Sesión 5 · Cantar y orar', frase:'Cantar y orar me ayudan a calmarme', ayudo:'Después de desahogarme me siento más tranquila', cuando:'Cuando siento angustia en el pecho'},
+  {id:'s3a', f:'', ej:'Sesión 3 · Autoinstrucción', frase:'Tómalo con calma, no todo se puede solucionar en un solo momento', ayudo:'Bajar los pensamientos', cuando:'Cuando tengo muchos pensamientos'},
+  {id:'s3b', f:'', ej:'Sesión 3 · Abrazo de la mariposa', frase:'Me abrazo y me agradezco algo del día', ayudo:'Terminar el día con calma', cuando:'Antes de dormir'}
+];
+/* Imágenes de fe del kit (Jesús abrazando): solo si activa 🙏 */
+const FINAL_FE = pags(41,43);
+const finales = ()=>estado.fe?FINAL_FE:[];
+const EMOCIONES = ['Miedo','Ansiedad','Tristeza','Rabia','Culpa','Vergüenza','Soledad','Cansancio','Frustración','Ilusión','Calma'];
+const USE_OPC = ()=>['Respiré','Vi mis tarjetas','Escuché una canción','¿Y si…?','Lo que depende de mí','Carta compasiva',...(estado.fe?['Oré']:[])];
+
+/* ===== Compartido como la cartilla: #<token>.<WhatsApp>[.<lo guardado en el caso>][.p = abierto en sesión] ===== */
+const VISTA = location.hash==='#vista';
+const ENL = VISTA?[]:(decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || []);
+let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_kitP16_enlace')||'{}')||{}; }catch(e){}
+if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_kitP16_enlace', JSON.stringify(ULT)); }catch(e){} }
+const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
+const KEY = 'sana_kitP16_v1' + (TOKEN ? ':'+TOKEN : '');
+const LISTAS = ['cartas','sesion','usos','escritos','ejercicios'];
+const base = ()=>({cartas:[], extras:{}, sesion:SESION_P16.map(x=>({...x})), usos:[], escritos:[], ejercicios:[], del:[], fe:true});
+const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const hoyISO = ()=>{ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fechaBonita = f => { if(!f) return ''; const [y,m,d]=f.split('-'); return +d+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]+' '+y; };
+
+/* Unir dos versiones sin perder nada: listas por id (gana la más reciente de cada elemento) y borrados (del) */
+function unir(a,b){
+  const o = base(); o.del = [...new Set([...(a.del||[]),...(b.del||[])])]; const del = new Set(o.del);
+  const lista = (x,y)=>{ const m = new Map(); [...(x||[]),...(y||[])].forEach(it=>{ if(!it||!it.id) return; const v=m.get(it.id); if(!v||(+it._t||0)>=(+v._t||0)) m.set(it.id,it); }); return [...m.values()].filter(it=>!del.has(it.id)); };
+  LISTAS.forEach(k=>o[k]=lista(a[k],b[k]));
+  new Set([...Object.keys(a.extras||{}),...Object.keys(b.extras||{})]).forEach(k=>{ const x=(a.extras||{})[k]||{}, y=(b.extras||{})[k]||{};
+    o.extras[k] = {frases:lista(x.frases,y.frases), canciones:lista(x.canciones,y.canciones), imagenes:lista(x.imagenes,y.imagenes)}; });
+  const nueva = (+b._t||0)>=(+a._t||0) ? b : a, vieja = nueva===a ? b : a;
+  o.fe = nueva.fe!=null ? !!nueva.fe : !!vieja.fe;
+  o._t = Math.max(+a._t||0, +b._t||0); return o;
+}
+let estado = base();
+if(!VISTA){ try{ const g = JSON.parse(localStorage.getItem(KEY)); if(g) estado = unir(base(), g); }catch(e){} }
+let ACTUALIZADA = false;
+if(ENL[3]){ try{ const b=ENL[3].replace(/-/g,'+').replace(/_/g,'/'), bin=atob(b+'==='.slice((b.length+3)%4));
+  const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
+  if(o&&typeof o==='object'){ const antes=JSON.stringify(estado); estado = unir(estado, o); ACTUALIZADA = !EN_SESION && antes!==JSON.stringify(base()) && antes!==JSON.stringify(estado);
+    try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} } }catch(e){} }
+if(VISTA){ const h=hoyISO(); }
+const guardar = ()=>{ if(VISTA) return; estado._t = Date.now(); try{ localStorage.setItem(KEY, JSON.stringify(estado)); }catch(e){} };
+const extras = id => { const e = estado.extras[id] = estado.extras[id] || {}; e.frases=e.frases||[]; e.canciones=e.canciones||[]; e.imagenes=e.imagenes||[]; return e; };
+const todasCartas = ()=>[...KIT, ...estado.cartas.map(c=>({...c, tarjetas:[], canciones:[], propia:true}))];
+const cartaPor = id => todasCartas().find(c=>c.id===id);
+const escrito = id => (estado.escritos.find(x=>x.id===id)||{}).t||'';
+const nomCarta = id=>{ const c=cartaPor(id); return c?c.cuando.replace(/^Cuando tu lucha sea con /,''):'Mi kit'; };
+
+/* ===== Piezas con el diseño ===== */
+const fondo = (tipo,color)=>`background-image:url(${IMG}${tipo}-${color}.jpg)`;
+/* Portadas sin símbolos: todas iguales (fondo de su color + texto), así las cartas que crea el paciente se ven como las demás */
+function portada(c){
+  return `<div class="pag portada" style="${fondo('c',c.color)}"><div class="txt"><div class="abrelo">ÁBRELO</div><div class="cuando">${esc(c.cuando)}</div></div><div class="marca">@sanatumentte</div></div>`;
+}
+const pagTexto = (color, html, edit)=>`<div class="pag" style="${fondo('b',color)}">${edit||''}<div class="txt fit">${html}</div></div>`;
+const botonesEd = (tipo,id,soloEditar,soloQuitar)=>`<div class="editar">${soloQuitar?'':`<button data-ed="${tipo}" data-id="${id}" title="Editar">✏️</button>`}${soloEditar?'':`<button data-del="${tipo}" data-id="${id}" title="Quitar">🗑</button>`}</div>`;
+/* Tarjetas del kit (las que hizo la psicóloga), sus frases y sus imágenes */
+const imgPag = (src,edit)=>`<div class="pag">${edit||''}<img src="${src}" alt="" loading="lazy" style="background:#fff;object-fit:contain"></div>`;
+function kitTarjetas(c){
+  return (c.tarjetas||[]).map(t=> t.img
+    ? `<div class="pag"><img src="${IMG}${t.img}.jpg" alt="" loading="lazy">${t.link?`<a class="btn play" href="${esc(t.link[0])}" target="_blank" rel="noopener">${esc(t.link[1])}</a>`:''}</div>`
+    : pagTexto(c.color, `${t.t?`<div class="t">${esc(t.t)}</div>`:''}${t.p?`<div class="p"${t.s?' style="--z:.78"':''}>${esc(t.p)}</div>`:''}${t.ref?`<div class="ref">${esc(t.ref)}</div>`:''}${t.v?`<div class="v">${esc(t.v)}</div>`:''}${t.c?`<div class="p" style="margin-top:3cqw;font-size:calc(4.4cqw*var(--z));font-style:italic">${esc(t.c)}</div>`:''}${t.ir?`<div style="margin-top:4cqw"><button class="btn" data-ir="${t.ir}" data-id="${c.id}"${t.que?` data-que="${t.que}"`:''}>${esc(t.b)}</button></div>`:''}`));
+}
+function cardFrase(c,f){
+  if(f.tipo==='control') return pagTexto(c.color, `${f.sit?`<div class="f">${esc(f.sit)}</div>`:''}<div class="t">En mis manos</div><div class="v">${(f.si||[]).map(x=>'✓ '+esc(x)).join('<br>')||'—'}</div><div class="sep">•••• ♥ ••••</div><div class="t">${estado.fe?'Lo entrego a Dios':'No depende de mí'}</div><div class="v">${(f.no||[]).map(esc).join(' · ')||'—'}</div>${f.hoy?`<div class="ref">Hoy: ${esc(f.hoy)}</div>`:''}`, botonesEd('frase',f.id,false,true));
+  return pagTexto(c.color, `${f.tit?`<div class="t">${esc(f.tit)}</div>`:''}<div class="p">${esc(f.t)}</div>${f.ref?`<div class="ref">${esc(f.ref)}</div>`:''}`, botonesEd('frase',f.id,false,!!f.tipo));
+}
+const misFrases = c=>extras(c.id).frases.map(f=>cardFrase(c,f));
+const misImagenes = c=>[...finales().map(p=>imgPag(IMG+p+'.jpg')), ...extras(c.id).imagenes.map(m=>imgPag(m.src, botonesEd('imagen',m.id,false,true)))];
+const tarjetasDe = c=>[...kitTarjetas(c), ...misFrases(c)];
+/* Guardar en «Ver mis tarjetas» lo que sale de un ejercicio */
+function botonGuardarTarjeta(item){
+  if(!vista.carta) return '';
+  setTimeout(()=>{ const b=document.getElementById('aTarj'); if(b) b.onclick=()=>{ extras(vista.carta).frases.push({id:uid(),_t:Date.now(),...item}); guardar(); b.textContent='✓ Guardada en mis tarjetas'; b.disabled=true; }; });
+  return '<button class="btn" id="aTarj">⭐ Guardar en mis tarjetas</button>';
+}
+/* El texto siempre cabe: se achica un poco y, si aún es largo, la tarjeta se puede deslizar */
+function ajustar(raiz){
+  (raiz||document).querySelectorAll('.txt.fit').forEach(t=>{ const pag=t.parentElement; let z=1;
+    pag.style.setProperty('--z',1); t.classList.remove('scroll');
+    while(t.scrollHeight>t.clientHeight+1 && z>0.62){ z-=0.04; pag.style.setProperty('--z',z.toFixed(2)); }
+    if(t.scrollHeight>t.clientHeight+1) t.classList.add('scroll'); });
+}
+
+/* ===== Pantallas ===== */
+const app = document.getElementById('app');
+let vista = {v:'inicio'};
+function ir(v){ pararResp(); vista = v; pintar(); window.scrollTo(0,0); }
+function pintar(){
+  const c = vista.id && cartaPor(vista.id);
+  if(vista.v==='carta'&&c) return pintarMenu(c);
+  if(vista.v==='ej'&&c) return pintarEj(c);
+  if(vista.v==='ver'&&c) return pintarVer(c);
+  if(vista.v==='oir'&&c) return pintarOir(c);
+  if(vista.v==='resp') return pintarResp();
+  if(vista.v==='ysi') return pintarYsi();
+  if(vista.v==='control') return pintarControl();
+  if(vista.v==='comp') return pintarComp();
+  if(vista.v==='frase'&&c) return pintarFrase(c);
+  if(vista.v==='sesion') return pintarSesion();
+  if(vista.v==='stats') return pintarStats();
+  if(vista.v==='nueva') return pintarNueva(vista.id);
+  pintarInicio();
+}
+const volverA = (txt,v)=>`<button class="btn sec sm volver" data-ir="${v.v}" ${v.id?`data-id="${v.id}"`:''}>← ${txt}</button>`;
+const volverCarta = ()=> vista.carta ? volverA(nomCarta(vista.carta).replace(/^./,m=>m.toUpperCase()),{v:'carta',id:vista.carta}) : volverA('Mi kit',{v:'inicio'});
+
+function pintarInicio(){
+  const aviso = EN_SESION ? '🩺 <b>Modo sesión:</b> se abrió con lo último guardado en el caso. Al terminar, toca «📋 Copiar para enviar a mi psicóloga».'
+    : ACTUALIZADA ? '✨ <b>Tu kit se actualizó</b> con lo nuevo que trabajaste con tu psicóloga.' : VISTA ? '👁 <b>Vista previa</b> con un ejemplo: no se guarda nada.' : '';
+  app.innerHTML = `${aviso?`<div class="nota">${aviso}</div>`:''}
+    <h2>Ábrelo cuando lo necesites</h2>
+    <div class="sobres">${todasCartas().length?'':`<button class="sobre" data-ir="nueva">${portada({cuando:'Cuando tu lucha sea con…',color:'lila'})}</button>`}${todasCartas().map(c=>`<button class="sobre" data-ir="carta" data-id="${c.id}">${portada(c)}</button>`).join('')}
+      <button class="sobre" data-ir="sesion"><div class="pag portada sesion" style="${fondo('c','menta')}"><div class="txt"><div class="cuando">Lo que me llevo de sesión</div><div class="f" style="margin-top:2cqw">${estado.sesion.length} aprendizaje${estado.sesion.length===1?'':'s'}</div></div><div class="marca">@sanatumentte</div></div></button>
+    </div>
+    <div class="fila" style="margin-top:14px"><button class="btn" data-ir="nueva">➕ Nueva carta</button><button class="btn sec" data-ir="stats">📊 Mis estadísticas</button></div>
+    <div class="fila"><button class="chip${estado.fe?' sel':''}" id="feBtn">🙏 Incluir mi fe (versículos y oración)</button></div>
+    <div class="fila"><a class="btn sec" href="PlanDeSeguridad.html" target="_blank" rel="noopener">🛟 Mi plan de seguridad</a></div>
+    ${envio()}`;
+  enlazar();
+  feBtn.onclick = ()=>{ estado.fe=!estado.fe; guardar(); pintar(); };
+}
+
+/* Menú de la carta: secciones que se despliegan (Ver · Escuchar · Mi cuerpo · Hacer) */
+function pintarMenu(c){
+  const nF = extras(c.id).frases.length, nI = finales().length + extras(c.id).imagenes.length, nK = (c.tarjetas||[]).length;
+  const nC = (c.canciones||[]).length + extras(c.id).canciones.length;
+  const abierta = k=>(vista.abierta||'')===k?' open':'';
+  const sec = (k,ico,tit,sub,cuerpo)=>`<details class="seccion" data-sec="${k}"${abierta(k)}><summary><i>${ico}</i><span>${tit}<small>${sub}</small></span><b class="flecha">▾</b></summary><div class="secIn">${cuerpo}</div></details>`;
+  const boton = (attrs,ico,tit,sub)=>`<button class="opc" ${attrs}><i>${ico}</i>${tit}<small>${sub}</small></button>`;
+  app.innerHTML = `${volverA('Mi kit',{v:'inicio'})}<div style="max-width:260px;margin:0 auto">${portada(c)}</div>
+    <h2 style="text-align:center">¿Qué quieres hacer ahora?</h2>
+    ${sec('ver','👀','Ver','Mis tarjetas e imágenes', `<div class="menu">
+      ${boton(`data-ir="ver" data-id="${c.id}" data-que="frases"`,'💌','Mis tarjetas', nF+nK?`${nF+nK} tarjeta${nF+nK===1?'':'s'}`:'Aún no hay')}
+      ${boton(`data-ir="ver" data-id="${c.id}" data-que="imagenes"`,'🖼️','Mis imágenes', `${nI} imagen${nI===1?'':'es'}`)}
+</div>`)}
+    ${sec('oir','👂','Escuchar', `${nC} canci${nC===1?'ón':'ones'}`, `<div class="menu uno">${boton(`data-ir="oir" data-id="${c.id}"`,'🎵','Escuchar mis canciones','O agregar una nueva')}</div>`)}
+    ${sec('cuerpo','🫁','Mi cuerpo','Calmarme desde el cuerpo', `<div class="menu uno">${boton('data-ir="resp"','🫁','Respirar','Con la bolita y música suave')}</div>`)}
+    ${sec('hacer','✍️','Hacer','Un ejercicio para este momento', `<div class="menu">
+      ${(c.ejercicios||[]).map(e=>boton(`data-ir="ej" data-id="${c.id}" data-que="${e.id}"`,e.ic,esc(e.t),esc(e.sub))).join('')}
+      ${boton(`data-ir="frase" data-id="${c.id}"`,'✍️','Escribir mi frase','Con título')}
+      ${boton('data-ir="ysi"','🌪️','¿Y si…?','Ponerlo a prueba')}
+      ${boton('data-ir="control"','🤲','Lo que depende de mí','En mis manos')}
+      ${boton('data-ir="comp"','💗','Carta compasiva','Hablarme con ternura')}</div>`)}
+    ${formUso(c.id)}
+    <div class="fila"><a class="btn sec" href="PlanDeSeguridad.html" target="_blank" rel="noopener">🛟 Mi plan de seguridad</a></div>
+    ${c.propia?`<div class="fila"><button class="btn sec sm" data-ir="nueva" data-id="${c.id}">✏️ Cambiar título o diseño</button><button class="btn sec sm" data-del="carta" data-id="${c.id}">🗑 Quitar esta carta</button></div>`:''}`;
+  vista.carta = c.id;
+  document.querySelectorAll('details.seccion').forEach(d=>d.addEventListener('toggle',()=>{ if(d.open){ vista.abierta=d.dataset.sec; document.querySelectorAll('details.seccion').forEach(o=>{ if(o!==d) o.open=false; }); } }));
+  enlazar(); enlazarUso(c.id);
+}
+
+/* 👀 Ver: una a una — sus frases, sus imágenes (puede subir nuevas) o las tarjetas del kit */
+function pintarVer(c){
+  const que = vista.que||'frases';
+  const L = que==='imagenes'?misImagenes(c):tarjetasDe(c);
+  const TIT = {frases:'💌 Mis tarjetas', imagenes:'🖼️ Mis imágenes', kit:'📖 Tarjetas del kit'}[que];
+  let i = Math.min(vista.i||0, Math.max(0,L.length-1));
+  app.innerHTML = `${volverA('Volver',{v:'carta',id:c.id})}<h2 style="text-align:center">${TIT}</h2>
+    <div class="visor" id="visor"></div>
+    ${L.length>1?'<div class="visorNav"><button class="btn sec" id="vAnt">← Anterior</button><span id="vNum"></span><button class="btn" id="vSig">Siguiente →</button></div>':''}
+    <div class="fila" style="justify-content:center;margin-top:12px">
+      ${que==='frases'?`<button class="btn" data-ir="frase" data-id="${c.id}">✍️ Escribir una frase</button>`:''}
+      ${que==='imagenes'?'<label class="btn" style="margin:0">📷 Subir una imagen<input type="file" id="subImg" accept="image/*" hidden></label>':''}</div>
+    ${que==='imagenes'?'<p class="hint" style="text-align:center">Las imágenes quedan guardadas solo en tu celular.</p>':''}`;
+  const v=document.getElementById('visor');
+  const mostrar = ()=>{ vista.i=i;
+    v.innerHTML = L[i] || `<div class="vacioCaja">${que==='frases'?'Aún no has escrito frases en esta carta.<br>Escribe una o guarda la de un ejercicio con ⭐.':'Aún no hay imágenes.'}</div>`;
+    if(L.length>1){ vNum.textContent=`${i+1} / ${L.length}`; vAnt.disabled=i<=0; vSig.disabled=i>=L.length-1; }
+    ajustar(v); enlazar(v); };
+  if(L.length>1){ vAnt.onclick=()=>{ if(i>0){ i--; mostrar(); } }; vSig.onclick=()=>{ if(i<L.length-1){ i++; mostrar(); } };
+    let x0=null; v.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
+    v.addEventListener('touchend',e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>50){ dx<0?vSig.onclick():vAnt.onclick(); } }); }
+  enlazar(); mostrar();
+  const inp=document.getElementById('subImg');
+  if(inp) inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const im=new Image(), r=new FileReader();
+    r.onload=()=>{ im.onload=()=>{ const k=Math.min(1,900/Math.max(im.width,im.height)), cv=document.createElement('canvas'); cv.width=Math.round(im.width*k); cv.height=Math.round(im.height*k);
+      cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+      extras(c.id).imagenes.push({id:uid(),_t:Date.now(),src:cv.toDataURL('image/jpeg',.8)});
+      try{ guardar(); }catch(e){} vista.i=misImagenes(c).length-1; pintar(); }; im.src=r.result; }; r.readAsDataURL(f); };
+}
+
+/* 🎵 Escuchar: con la portada y el reproductor de YouTube o Spotify cuando se puede */
+function embed(u){
+  let m = u.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{6,})/);
+  if(m) return `<iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" height="200" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+  m = u.match(/open\.spotify\.com\/(?:intl-\w+\/)?(track|album|playlist|episode)\/(\w+)/);
+  if(m) return `<iframe src="https://open.spotify.com/embed/${m[1]}/${m[2]}" height="152" allow="encrypted-media" loading="lazy"></iframe>`;
+  return `<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">▶️ Escuchar</a>`;
+}
+function pintarOir(c){
+  const L = [...(c.canciones||[]).map(s=>({...s,base:1})), ...extras(c.id).canciones];
+  app.innerHTML = `${volverA('Volver',{v:'carta',id:c.id})}<h2>🎵 Escucha por un momento</h2>
+    ${L.length?'':'<p class="hint">Todavía no hay canciones. Pega el enlace de una que te dé calma.</p>'}
+    ${L.map(s=>`<div class="cancion"><div class="nom"><span>${esc(s.n||'Mi canción')}</span>${s.base?'':`<span><button data-ed="cancion" data-id="${s.id}">✏️</button> <button data-del="cancion" data-id="${s.id}">🗑</button></span>`}</div>${embed(s.u)}</div>`).join('')}
+    <div class="caja"><b>➕ Agregar canción</b>
+      <label>Nombre</label><input type="text" id="ncNom" placeholder="Nombre de la canción">
+      <label>Pega el enlace</label><input type="url" id="ncUrl" placeholder="https://… (YouTube o Spotify)">
+      <p class="hint">Con YouTube o Spotify se ve la portada y se escucha aquí mismo.</p>
+      <div class="fila"><button class="btn" id="ncOk">Agregar</button></div></div>`;
+  enlazar();
+  ncOk.onclick = ()=>{ let u=ncUrl.value.trim(); if(!u) return; if(!/^https?:\/\//i.test(u)) u='https://'+u;
+    extras(c.id).canciones.push({id:uid(),_t:Date.now(),n:ncNom.value.trim(),u}); guardar(); pintar(); };
+}
+
+/* ✍️ Escribir mi frase: título (puede elegir una guía) + frase, con vista previa; se guarda en «Mis frases» */
+const GUIAS_BASE = [{t:'Lo que quiero recordarme', guia:'Escribe una frase tuya, con tus palabras.'},{t:'¿Qué siento ahora?', guia:'Ponle nombre a lo que sientes y dónde lo notas en tu cuerpo.'},{t:'Lo que me ayuda', guia:'¿Qué te ha servido otras veces en un momento así?'}];
+function pintarFrase(c){
+  const ed = vista.editar && extras(c.id).frases.find(f=>f.id===vista.editar) || {};
+  const G = c.guias || GUIAS_BASE;
+  app.innerHTML = `${volverA('Volver',{v:'carta',id:c.id})}<h2>✍️ ${ed.id?'Editar mi frase':'Escribir mi frase'}</h2>
+    <div class="caja">${ed.id?'':`<label>Elige una idea (o escribe tu propio título)</label><div class="chips" id="fGu">${G.map((g,i)=>`<button class="chip" data-i="${i}">${esc(g.t)}</button>`).join('')}</div><p class="hint" id="fGuia"></p>`}
+      <label>Título</label><input type="text" id="fTit" value="${esc(ed.tit||'')}" placeholder="Ej.: Lo que quiero recordarme">
+      <label>Mi frase</label><textarea id="fTxt" placeholder="Escríbela con tus palabras">${esc(ed.t||'')}</textarea>
+      <div${estado.fe?'':' class="oculto"'}><label>Versículo (opcional)</label><input type="text" id="fRef" value="${esc(ed.ref||'')}" placeholder="Ej.: Salmo 56:3"></div>
+      <div class="hint" style="margin-top:12px">👁 Así se verá</div><div id="fPrev" style="max-width:300px;margin:0 auto"></div>
+      <div class="fila" style="justify-content:center"><button class="btn" id="fOk">⭐ Guardar en mis tarjetas</button></div></div>`;
+  enlazar();
+  const prev = ()=>{ const p=document.getElementById('fPrev'); p.innerHTML = pagTexto(c.color, `${fTit.value.trim()?`<div class="t">${esc(fTit.value.trim())}</div>`:''}<div class="p">${esc(fTxt.value.trim()||'Tu frase aquí')}</div>${fRef.value.trim()?`<div class="ref">${esc(fRef.value.trim())}</div>`:''}`); ajustar(p); };
+  [fTit,fTxt,fRef].forEach(e=>e.oninput=prev); prev();
+  document.querySelectorAll('#fGu .chip').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#fGu .chip').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+    const g=G[+b.dataset.i]; fTit.value=g.t; fGuia.textContent=g.guia; fTxt.placeholder=g.guia; prev(); });
+  fOk.onclick = ()=>{ const t=fTxt.value.trim(); if(!t){ fTxt.focus(); return; } const v={tit:fTit.value.trim(), t, ref:fRef.value.trim(), _t:Date.now()};
+    if(ed.id) Object.assign(ed,v); else extras(c.id).frases.push({id:uid(),...v});
+    guardar(); ir({v:'ver',id:c.id,que:'frases',i:ed.id?0:extras(c.id).frases.length-1}); };
+}
+
+/* 🫁 Respirar: la bolita crece al inhalar (4) y se achica al exhalar (6); vibra al cambiar y suena música de meditación (se puede silenciar) */
+let RESP = null, AUDIO = null, SONIDO = true;
+try{ SONIDO = localStorage.getItem('sana_kit_sonido')!=='0'; }catch(e){}
+const ACORDES = [[73.42,146.83,220,329.63,369.99],[61.74,123.47,185,293.66,329.63],[49,98,146.83,246.94,369.99],[55,110,164.81,246.94,329.63]]; /* Re mayor: uno por respiración */
+const ES_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+let MUDO = null; /* iPhone: un audio en silencio hace que la música suene aunque el celular esté en modo silencio */
+function despertarAudio(){ try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
+  try{ if(!MUDO){ const sr=8000, n=sr, b=new ArrayBuffer(44+n*2), v=new DataView(b), w=(o,t)=>{ for(let i=0;i<t.length;i++) v.setUint8(o+i,t.charCodeAt(i)); };
+      w(0,'RIFF'); v.setUint32(4,36+n*2,true); w(8,'WAVEfmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,'data'); v.setUint32(40,n*2,true);
+      MUDO = new Audio(URL.createObjectURL(new Blob([b],{type:'audio/wav'}))); MUDO.loop = true; MUDO.setAttribute('playsinline',''); }
+    const r = MUDO.play(); r&&r.catch&&r.catch(()=>{}); }catch(e){} }
+function vibrarIOS(){ /* iPhone (iOS 18 o más): toque suave usando un interruptor oculto */
+  try{ const l=document.createElement('label'), i=document.createElement('input'); i.type='checkbox'; i.setAttribute('switch',''); l.appendChild(i);
+    l.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden'; document.body.appendChild(l); l.click(); setTimeout(()=>l.remove(),300); }catch(e){} }
+function musica(){ /* acordes suaves con eco: suben y se aclaran al inhalar, bajan y se apagan al exhalar */
+  despertarAudio(); if(AUDIO) return AUDIO; const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+  const ctx = new AC(), comp = ctx.createDynamicsCompressor(), master = ctx.createGain(), nivel = ctx.createGain(), filtro = ctx.createBiquadFilter(),
+    eco = ctx.createConvolver(), seco = ctx.createGain(), mojado = ctx.createGain();
+  master.gain.value = 0; nivel.gain.value = .05; filtro.type='lowpass'; filtro.frequency.value=315; filtro.Q.value=.5; seco.gain.value=.7; mojado.gain.value=.6;
+  const sr = ctx.sampleRate, n = Math.floor(sr*3.5), ir = ctx.createBuffer(2,n,sr);
+  for(let c=0;c<2;c++){ const d=ir.getChannelData(c); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.5)*.5; }
+  eco.buffer = ir;
+  filtro.connect(seco); filtro.connect(eco); eco.connect(mojado); seco.connect(nivel); mojado.connect(nivel); nivel.connect(master); master.connect(comp); comp.connect(ctx.destination);
+  const re = new Float32Array(8), im = new Float32Array(8); for(let k=1;k<8;k++) im[k] = 1/(k*k*.7+.3);
+  AUDIO = {ctx, master, nivel, filtro, onda: ctx.createPeriodicWave(re,im), acorde:-1, voces:null, v:.05, fc:315}; return AUDIO;
+}
+function curva(p, desde, hasta, seg, t){ const k=40, c=new Float32Array(k);
+  for(let i=0;i<k;i++) c[i] = desde+(hasta-desde)*(1-Math.cos(Math.PI*i/(k-1)))/2;
+  try{ (p.cancelAndHoldAtTime||p.cancelScheduledValues).call(p,t); p.setValueCurveAtTime(c,t,seg); }catch(e){ p.setTargetAtTime(hasta,t,seg/3); } }
+function soltarAcorde(a, t, d){ if(!a.voces) return; const v=a.voces; a.voces=null;
+  v.g.gain.cancelScheduledValues(t); v.g.gain.setValueAtTime(v.g.gain.value,t); v.g.gain.linearRampToValueAtTime(0,t+d); v.osc.forEach(o=>o.stop(t+d+.1)); }
+function acorde(a){ const t=a.ctx.currentTime, g=a.ctx.createGain(), osc=[]; soltarAcorde(a,t,3);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(1,t+2.5); g.connect(a.filtro); a.acorde=(a.acorde+1)%ACORDES.length;
+  ACORDES[a.acorde].forEach((f,j)=>[-7,0,7].forEach(c=>{ const o=a.ctx.createOscillator(), v=a.ctx.createGain(); o.setPeriodicWave(a.onda); o.frequency.value=f; o.detune.value=c;
+    v.gain.value=(j?.55:.9)*.09; o.connect(v); v.connect(g); o.start(t); osc.push(o); }));
+  a.voces = {g, osc}; }
+function campanita(a, f){ const t=a.ctx.currentTime; /* aguda al inhalar, más grave al exhalar */
+  [[1,1],[2.76,.25]].forEach(([r,v])=>{ const o=a.ctx.createOscillator(), g=a.ctx.createGain(); o.frequency.value=f*r;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.07*v,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+3.5); o.connect(g); g.connect(a.master); o.start(t); o.stop(t+3.6); }); }
+function sonido(fase, seg, sigue){ const a = SONIDO && musica(); if(!a) return; const t=a.ctx.currentTime; a.ctx.resume&&a.ctx.resume();
+  a.master.gain.cancelScheduledValues(t); a.master.gain.setTargetAtTime(fase==='fin'?0:1.5, t, fase==='fin'?1.3:.6);
+  if(fase==='fin'){ setTimeout(()=>{ if(!RESP) try{ MUDO&&MUDO.pause(); }catch(e){} },7000); soltarAcorde(a,t,6); a.v=.05; a.fc=315; curva(a.nivel.gain,a.nivel.gain.value,.05,1,t); return; }
+  if(!sigue){ if(fase==='in'||!a.voces) acorde(a); campanita(a, fase==='in'?880:587.33); } else if(!a.voces) acorde(a);
+  const v = fase==='in'?1:.05, fc = fase==='in'?1295:315; curva(a.nivel.gain,a.v,v,seg,t); curva(a.filtro.frequency,a.fc,fc,seg,t); a.v=v; a.fc=fc; }
+function silencio(){ try{ MUDO&&MUDO.pause(); }catch(e){} if(AUDIO){ const t=AUDIO.ctx.currentTime; AUDIO.master.gain.cancelScheduledValues(t); AUDIO.master.gain.setTargetAtTime(0,t,.3); soltarAcorde(AUDIO,t,1.5); } }
+function pararResp(){ if(RESP){ clearTimeout(RESP.t); RESP=null; try{ navigator.vibrate&&navigator.vibrate(0); }catch(e){} } silencio(); }
+function pintarResp(){
+  const puedeVibrar = 'vibrate' in navigator || ES_IOS;
+  app.innerHTML = `${volverCarta()}<h2 style="text-align:center">🫁 Respira conmigo</h2>
+    <p class="hint" style="text-align:center">Apoya tus pies en el suelo y suelta los hombros. Inhala suave por la nariz mientras la bolita crece y exhala lento por la boca mientras se hace pequeña. No retengas el aire. Si te mareas, respira normal.</p>
+    <div class="resp"><div class="globo"><div class="bola" id="bola"></div><div class="fase" id="fase">Toca<br>empezar</div></div>
+      <div class="chips" id="rVeces">${[5,6,8].map(n=>`<button class="chip${n===6?' sel':''}" data-n="${n}">${n} veces</button>`).join('')}</div>
+      <div class="chips"><button class="chip${SONIDO?' sel':''}" id="rSon">${SONIDO?'🔊 Música suave':'🔇 Sin sonido'}</button>
+        <button class="chip${puedeVibrar?' sel':''}" id="rVib" ${puedeVibrar?'':'disabled'}>📳 Vibrar</button></div>
+      ${puedeVibrar?(ES_IOS?'<p class="hint" style="text-align:center">En iPhone la vibración es un toque suave (desde iOS 18). Si no la sientes, guíate por la bolita y la campanita.</p>':''):'<p class="hint" style="text-align:center">Este celular no permite vibrar desde una página. Guíate por la bolita y la música.</p>'}
+      <button class="btn" id="rIni">▶️ Empezar</button></div>`;
+  enlazar();
+  let veces = 6, vibrar = puedeVibrar;
+  document.querySelectorAll('#rVeces .chip').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#rVeces .chip').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); veces=+b.dataset.n; });
+  rSon.onclick = ()=>{ SONIDO=!SONIDO; try{ localStorage.setItem('sana_kit_sonido', SONIDO?'1':'0'); }catch(e){} rSon.classList.toggle('sel',SONIDO); rSon.textContent=SONIDO?'🔊 Música suave':'🔇 Sin sonido'; if(!SONIDO) silencio(); else if(RESP) sonido(RESP.fase,1,true); };
+  rVib.onclick = ()=>{ vibrar=!vibrar; rVib.classList.toggle('sel',vibrar); };
+  rIni.onclick = ()=>{ if(RESP){ pararResp(); reset(); return; } empezar(); };
+  const bola=document.getElementById('bola'), fase=document.getElementById('fase');
+  const reset = ()=>{ bola.style.transition='transform .6s ease'; bola.style.transform='scale(1)'; fase.innerHTML='Toca<br>empezar'; rIni.textContent='▶️ Empezar'; };
+  const vib = p=>{ if(!vibrar) return; try{ if(navigator.vibrate) navigator.vibrate(p); else if(ES_IOS){ const n=Array.isArray(p)?Math.ceil(p.length/2):1; for(let k=0;k<n;k++) setTimeout(vibrarIOS,k*180); } }catch(e){} };
+  function empezar(){ RESP={n:0}; rIni.textContent='⏹ Parar'; paso('in'); }
+  function paso(f){ if(!RESP) return; RESP.fase=f;
+    if(f==='in'){ RESP.n++; if(RESP.n>veces){ fin(); return; } vib(200); sonido('in',4); bola.style.transition='transform 4s ease-in-out'; bola.style.transform='scale(2.1)'; cuenta('Inhala',4,()=>paso('out')); }
+    else { vib([90,90,90]); sonido('out',6); bola.style.transition='transform 6s ease-in-out'; bola.style.transform='scale(1)'; cuenta('Exhala',6,()=>paso('in')); } }
+  function cuenta(txt,s,luego){ let k=s; const tic=()=>{ if(!RESP) return; if(k===0){ luego(); return; } fase.innerHTML=`${txt}<small>${k} · ${RESP.n}/${veces}</small>`; k--; RESP.t=setTimeout(tic,1000); }; tic(); }
+  function fin(){ RESP=null; sonido('fin'); vib([60,60,60,60,200]); fase.innerHTML='Bien 💛'; rIni.textContent='▶️ Otra vez';
+    guardarEj({tipo:'resp', veces}); }
+}
+
+/* Ejercicios hechos en el momento (quedan en su historial) */
+function guardarEj(d){ estado.ejercicios.push({id:uid(),_t:Date.now(),f:hoyISO(),carta:vista.carta||'',...d}); guardar(); }
+function historial(tipo, fila){
+  const L = estado.ejercicios.filter(e=>e.tipo===tipo).slice(-5).reverse();
+  return L.length?`<details class="caja"><summary><b>🗂 Los que ya hice (${estado.ejercicios.filter(e=>e.tipo===tipo).length})</b></summary>${L.map(e=>`<div class="nota">${esc(fechaBonita(e.f))} · ${fila(e)} <button class="chip" data-del="ejercicio" data-id="${e.id}" style="padding:1px 8px">🗑</button></div>`).join('')}</details>`:'';
+}
+/* Formulario por pasos (máx. 2 preguntas por pantalla) */
+function pasosForm(titulo, intro, pasos, alTerminar){
+  let k=0; const r={};
+  const pintarPaso = ()=>{
+    const P = pasos[k], c = document.getElementById('pf');
+    c.innerHTML = `<div class="pasos">Paso ${k+1} de ${pasos.length}</div>${P.map(q=>`<label>${q.l}</label>${q.ayuda?`<div class="hint">${q.ayuda}</div>`:''}<textarea data-k="${q.k}" placeholder="${esc(q.ph||'')}">${esc(r[q.k]||'')}</textarea>`).join('')}
+      <div class="fila" style="justify-content:space-between;margin-top:12px">${k?'<button class="btn sec" id="pfAnt">← Atrás</button>':'<span></span>'}<button class="btn" id="pfSig">${k===pasos.length-1?'Terminar ✓':'Siguiente →'}</button></div>`;
+    c.querySelectorAll('[data-k]').forEach(t=>t.oninput=()=>r[t.dataset.k]=t.value);
+    if(k) pfAnt.onclick=()=>{ k--; pintarPaso(); };
+    pfSig.onclick=()=>{ if(k<pasos.length-1){ k++; pintarPaso(); window.scrollTo(0,0); } else alTerminar(r); };
+  };
+  return {html:`${volverCarta()}<h2>${titulo}</h2><p class="hint">${intro}</p><div class="caja" id="pf"></div>`, iniciar:pintarPaso};
+}
+
+/* ✍️ Ejercicios propios de cada carta (para hacer en el momento); lo escrito puede guardarse en «Mis tarjetas» con ⭐ */
+function pintarEj(c){
+  const e = (c.ejercicios||[]).find(x=>x.id===vista.que); if(!e) return pintarMenu(c);
+  vista.carta = c.id;
+  const f = pasosForm(e.ic+' '+esc(e.t), esc(e.sub||''), e.pasos, r=>{ guardarEj({tipo:'ej-'+e.id,...r});
+    const val = e.guardar ? (r[e.guardar]||'').trim() : '';
+    app.innerHTML = `${volverCarta()}<h2>${e.ic} ${esc(e.t)}</h2>
+      ${pagTexto(c.color, `<div class="t">${esc(e.t)}</div>${e.pasos.flat().filter(q=>r[q.k]).map(q=>`<div class="f">${esc(q.l.replace(/^\d+\.\s*/,''))}</div><div class="p">${esc(r[q.k])}</div>`).join('')}${e.final?`<div class="ref">${esc(e.final)}</div>`:''}`)}
+      <div class="fila" style="justify-content:center;margin-top:12px">${val?botonGuardarTarjeta({tit:e.t, t:val}):''}<button class="btn sec" data-ir="carta" data-id="${c.id}">Listo</button></div>`;
+    ajustar(); enlazar(); });
+  app.innerHTML = f.html + historial('ej-'+e.id, x=>esc(x[e.guardar||e.pasos[0][0].k]||'')); enlazar(); f.iniciar();
+}
+
+/* 🌪️ ¿Y si…? — descatastrofizar en 4 pasos (J. Beck): peor, mejor, más probable y qué puedo hacer. Una sola ronda. */
+function pintarYsi(){
+  const f = pasosForm('🌪️ ¿Y si…?', 'Cuando aparezca un «¿y si…?», ponlo a prueba una sola vez y luego vuelve a tu día.', [
+    [{k:'ysi',l:'1. Escribe tu «¿y si…?» tal cual llega',ph:'¿Y si…'}],
+    [{k:'peor',l:'2. ¿Qué es lo peor que podría pasar?'},{k:'mejor',l:'¿Y lo mejor que podría pasar?'}],
+    [{k:'prob',l:'3. ¿Qué es lo más probable que pase?',ayuda:'Piensa en lo que sabes hoy, no en lo que temes.'},{k:'puedo',l:'Si pasara lo difícil, ¿qué haría o a quién acudiría?'}],
+    [{k:'frase',l:'4. Una frase para mí ahora',ph:'Ej.: Es un «¿y si…?», no un hecho. Hoy me ocupo de…'},{k:'ahora',l:'¿Qué voy a hacer ahora?'}]
+  ], r=>{ guardarEj({tipo:'ysi',...r}); app.innerHTML = `${volverCarta()}<h2>🌪️ Mi «¿y si…?» puesto a prueba</h2>
+      ${pagTexto(vista.carta&&cartaPor(vista.carta)?cartaPor(vista.carta).color:'lila', `<div class="f">¿Y si…? ${esc(r.ysi||'')}</div><div class="t">Lo más probable</div><div class="p">${esc(r.prob||'—')}</div>${r.frase?`<div class="ref">${esc(r.frase)}</div>`:''}${r.ahora?`<div class="f">Ahora: ${esc(r.ahora)}</div>`:''}`)}
+      <div class="fila" style="justify-content:center;margin-top:12px">${botonGuardarTarjeta({tit:'Mi «¿y si…?» puesto a prueba', t:`¿Y si ${(r.ysi||'').replace(/^¿?\s*y si\s*/i,'').replace(/\?$/,'')}?\nLo más probable: ${r.prob||'—'}${r.frase?'\n'+r.frase:''}`})}<button class="btn sec" data-ir="${vista.carta?'carta':'inicio'}" data-id="${vista.carta||''}">Listo</button></div>`;
+    ajustar(); enlazar(); });
+  app.innerHTML = f.html + historial('ysi', e=>`<b>${esc(e.ysi||'')}</b> → ${esc(e.prob||'')}`); enlazar(); f.iniciar();
+}
+
+/* 🤲 Lo que depende de mí — tarjeta dividida: arriba «En mis manos» (con casillas), abajo «Lo entrego a Dios» */
+function pintarControl(){
+  const d = vista.d || (vista.d={sit:'',si:[],no:[],hechos:[],hoy:''});
+  const col = vista.carta&&cartaPor(vista.carta)?cartaPor(vista.carta).color:'lila';
+  app.innerHTML = `${volverCarta()}<h2 style="text-align:center">🤲 Lo que depende de mí</h2>
+    <p class="hint" style="text-align:center">Escribe cada cosa que te preocupa y ponla en su lugar.</p>
+    <div class="caja"><label>¿Qué me preocupa ahora?</label><input type="text" id="cSit" value="${esc(d.sit)}" placeholder="Ej.: lo que pase en la entrevista">
+      <label>Escribe una cosa</label><input type="text" id="cIt" placeholder="Ej.: prepararme con calma">
+      <div class="fila"><button class="btn sm" id="cSi">🤲 En mis manos</button><button class="btn sec sm" id="cNo">${estado.fe?'🙏 Lo entrego a Dios':'🍃 No depende de mí'}</button></div></div>
+    <div style="max-width:340px;margin:0 auto">${pagTexto(col, `${d.sit?`<div class="f">${esc(d.sit)}</div>`:''}
+      <div class="t">En mis manos</div>
+      <div class="lista">${d.si.map((x,i)=>`<button class="itm${d.hechos.includes(i)?' ok':''}" data-q="si" data-i="${i}">${d.hechos.includes(i)?'☑':'☐'} ${esc(x)}</button>`).join('')||'<span class="vacio">Lo que sí puedo hacer</span>'}</div>
+      <div class="sep">•••• ♥ ••••</div>
+      <div class="t">${estado.fe?'Lo entrego a Dios':'No depende de mí: lo suelto'}</div>
+      <div class="lista">${d.no.map((x,i)=>`<button class="itm lila" data-q="no" data-i="${i}">${esc(x)} ✕</button>`).join('')||'<span class="vacio">Lo que no depende de mí</span>'}</div>
+      ${estado.fe?'<div class="f">1 Pedro 5:7</div>':''}`)}</div>
+    <p class="hint" style="text-align:center">Toca lo que está en tus manos para marcarlo cuando lo hagas. Para quitar algo, mantenlo presionado.</p>
+    <div class="caja"><label>De lo que está en mis manos, hoy voy a…</label><input type="text" id="cHoy" value="${esc(d.hoy||'')}">
+      <div class="fila" style="justify-content:center"><button class="btn" id="cOk">Guardar</button></div><div id="cMsg"></div></div>
+    ${historial('control', e=>`<b>${esc(e.sit||'')}</b> · hoy: ${esc(e.hoy||'')}`)}`;
+  enlazar(); ajustar();
+  cSit.oninput=()=>d.sit=cSit.value; cHoy.oninput=()=>d.hoy=cHoy.value;
+  const add = q=>{ const v=cIt.value.trim(); if(!v){ cIt.focus({preventScroll:true}); return; } d[q].push(v); const y=scrollY; pintar(); scrollTo(0,y); };
+  cSi.onclick=()=>add('si'); cNo.onclick=()=>add('no');
+  document.querySelectorAll('.itm').forEach(b=>{ let tm;
+    const quitar=()=>{ const q=b.dataset.q, i=+b.dataset.i; d[q].splice(i,1); if(q==='si') d.hechos=d.hechos.filter(h=>h!==i).map(h=>h>i?h-1:h); const y=scrollY; pintar(); scrollTo(0,y); };
+    b.onpointerdown=()=>{ tm=setTimeout(()=>{ tm='largo'; quitar(); },650); };
+    b.onpointerup=b.onpointerleave=()=>{ if(tm!=='largo') clearTimeout(tm); };
+    b.onclick=()=>{ if(tm==='largo') return; if(b.dataset.q==='no'){ quitar(); return; } const i=+b.dataset.i; d.hechos=d.hechos.includes(i)?d.hechos.filter(h=>h!==i):[...d.hechos,i]; const y=scrollY; pintar(); scrollTo(0,y); }; });
+  cOk.onclick=()=>{ if(!d.si.length&&!d.no.length){ cMsg.innerHTML='<div class="nota">Agrega al menos una cosa.</div>'; return; }
+    const item={tipo:'control',sit:d.sit,si:[...d.si],no:[...d.no],hoy:d.hoy||''}; guardarEj(item);
+    cMsg.innerHTML=`<div class="nota">✅ Guardado. Ahora enfócate en lo que está en tus manos 💛</div><div class="fila" style="justify-content:center">${botonGuardarTarjeta({...item,tit:'En mis manos',t:''})}</div>`; };
+}
+
+/* 💗 Carta compasiva (Baer; J. Beck: «¿qué le diría a una amiga?») */
+function pintarComp(){
+  const f = pasosForm('💗 Mi carta compasiva', 'Háblate como le hablarías a alguien que quieres.', [
+    [{k:'duele',l:'1. ¿Qué me está doliendo ahora?',ayuda:'Ponle nombre, sin juzgarte.'}],
+    [{k:'comun',l:'2. No soy la única',ph:'Otras pasan por esto y no por eso valen menos. Sentir esto es parte de ser humana.',ayuda:'¿Quién más podría sentirse así?'}],
+    [{k:'amiga',l:'3. ¿Qué le diría a una amiga que siente esto?'},{k:'frase',l:'Ahora dímelo a mí: mi frase compasiva',ph:'Querida yo…'}]
+  ], r=>{ guardarEj({tipo:'comp',...r}); const col=vista.carta&&cartaPor(vista.carta)?cartaPor(vista.carta).color:'rosa';
+    app.innerHTML = `${volverCarta()}<h2>💗 Mi carta compasiva</h2>
+      ${pagTexto(col, `<div class="t">Querida yo:</div>${r.comun?`<div class="v">${esc(r.comun)}</div>`:''}<div class="p">${esc(r.frase||r.amiga||'')}</div>`)}
+      <div class="fila" style="justify-content:center;margin-top:12px">${botonGuardarTarjeta({tit:'Querida yo:', t:r.frase||r.amiga||''})}<button class="btn sec" data-ir="${vista.carta?'carta':'inicio'}" data-id="${vista.carta||''}">Listo</button></div>`;
+    ajustar(); enlazar(); });
+  app.innerHTML = f.html + historial('comp', e=>`${esc(e.frase||e.amiga||'')}`); enlazar(); f.iniciar();
+}
+
+/* Registro de uso: opcional y breve */
+function formUso(cartaId){
+  const num = k=>`<div class="chips num" data-num="${k}">${Array.from({length:11},(_,i)=>`<button class="chip" data-v="${i}">${i}</button>`).join('')}</div>`;
+  return `<details class="caja" id="uso"><summary><b>📝 ¿Cómo me fue? (opcional)</b></summary>
+    <p class="hint">Úsalo 1 o 2 veces por momento difícil y luego vuelve a tu día.</p>
+    <label>¿Qué tan fuerte era el malestar antes? (0–10)</label>${num('antes')}
+    <label>¿Qué usé?</label><div class="chips" id="usoQue">${USE_OPC().map(o=>`<button class="chip">${esc(o)}</button>`).join('')}<button class="chip" id="usoOtroB">✏️ Otro</button></div>
+    <input type="text" id="usoOtro" class="oculto" placeholder="¿Qué más usaste?" style="margin-top:6px">
+    <label>¿Y después? (0–10)</label>${num('desp')}
+    <label>Después, ¿pude hacer lo que me importa?</label><div class="chips" id="usoAy">${['Sí','Un poco','No'].map(o=>`<button class="chip">${o}</button>`).join('')}</div>
+    <label>Nota (opcional)</label><input type="text" id="usoNota">
+    <div class="fila"><button class="btn" id="usoOk">Guardar</button></div><div id="usoMsg"></div></details>`;
+}
+function enlazarUso(cartaId){
+  const r = {};
+  document.querySelectorAll('#uso [data-num]').forEach(g=>g.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ g.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); r[g.dataset.num]=+b.dataset.v; }));
+  document.querySelectorAll('#usoQue .chip:not(#usoOtroB)').forEach(b=>b.onclick=()=>b.classList.toggle('sel'));
+  usoOtroB.onclick = e=>{ e.target.classList.toggle('sel'); usoOtro.classList.toggle('oculto', !e.target.classList.contains('sel')); };
+  document.querySelectorAll('#usoAy .chip').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#usoAy .chip').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); r.ayudo=b.textContent; });
+  usoOk.onclick = ()=>{
+    const uso=[...document.querySelectorAll('#usoQue .chip.sel:not(#usoOtroB)')].map(b=>b.textContent); if(usoOtro.value.trim()) uso.push(usoOtro.value.trim());
+    if(r.antes==null&&!uso.length){ usoMsg.innerHTML='<div class="nota">Marca al menos el malestar o lo que usaste.</div>'; return; }
+    estado.usos.push({id:uid(), _t:Date.now(), f:hoyISO(), carta:cartaId, antes:r.antes, desp:r.desp, uso, ayudo:r.ayudo||'', nota:usoNota.value.trim()});
+    guardar(); document.querySelectorAll('#uso .chip.sel').forEach(x=>x.classList.remove('sel')); document.querySelectorAll('#uso input').forEach(x=>x.value='');
+    Object.keys(r).forEach(k=>delete r[k]); usoMsg.innerHTML='<div class="nota">✅ Guardado. Bien hecho por cuidarte 💛</div>';
+  };
+}
+
+/* 🌱 Lo que me llevo de sesión: solo lo esencial de cada ejercicio (la plantilla completa queda en el cuaderno de cierre) */
+function pintarSesion(){
+  const L = [...estado.sesion].sort((a,b)=>(b.f||'').localeCompare(a.f||''));
+  const ed = vista.editar && estado.sesion.find(x=>x.id===vista.editar) || {};
+  app.innerHTML = `${volverA('Mi kit',{v:'inicio'})}<h2>🌱 Lo que me llevo de sesión</h2>
+    <p class="hint">Lo que me sirvió de cada ejercicio, para tenerlo a la mano.</p>
+    <div class="visor" id="visor"></div>
+    ${L.length>1?'<div class="visorNav"><button class="btn sec" id="vAnt">← Anterior</button><span id="vNum"></span><button class="btn" id="vSig">Siguiente →</button></div>':''}
+    <details class="caja" ${ed.id||!L.length?'open':''}><summary><b>${ed.id?'✏️ Editar':'➕ Agregar lo que me llevo'}</b></summary>
+      <label>Ejercicio o tema</label><input type="text" id="sEj" value="${esc(ed.ej||'')}" placeholder="Ej.: ¿Y si…?, carta compasiva…">
+      <label>La frase que realmente me sirvió</label><textarea id="sFr">${esc(ed.frase||'')}</textarea>
+      <label>Lo que me ayudó</label><input type="text" id="sAy" value="${esc(ed.ayudo||'')}">
+      <label>¿Cuándo usarlo?</label><input type="text" id="sCu" value="${esc(ed.cuando||'')}" placeholder="Ej.: cuando me llegan los «¿y si…?»">
+      <label>Fecha</label><input type="date" id="sF" value="${esc(ed.f||hoyISO())}">
+      <div class="fila"><button class="btn" id="sOk">Guardar</button></div></details>`;
+  enlazar();
+  const tarj = s=>pagTexto('menta', `<div class="f">${esc(fechaBonita(s.f))} · ${esc(s.ej||'Sesión')}</div>${s.frase?`<div class="t" style="font-size:calc(5.4cqw*var(--z))">«${esc(s.frase)}»</div>`:''}${s.ayudo?`<div class="p" style="font-size:calc(4cqw*var(--z))"><b>Lo que me ayudó:</b> ${esc(s.ayudo)}</div>`:''}${s.cuando?`<div class="ref">Úsalo: ${esc(s.cuando)}</div>`:''}`, botonesEd('sesion',s.id));
+  let i=0; const v=document.getElementById('visor');
+  const mostrar=()=>{ v.innerHTML = L.length?tarj(L[i]):'<p class="hint">Aquí irán apareciendo las frases y lo que te ayudó de lo que trabajamos en sesión.</p>'; ajustar(v); enlazar(v);
+    if(L.length>1){ vNum.textContent=`${i+1} / ${L.length}`; vAnt.disabled=i<=0; vSig.disabled=i>=L.length-1; } };
+  if(L.length>1){ vAnt.onclick=()=>{ if(i>0){ i--; mostrar(); } }; vSig.onclick=()=>{ if(i<L.length-1){ i++; mostrar(); } }; }
+  mostrar();
+  sOk.onclick = ()=>{ const val = {ej:sEj.value.trim(), frase:sFr.value.trim(), ayudo:sAy.value.trim(), cuando:sCu.value.trim(), f:sF.value||hoyISO(), _t:Date.now()};
+    if(!val.frase&&!val.ayudo) return;
+    if(ed.id) Object.assign(ed,val); else estado.sesion.push({id:uid(),...val});
+    vista.editar=null; guardar(); pintar(); };
+}
+
+function pintarNueva(id){
+  const c = id && estado.cartas.find(x=>x.id===id) || {cuando:'Cuando tu lucha sea con ', color:'lila'};
+  app.innerHTML = `${volverA('Mi kit',{v:'inicio'})}<h2>${id?'Cambiar mi carta':'Nueva carta'}</h2>
+    <div class="caja"><label>Título</label><input type="text" id="cT" value="${esc(c.cuando)}">
+      <label>Elige el diseño</label><div class="disenos">${Object.keys(COLORES).map(k=>`<button class="sobre${k===c.color?' sel':''}" data-c="${k}" title="${k}">${portada({cuando:'',color:k})}</button>`).join('')}</div>
+      <p class="hint">Tu carta y todas sus tarjetas tendrán este diseño.</p>
+      <div class="hint" style="margin-top:12px">👁 Vista previa</div><div id="cPrev" style="max-width:240px"></div>
+      <div class="fila"><button class="btn" id="cOk">${id?'Guardar':'Crear y abrir'}</button></div></div>`;
+  enlazar();
+  const prev = ()=>{ cPrev.innerHTML = portada(c); };
+  cT.oninput = e=>{ c.cuando=e.target.value; prev(); };
+  document.querySelectorAll('.disenos .sobre').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.disenos .sobre').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); c.color=b.dataset.c; prev(); });
+  prev();
+  cOk.onclick = ()=>{ if(!c.cuando.trim()) return; if(!id){ c.id=uid(); estado.cartas.push(c); } c._t=Date.now(); guardar(); ir({v:'carta', id:c.id}); };
+}
+
+/* 📊 Estadísticas de la semana o el mes */
+function pintarStats(){
+  const per = vista.per||'semana', dias = per==='semana'?7:30, desde = new Date(Date.now()-dias*864e5).toISOString().slice(0,10);
+  const U = estado.usos.filter(u=>(u.f||'')>=desde), E = estado.ejercicios.filter(e=>(e.f||'')>=desde);
+  const prom = k=>{ const L=U.filter(u=>u[k]!=null); return L.length?(L.reduce((s,u)=>s+u[k],0)/L.length).toFixed(1):'–'; };
+  const cuenta = arr=>{ const m={}; arr.forEach(x=>m[x]=(m[x]||0)+1); return Object.entries(m).sort((a,b)=>b[1]-a[1]); };
+  const barras = L=>{ const mx=Math.max(1,...L.map(x=>x[1])); return L.slice(0,6).map(([k,n])=>`<div class="barra"><span>${esc(k)}</span><i style="width:${n/mx*50}%"></i><span>${n}</span></div>`).join('') || '<p class="hint">Todavía no hay registros.</p>'; };
+  const NOM = {resp:'🫁 Respirar', ysi:'🌪️ ¿Y si…?', control:'⭕ Lo que depende de mí', comp:'💗 Carta compasiva'};
+  app.innerHTML = `${volverA('Mi kit',{v:'inicio'})}<h2>📊 Mis estadísticas</h2>
+    <div class="chips" style="margin-bottom:12px"><button class="chip${per==='semana'?' sel':''}" data-per="semana">Esta semana</button><button class="chip${per==='mes'?' sel':''}" data-per="mes">Este mes</button></div>
+    <div class="stat"><div><b>${E.length}</b>ejercicios hechos</div><div><b>${prom('antes')}</b>malestar antes</div><div><b>${prom('desp')}</b>malestar después</div></div>
+    <h3>Los ejercicios que más hice</h3>${barras(cuenta(E.map(e=>NOM[e.tipo]||e.tipo)))}
+    <h3>Las cartas que más abrí</h3>${barras(cuenta([...U.map(u=>u.carta),...E.filter(e=>e.carta).map(e=>e.carta)].map(nomCarta)))}
+    <h3>Lo que usé cuando sí pude seguir con mi día</h3>${barras(cuenta(U.filter(u=>u.ayudo==='Sí'||u.ayudo==='Un poco').flatMap(u=>u.uso||[])))}
+    <h3>Mis registros</h3>${U.length?[...U].reverse().map(u=>`<div class="nota">${esc(fechaBonita(u.f))} · <b>${esc(nomCarta(u.carta))}</b> · ${u.antes??'–'} → ${u.desp??'–'}${u.ayudo?' · '+esc(u.ayudo):''}<br><small>${esc((u.uso||[]).join(', '))}${u.nota?' — '+esc(u.nota):''}</small> <button class="chip" data-del="uso" data-id="${u.id}" style="padding:1px 8px">🗑</button></div>`).join(''):'<p class="hint">Al final de cada carta puedes anotar cómo te fue.</p>'}`;
+  enlazar();
+  document.querySelectorAll('[data-per]').forEach(b=>b.onclick=()=>{ vista.per=b.dataset.per; pintar(); });
+}
+
+/* Ventana para escribir (tarjetas para escribir y editar canciones) */
+function escribir(titulo, guia, valor, alGuardar){
+  const m=document.createElement('div'); m.className='modal';
+  m.innerHTML=`<div class="caja"><b>${esc(titulo)}</b>${guia?`<p class="hint">${esc(guia)}</p>`:''}<textarea id="mTxt" style="min-height:110px">${esc(valor||'')}</textarea>
+    <div class="fila" style="justify-content:flex-end"><button class="btn sec" id="mNo">Cancelar</button><button class="btn" id="mSi">Guardar</button></div></div>`;
+  document.body.appendChild(m); const t=m.querySelector('#mTxt'); t.focus({preventScroll:true});
+  m.querySelector('#mNo').onclick=()=>m.remove(); m.onclick=e=>{ if(e.target===m) m.remove(); };
+  m.querySelector('#mSi').onclick=()=>{ alGuardar(t.value.trim()); m.remove(); };
+}
+
+/* Botones comunes: navegar, editar y quitar */
+function enlazar(raiz){
+  raiz = raiz||app;
+  raiz.querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>{ const v={v:b.dataset.ir}; if(b.dataset.id) v.id=b.dataset.id; if(b.dataset.que) v.que=b.dataset.que; if(b.dataset.carta!=null) v.carta=b.dataset.carta; else if(vista.carta&&['resp','ysi','control','comp','ej'].includes(v.v)) v.carta=vista.carta; ir(v); });
+  raiz.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(!b.dataset.ok){ b.dataset.ok='1'; const t=b.textContent; b.textContent='¿Seguro?'; setTimeout(()=>{ delete b.dataset.ok; b.textContent=t; },4000); return; }
+    estado.del.push(b.dataset.id); estado = unir(estado, base()); guardar();
+    if(b.dataset.del==='carta') ir({v:'inicio'}); else pintar(); });
+  raiz.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id, tipo=b.dataset.ed, c=vista.id&&cartaPor(vista.id);
+    if(tipo==='sesion'){ vista.editar=id; pintar(); return; }
+    if(tipo==='frase'){ vista.editar=id; ir({v:'frase', id:vista.id, editar:id}); return; }
+    if(tipo==='escrito'){ const t=(c&&c.tarjetas||[]).find(x=>x.id===id)||{};
+      escribir(t.t||'Escribe', t.guia, escrito(id), val=>{ const it=estado.escritos.find(x=>x.id===id); if(it) Object.assign(it,{t:val,_t:Date.now()}); else estado.escritos.push({id,t:val,_t:Date.now()}); guardar(); pintar(); }); return; }
+    if(tipo==='cancion'){ const it=extras(vista.id).canciones.find(x=>x.id===id); if(!it) return;
+      escribir('Enlace de la canción', it.n, it.u, val=>{ if(!val) return; it.u=/^https?:\/\//i.test(val)?val:'https://'+val; it._t=Date.now(); guardar(); pintar(); }); } });
+  raiz.querySelectorAll('#btnWa').forEach(a=>a.onclick=()=>{ a.href='https://api.whatsapp.com/send?phone='+MI_WA+'&text='+encodeURIComponent(mensajeSana()); });
+  raiz.querySelectorAll('#btnCopiar').forEach(b=>b.onclick=()=>{
+    const msg = mensajeSana(), av = document.getElementById('platAviso');
+    const manual = ()=>{ av.innerHTML='Copia este texto y envíalo por WhatsApp a tu psicóloga:<textarea readonly style="margin-top:6px">'+esc(msg)+'</textarea>'; };
+    try{ navigator.clipboard.writeText(msg).then(()=>{ av.innerHTML='<div class="nota">✅ Copiado. Pégalo en el chat de WhatsApp con tu psicóloga.</div>'; }, manual); }catch(e){ manual(); } });
+}
+
+/* ===== Envío a la psicóloga (SANA1 compartido, k:'c') ===== */
+const MI_WA = ULT.w || '573150898447';
+function envio(){
+  return `<div class="caja" style="text-align:center;margin-top:18px"><b>💌 Compartir mi kit con mi psicóloga</b>
+    <p class="hint">Envía lo que agregaste y tus ejercicios. Todo sigue guardado en tu celular.</p>
+    <div class="fila" style="justify-content:center"><a class="btn wa" id="btnWa" href="#" target="_blank" rel="noopener">📲 Enviar a mi psicóloga por WhatsApp</a>
+    <button class="btn sec" id="btnCopiar">📋 Copiar para enviar a mi psicóloga</button></div><div id="platAviso"></div></div>
+    <p class="crisis">Si estás en peligro o piensas en hacerte daño, abre tu Plan de seguridad o llama ya a ${esc(lineaCrisis())} o acude a urgencias.</p>`;
+}
+function mensajeSana(){
+  const res = [], linea = (e)=>{
+    if(e.tipo==='resp') return `🫁 Respiró ${e.veces||''} veces`;
+    if(e.tipo==='ysi') return `🌪️ ¿Y si ${e.ysi||''}? · Peor: ${e.peor||'–'} · Mejor: ${e.mejor||'–'} · Lo más probable: ${e.prob||'–'} · Si pasara: ${e.puedo||'–'} · Frase: ${e.frase||'–'} · Ahora: ${e.ahora||'–'}`;
+    if(e.tipo==='control') return `⭕ ${e.sit||''} · Sí depende: ${(e.si||[]).join(', ')||'–'} · No depende: ${(e.no||[]).join(', ')||'–'} · Hoy: ${e.hoy||'–'}`;
+    if(e.tipo==='comp') return `💗 Le duele: ${e.duele||'–'} · ${e.comun||''} · A una amiga: ${e.amiga||'–'} · Su frase: ${e.frase||'–'}`;
+    return e.tipo; };
+  if(estado.sesion.length) res.push({label:'🌱 Lo que me llevo de sesión', val:estado.sesion.map(s=>`• ${fechaBonita(s.f)} · ${s.ej||'Sesión'}: «${s.frase||''}»${s.ayudo?' — Me ayudó: '+s.ayudo:''}${s.cuando?' — Úsalo: '+s.cuando:''}`).join('\n')});
+  const E = estado.ejercicios.slice(-30);
+  if(E.length) res.push({label:'🧰 Ejercicios que hice', val:E.map(e=>`• ${fechaBonita(e.f)}${e.carta?' · '+nomCarta(e.carta):''} · ${linea(e)}`).join('\n')});
+  const U = estado.usos.slice(-30);
+  if(U.length) res.push({label:'📝 ¿Cómo me fue?', val:U.map(u=>`• ${fechaBonita(u.f)} · ${nomCarta(u.carta)} · malestar ${u.antes??'–'} → ${u.desp??'–'}${u.ayudo?' · pudo hacer lo que le importa: '+u.ayudo:''}${(u.uso||[]).length?' · usó: '+u.uso.join(', '):''}${u.nota?' · '+u.nota:''}`).join('\n')});
+  const W = estado.escritos.filter(x=>x.t); if(W.length) res.push({label:'✍️ Lo que escribí en mis tarjetas', val:W.map(x=>{ const t=KIT.flatMap(c=>c.tarjetas||[]).find(y=>y.id===x.id); return `• ${t?t.t:x.id}: ${x.t}`; }).join('\n')});
+  const nuevas = todasCartas().map(c=>{ const ex=estado.extras[c.id]; if(!ex||(!ex.frases.length&&!ex.canciones.length)) return ''; return `${c.cuando}:\n${ex.frases.map(f=>'  ✍️ '+(f.tit?f.tit+': ':'')+f.t+(f.ref?' ('+f.ref+')':'')).join('\n')}${ex.canciones.length?'\n'+ex.canciones.map(s=>'  🎵 '+(s.n||s.u)).join('\n'):''}`; }).filter(Boolean);
+  if(estado.cartas.length) res.push({label:'💌 Mis cartas nuevas', val:estado.cartas.map(c=>'• '+c.cuando).join('\n')});
+  if(nuevas.length) res.push({label:'⭐ Frases y canciones que agregué', val:nuevas.join('\n')});
+  const s = JSON.parse(JSON.stringify(estado)); Object.values(s.extras||{}).forEach(e=>delete e.imagenes);   /* las imágenes pesan mucho: quedan en su celular */
+  const o = {v:1,k:'c',c:'kitP16',f:hoyISO(),res,s}; if(TOKEN) o.t = TOKEN;
+  return '💛 Mi kit emocional «Ábrelo»\nSANA1:z'+LZString.compressToEncodedURIComponent(JSON.stringify(o));
+}
+/* Línea de crisis según la zona horaria del celular (sin pedir ubicación) */
+function lineaCrisis(){ let z=''; try{ z=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+  const L=[[/^America\/Bogota$/,'la Línea 123 (Colombia)'],[/^America\/(New_York|Chicago|Denver|Phoenix|Los_Angeles|Anchorage|Detroit|Indiana|Kentucky|Boise|Adak)|^Pacific\/Honolulu$/,'la línea 988 (Estados Unidos: llama o escribe; marca 2 para español)'],
+    [/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns)$/,'la línea 988 (Canadá)'],[/^America\/(Mexico_City|Monterrey|Merida|Cancun|Chihuahua|Hermosillo|Mazatlan|Tijuana|Matamoros|Bahia_Banderas)$/,'la línea 911 (México)'],
+    [/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/,'la línea 024 (España)'],[/^America\/Guayaquil$/,'la línea 911 (Ecuador)'],[/^America\/Lima$/,'la Línea 113, opción 5 (Perú)'],[/^America\/Santiago$/,'la línea *4141 (Chile)']];
+  const m=L.find(([r])=>r.test(z)); return m?m[1]:'la línea de emergencias de tu país'; }
+window.addEventListener('resize', ()=>ajustar());
+pintar();
+</script>
+</body>
+</html>
