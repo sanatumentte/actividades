@@ -130,6 +130,24 @@ textarea{min-height:70px;resize:vertical}
   .menu.uno{grid-template-columns:1fr;max-width:340px}
   .modal .caja{max-width:760px;border-radius:20px;margin:auto}
 }
+/* Guía de primera vez */
+#tour .tourLuz{position:fixed;border-radius:14px;box-shadow:0 0 0 3px #fff,0 0 0 9999px #2a1f3299;pointer-events:none;z-index:40;transition:all .25s;animation:tourLatir 1.6s infinite}
+@keyframes tourLatir{50%{box-shadow:0 0 0 6px #fff,0 0 0 9999px #2a1f3299}}
+#tour .tourVelo{position:fixed;inset:0;background:#2a1f3299;z-index:40}
+#tour .tourGlobo{position:fixed;z-index:41;background:#fff;border-radius:16px;padding:14px 16px 10px;box-shadow:0 8px 28px #0003;font-size:.95rem;color:var(--txt)}
+#tour .tourGlobo.centro{left:50%!important;top:50%!important;transform:translate(-50%,-50%);width:min(320px,calc(100vw - 32px))!important}
+#tour .tourT{display:block;font:600 1.1rem Fredoka,'Bree Serif',sans-serif;color:var(--mor2);margin-bottom:4px}
+#tour .tourGlobo p{margin:0 0 10px;line-height:1.4}
+#tour .tourFlecha{position:absolute;top:-8px;width:16px;height:16px;background:#fff;transform:rotate(45deg)}
+#tour .tourGlobo.arriba .tourFlecha{top:auto;bottom:-8px}
+#tour .centro .tourFlecha{display:none}
+#tour .tourBtns{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#tour .tX{border:0;background:none;color:#8a7a90;font:600 .85rem Nunito,Poppins,sans-serif;cursor:pointer;padding:6px 0}
+#tour .tourToca{font-weight:700;color:var(--mor2);font-size:.9rem;animation:tourBote 1s infinite}
+@keyframes tourBote{50%{transform:translateY(-3px)}}
+#tour .tourN{display:block;text-align:center;color:#a99aae;font-size:.75rem;margin-top:6px}
+#tour .tourMini{position:fixed;right:12px;bottom:12px;z-index:41;display:flex;gap:4px;background:#fff;border-radius:99px;padding:4px 6px 4px 12px;box-shadow:0 4px 14px #0003}
+#tour .tourMini button{border:0;background:none;font:700 .9rem Nunito,Poppins,sans-serif;color:var(--mor2);cursor:pointer}
 </style>
 </head>
 <body>
@@ -693,6 +711,72 @@ function lineaCrisis(){ let z=''; try{ z=Intl.DateTimeFormat().resolvedOptions()
     [/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/,'la línea 024 (España)'],[/^America\/Guayaquil$/,'la línea 911 (Ecuador)'],[/^America\/Lima$/,'la Línea 113, opción 5 (Perú)'],[/^America\/Santiago$/,'la línea *4141 (Chile)']];
   const m=L.find(([r])=>r.test(z)); return m?m[1]:'la línea de emergencias de tu país'; }
 window.addEventListener('resize', ()=>ajustar());
+
+/* ===== Guía de primera vez: flechitas que muestran dónde tocar para armar el kit ===== */
+const TOUR_KEY = 'sana_kit_tour_v1';
+const TOUR = [
+  {v:'inicio', t:'¡Hola! 💛', d:'Este es <b>tu kit emocional</b>. Lo armas tú, con lo que de verdad te ayuda. Te muestro en un minuto cómo hacerlo.', b:'Empezar'},
+  {v:'inicio', s:'.sobres .sobre[data-ir="nueva"], .fila .btn[data-ir="nueva"]', t:'1. Crea tu primera carta', d:'Cada carta es para una lucha: la ansiedad, la tristeza, una persona… <b>Toca aquí.</b>', espera:true},
+  {v:'nueva', s:'#cT', t:'2. Ponle nombre', d:'Completa la frase con tu lucha. Por ejemplo: «Cuando tu lucha sea con <b>la ansiedad</b>».', b:'Listo'},
+  {v:'nueva', s:'.disenos', t:'3. Elige su diseño', d:'Tu carta y todas sus tarjetas tendrán este diseño. Abajo ves cómo queda.', b:'Listo'},
+  {v:'nueva', s:'#cOk', t:'4. Crea tu carta', d:'<b>Toca «Crear y abrir».</b>', espera:true},
+  {v:'carta', s:'details.seccion[data-sec="ver"]', t:'5. 👀 Ver', d:'Aquí aparecen tus frases y tus imágenes. Puedes subir fotos que te den calma.', b:'Siguiente'},
+  {v:'carta', s:'details.seccion[data-sec="oir"]', t:'6. 👂 Escuchar', d:'Pega el enlace de una canción de YouTube o Spotify y suena aquí mismo.', b:'Siguiente'},
+  {v:'carta', s:'details.seccion[data-sec="cuerpo"]', t:'7. 🫁 Mi cuerpo', d:'Respira con la bolita: inhala en 4, exhala en 6. Practícalo también en calma.', b:'Siguiente'},
+  {v:'carta', s:'details.seccion[data-sec="hacer"]', t:'8. ✍️ Hacer', d:'Escribe tu frase o haz un ejercicio corto. Lo que te sirva, guárdalo con <b>⭐ Guardar en mis tarjetas</b>.', b:'Siguiente'},
+  {v:'carta', s:'#uso', t:'9. ¿Cómo me fue?', d:'Opcional: anota cómo estabas antes y después, y si pudiste hacer lo que te importa.', b:'Siguiente'},
+  {v:'carta', s:'.volver', t:'10. Vuelve a tu kit', d:'<b>Toca aquí</b> para volver a tus cartas.', espera:true},
+  {v:'inicio', s:'.sobre[data-ir="sesion"]', t:'11. Lo que me llevo de sesión', d:'Aquí aparece lo que trabajemos en terapia: la frase que te sirvió y cuándo usarla.', b:'Siguiente'},
+  {v:'inicio', s:'#feBtn', t:'12. Tu fe (si quieres)', d:'Si deseas versículos y oración en tu kit, actívalo aquí. Es opcional.', b:'Siguiente'},
+  {v:'inicio', s:'#btnWa', t:'13. Envíamelo', d:'Cuando quieras, envíame tu kit por WhatsApp para revisarlo en sesión. Todo sigue guardado en tu celular.', b:'Siguiente'},
+  {v:'inicio', t:'¡Listo! 🌱', d:'Crea más cartas con <b>➕ Nueva carta</b>. Si quieres ver esta guía otra vez, toca <b>❓ Cómo armar mi kit</b>.<br><small>Este kit es un apoyo entre sesiones: no reemplaza la terapia ni la atención de urgencia.</small>', b:'Terminar'}
+];
+let TPASO = -1;
+const tourVisto = ()=>{ try{ return !!localStorage.getItem(TOUR_KEY); }catch(e){ return true; } };
+function tourFin(){ TPASO=-1; try{ localStorage.setItem(TOUR_KEY,'1'); }catch(e){} tourPintar(); }
+function tourEmpezar(){ TPASO=0; if(vista.v!=='inicio') ir({v:'inicio'}); else tourPintar(); }
+function tourPintar(){
+  let capa = document.getElementById('tour');
+  if(TPASO<0){ if(capa) capa.remove(); return; }
+  /* si la persona va por otro camino, la guía la sigue al paso de esa pantalla */
+  if(TOUR[TPASO].v!==vista.v){ const k=TOUR.findIndex((p,i)=>i>TPASO&&p.v===vista.v); if(k>0) TPASO=k; }
+  let p = TOUR[TPASO];
+  if(p.v===vista.v && p.s && !document.querySelector(p.s)){ const k=TOUR.findIndex((q,i)=>i>TPASO&&q.v===vista.v&&(!q.s||document.querySelector(q.s))); if(k>0){ TPASO=k; p=TOUR[k]; } }
+  if(!capa){ capa=document.createElement('div'); capa.id='tour'; document.body.appendChild(capa); }
+  if(p.v!==vista.v){ capa.innerHTML=`<div class="tourMini"><button id="tVolver">❓ Seguir la guía</button><button id="tSaltar" class="tX">✕</button></div>`;
+    tVolver.onclick=()=>ir(p.v==='carta'&&vista.carta?{v:'carta',id:vista.carta}:{v:p.v}); tSaltar.onclick=tourFin; return; }
+  const el = p.s && document.querySelector(p.s);
+  capa.innerHTML = `${el?'<div class="tourLuz"></div>':'<div class="tourVelo"></div>'}<div class="tourGlobo${el?'':' centro'}"><i class="tourFlecha"></i>
+    <b class="tourT">${p.t}</b><p>${p.d}</p><div class="tourBtns"><button class="tX" id="tSaltar">${TPASO===TOUR.length-1?'':'Saltar guía'}</button>
+    ${p.espera?'<span class="tourToca">👆 Toca lo que brilla</span>':`<button class="btn sm" id="tSig">${p.b||'Siguiente'}</button>`}</div><small class="tourN">${TPASO+1} de ${TOUR.length}</small></div>`;
+  const sig = document.getElementById('tSig'); if(sig) sig.onclick=()=>{ if(TPASO>=TOUR.length-1) return tourFin(); TPASO++; tourPintar(); };
+  tSaltar.onclick=tourFin;
+  if(el){ const r=el.getBoundingClientRect(); if(r.top<60||r.bottom>innerHeight-20) el.scrollIntoView({block:'center'}); }
+  tourUbicar();
+}
+function tourUbicar(){
+  const capa=document.getElementById('tour'); if(!capa||TPASO<0) return;
+  const p=TOUR[TPASO], el=p.s&&document.querySelector(p.s), luz=capa.querySelector('.tourLuz'), g=capa.querySelector('.tourGlobo');
+  if(!el||!luz||!g) return;
+  const r=el.getBoundingClientRect(), m=6;
+  Object.assign(luz.style,{left:r.left-m+'px',top:r.top-m+'px',width:r.width+2*m+'px',height:r.height+2*m+'px'});
+  const gw=Math.min(320,innerWidth-24), gh=g.offsetHeight, abajo = r.bottom+gh+24 < innerHeight || r.top<gh+24;
+  const left=Math.max(12,Math.min(innerWidth-gw-12, r.left+r.width/2-gw/2));
+  Object.assign(g.style,{width:gw+'px',left:left+'px',top:(abajo?r.bottom+m+14:r.top-m-14-gh)+'px'});
+  g.classList.toggle('arriba',!abajo);
+  g.querySelector('.tourFlecha').style.left=Math.max(16,Math.min(gw-28,r.left+r.width/2-left-8))+'px';
+}
+addEventListener('scroll',tourUbicar,{passive:true}); addEventListener('resize',tourUbicar);
+/* en los pasos «toca aquí», avanzar cuando toque lo que brilla */
+document.addEventListener('click',e=>{ if(TPASO<0) return; const p=TOUR[TPASO]; if(!p.espera||p.v!==vista.v) return;
+  const el=document.querySelector(p.s); if(el&&(el===e.target||el.contains(e.target))){ TPASO++; setTimeout(tourPintar,0); } },true);
+document.addEventListener('toggle',()=>setTimeout(tourUbicar,0),true);
+const pintarSinTour = pintar;
+pintar = function(){ pintarSinTour(); const a=document.getElementById('tourAyuda');
+  if(!a && vista.v==='inicio'){ const f=document.querySelector('#app .fila'); if(f){ f.insertAdjacentHTML('beforeend','<button class="btn sec" id="tourAyuda">❓ Cómo armar mi kit</button>'); tourAyuda.onclick=tourEmpezar; } }
+  tourPintar(); };
+if(!tourVisto() && !EN_SESION && !VISTA && !estado.cartas.length) TPASO=0;
+
 pintar();
 </script>
 </body>
