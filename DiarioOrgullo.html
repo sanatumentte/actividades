@@ -270,8 +270,8 @@ footer img{width:110px;margin-top:10px}
 const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_orgullo_enlace')||'{}')||{}; }catch(e){}
 if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_orgullo_enlace'); else localStorage.setItem('sana_orgullo_enlace', JSON.stringify(ULT)); }catch(e){} }
-const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
-const KEY = 'sana_orgullo_v1' + (TOKEN ? ':'+TOKEN : '');
+const TOKEN = ENL[1]||'', EN_SESION = !!ENL[4];
+const KEY = 'sana_orgullo_v1' + (TOKEN ? ':'+TOKEN : ':libre');
 const MI_WA = ULT.w || '573150898447';
 const hoyISO = ()=>{ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
 const base = ()=>({inicio:hoyISO(), g:'', dias:{}});

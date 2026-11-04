@@ -326,8 +326,8 @@ const H=decodeURIComponent(location.hash.slice(1)), VISTA=/^vista/.test(H);
 const ENL=H.match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT={}; try{ ULT=JSON.parse(localStorage.getItem('sana_nubes_enlace')||'{}')||{}; }catch(e){}
 if(ENL[1]&&!VISTA){ ULT={t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_nubes_enlace'); else localStorage.setItem('sana_nubes_enlace', JSON.stringify(ULT)); }catch(e){} }
-const TOKEN=VISTA?'':(ENL[1]||ULT.t||''), EN_SESION=!!ENL[4];
-const KEY='sana_nubes_v1'+(TOKEN?':'+TOKEN:(VISTA?':vista':''));
+const TOKEN=VISTA?'':(ENL[1]||''), EN_SESION=!!ENL[4];
+const KEY='sana_nubes_v1'+(TOKEN?':'+TOKEN:(VISTA?':vista':':libre'));
 const vacioE=()=>({nubes:[],lug:{},int:{}});
 let estado=vacioE(), actual=0;
 try{ const g=JSON.parse(localStorage.getItem(KEY)); if(g) estado=Object.assign(vacioE(), g); }catch(e){}

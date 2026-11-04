@@ -242,8 +242,8 @@ const TITULO = 'Mis límites con DEAR MAN';
 const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_dearman_enlace')||'{}')||{}; }catch(e){}
 if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_dearman_enlace'); else localStorage.setItem('sana_dearman_enlace', JSON.stringify(ULT)); }catch(e){} }
-const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
-const KEY = 'sana_dearman_v1' + (TOKEN ? ':'+TOKEN : '');
+const TOKEN = ENL[1]||'', EN_SESION = !!ENL[4];
+const KEY = 'sana_dearman_v1' + (TOKEN ? ':'+TOKEN : ':libre');
 const LOGO = document.querySelector('header img').src;
 const base = ()=>({regs:[]});
 let estado = base();
