@@ -244,7 +244,7 @@ const EJEMPLO={reg:[{id:'r1',f:'',t:'Nunca voy a ser como ellos',a:90,k:'sg',r1:
 const H=decodeURIComponent(location.hash.slice(1)), VISTA=/^vista/.test(H);
 const ENL=H.match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT={}; try{ ULT=JSON.parse(localStorage.getItem('sana_radio_enlace')||'{}')||{}; }catch(e){}
-if(ENL[1]&&!VISTA){ ULT={t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_radio_enlace', JSON.stringify(ULT)); }catch(e){} }
+if(ENL[1]&&!VISTA){ ULT={t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_radio_enlace'); else localStorage.setItem('sana_radio_enlace', JSON.stringify(ULT)); }catch(e){} }
 const TOKEN=VISTA?'':(ENL[1]||ULT.t||''), EN_SESION=!!ENL[4];
 const KEY='sana_radio_v1'+(TOKEN?':'+TOKEN:(VISTA?':vista':''));
 const vacioE=()=>({reg:[],inicio:'',hora:''});

@@ -208,7 +208,7 @@ input[type=range]{width:100%; accent-color:var(--c,var(--verde)); margin:8px 0 2
 /* Compartido como la cartilla: enlace de la plataforma #<token>.<WhatsApp>[.<lo último guardado en el caso>][.p = abierto en sesión]. */
 const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_certezas_enlace')||'{}')||{}; }catch(e){}
-if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_certezas_enlace', JSON.stringify(ULT)); }catch(e){} }
+if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_certezas_enlace'); else localStorage.setItem('sana_certezas_enlace', JSON.stringify(ULT)); }catch(e){} }
 const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
 const KEY = 'sana_certezas_v1' + (TOKEN ? ':'+TOKEN : '');
 const LOGO = document.querySelector('header img').src;

@@ -329,7 +329,7 @@ const LOGO = document.querySelector('header img').src;
    El token se recuerda, así sirve aunque luego lo abra sin el enlace. */
 const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_plan_enlace')||'{}')||{}; }catch(e){}
-if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_plan_enlace', JSON.stringify(ULT)); }catch(e){} }
+if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_plan_enlace'); else localStorage.setItem('sana_plan_enlace', JSON.stringify(ULT)); }catch(e){} }
 const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
 const KEY = 'plan-seguridad-sana' + (TOKEN ? ':'+TOKEN : '');
 const ESTADO_INICIAL = ()=>({campos:{}, chips:{}, listas:{distraccion:[['',''],['','']], ayuda:[['Mamá',''],['Papá',''],['','']]}});

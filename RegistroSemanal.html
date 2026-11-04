@@ -278,7 +278,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 const VISTA = /^#?vista/i.test(location.hash.slice(1));
 let ULT = {}; try{ if(!VISTA) ULT = JSON.parse(localStorage.getItem('sana_semanal_enlace')||'{}')||{}; }catch(e){}
-if(ENL[1] && !VISTA){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_semanal_enlace', JSON.stringify(ULT)); }catch(e){} }
+if(ENL[1] && !VISTA){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_semanal_enlace'); else localStorage.setItem('sana_semanal_enlace', JSON.stringify(ULT)); }catch(e){} }
 const TOKEN = VISTA ? '' : (ULT.t||''), EN_SESION = !!ENL[4];
 const KEY = 'sana_semanal_v1' + (TOKEN ? ':'+TOKEN : '');
 const MI_WA = ULT.w || '573150898447';

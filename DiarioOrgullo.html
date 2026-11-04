@@ -269,7 +269,7 @@ footer img{width:110px;margin-top:10px}
 /* ===== Compartido como la cartilla: #<token>.<WhatsApp>[.<estado>][.p = en sesión] ===== */
 const ENL = decodeURIComponent(location.hash.slice(1)).match(/^([A-Za-z0-9]{4,16})\.(\d{8,15})?(?:\.([A-Za-z0-9_-]*))?(\.p)?$/) || [];
 let ULT = {}; try{ ULT = JSON.parse(localStorage.getItem('sana_orgullo_enlace')||'{}')||{}; }catch(e){}
-if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ localStorage.setItem('sana_orgullo_enlace', JSON.stringify(ULT)); }catch(e){} }
+if(ENL[1]){ ULT = {t:ENL[1], w:ENL[2]||ULT.w}; try{ if(ENL[4]) localStorage.removeItem('sana_orgullo_enlace'); else localStorage.setItem('sana_orgullo_enlace', JSON.stringify(ULT)); }catch(e){} }
 const TOKEN = ULT.t||'', EN_SESION = !!ENL[4];
 const KEY = 'sana_orgullo_v1' + (TOKEN ? ':'+TOKEN : '');
 const MI_WA = ULT.w || '573150898447';
