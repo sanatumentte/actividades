@@ -472,6 +472,8 @@ function frases(t){ /* un pensamiento largo → varias nubes cortas (una idea po
   const out=[]; let acc='';
   t.split(/(?<=[.;:!?])\s+|,\s+|\s+(?=pero\s)/i).forEach(p=>{ p=p.trim(); if(/:$/.test(p)) return; /* «pensé:», «durante la estadía:» son rótulos, no pensamientos */
     p=p.replace(/^(y|e|o|pero)\s+/i,'').replace(/[.;,]+$/,''); if(!p) return;
+    /* «buena hija, hermana y tía»: la enumeración sigue con la frase anterior */
+    if(out.length&&!acc&&p.split(' ').length<=5&&/^[a-záéíóúñ]+ (y|e|o) [a-záéíóúñ]+/i.test(p)){ out[out.length-1]+=', '+p; return; }
     acc=acc?acc+', '+p:p; if(acc.split(' ').length>=3){ out.push(acc); acc=''; } });
   if(acc){ if(out.length) out[out.length-1]+=', '+acc; else out.push(acc); }
   return out.filter(esPensamiento).map(x=>x.charAt(0).toUpperCase()+x.slice(1));
