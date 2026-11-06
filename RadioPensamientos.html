@@ -410,7 +410,7 @@ function extraerReg(txt){
         const v=cc>=0?parseFloat(String(f[cc]||'').replace(',','.')):NaN, a=isNaN(v)?'':Math.max(0,Math.min(100,Math.round(v<=10?v*10:v)));
         frases(c).forEach(t=>out.push({t,f:fechaTabla(f[0]),a})); }); }
     else filas.forEach(f=>out.push({t:f.join(' ')}));
-  } else lineas.forEach(t=>out.push({t}));
+  } else lineas.forEach(l=>{ l=String(l).trim(); (l.length>90?frases(l):[l]).forEach(t=>out.push({t})); }); /* línea muy larga = varios pensamientos */
   const ya=new Set(estado.reg.map(r=>norm(r.t))), res=[];
   out.forEach(o=>{ let x=String(o.t||'').trim().replace(/^(\s*[•\-*·]|\s*\d+[.)])\s*/,'').replace(/^(pensamientos?|pens[oé]|lo que pens[eé])\s*:\s*/i,'').replace(/^[«“"]|[»”"]$/g,'').trim();
     const k=norm(x); if(x.length<3||/^(—|-|ninguno)$/i.test(x)||!k||ya.has(k)) return; ya.add(k); res.push(Object.assign({},o,{t:x})); });

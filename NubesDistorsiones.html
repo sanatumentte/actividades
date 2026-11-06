@@ -489,7 +489,7 @@ function extraer(txt){
       /* las celdas de emociones traen saltos de línea: solo cuenta la fila que empieza un registro (fecha llena) */
       filas.slice(h+1).forEach(f=>{ const c=(f[col]||'').trim(); if(f.length>col&&(f[0]||'').trim()&&c&&!/^\d+([.,]\d+)?$/.test(c)) out.push(...frases(c)); }); }
     else out=filas.map(f=>f.join(' '));
-  } else out=lineas;
+  } else lineas.forEach(l=>{ l=String(l).trim(); if(l.length>90) out.push(...frases(l)); else out.push(l); }); /* línea muy larga = varios pensamientos */
   const res=[];
   out.forEach(l=>{ l=String(l).trim(); if(!l) return;
     const q=l.match(/[«“"]([^»”"]{3,})[»”"]/g);
