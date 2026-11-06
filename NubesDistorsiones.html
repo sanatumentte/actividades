@@ -184,6 +184,7 @@ textarea{min-height:90px; resize:vertical}
     <h1>Lo que mi mente me dice no siempre es un hecho</h1>
     <p class="guia">Una distorsión es un pensamiento automático con un sesgo: puede tener algo de verdad, pero va más allá de los hechos. Toca cada tarjeta para darle la vuelta.</p>
     <div class="mazo" id="mazo"></div>
+    <div class="fila"><button type="button" class="btn sec mini" id="irPrep">🧩 Preparar las nubes: pegar pensamientos</button></div>
   </section>
 
   <!-- 2 · Ubicar las nubes -->
@@ -473,8 +474,13 @@ function frases(t){ /* un pensamiento largo → varias nubes cortas (una idea po
     p=p.replace(/^(y|e|o|pero)\s+/i,'').replace(/[.;,]+$/,''); if(!p) return;
     acc=acc?acc+', '+p:p; if(acc.split(' ').length>=3){ out.push(acc); acc=''; } });
   if(acc){ if(out.length) out[out.length-1]+=', '+acc; else out.push(acc); }
-  return out.map(x=>x.charAt(0).toUpperCase()+x.slice(1));
+  return out.filter(esPensamiento).map(x=>x.charAt(0).toUpperCase()+x.slice(1));
 }
+/* Solo pensamientos: fuera lo que narra lo que pasó o lo que sintió («me generó nervios», «se me vinieron varios pensamientos», «durante la estadía…») */
+function esPensamiento(x){ const n=norm(x);
+  if(/^(bueno|entonces|luego|despues|durante|en cuanto|cuando|mientras|ayer|hoy|el (lunes|martes|miercoles|jueves|viernes|sabado|domingo)|desde)\b/.test(n)) return false;
+  if(/\b(me genero|me generaba|se me vino|se me vinieron|se me ocurrio|me senti|senti|me dio|me puse|estaba|estabamos|ibamos|veniamos|fuimos|llegamos|crei que|pense que|pense|me di cuenta)\b/.test(n)) return false;
+  return true; }
 function extraer(txt){
   const lineas=String(txt||'').replace(/\r/g,'').split('\n'); let out=[];
   if(lineas.some(l=>l.includes('\t'))){
@@ -492,6 +498,8 @@ function extraer(txt){
 }
 document.getElementById('organizar').onclick=()=>{ const ta=document.getElementById('pegar'), L=extraer(ta.value);
   if(!L.length){ avisar('<b>No encontré pensamientos nuevos</b>Pega uno por línea, o la tabla completa con la fila de títulos.'); return; }
+  /* al pegar los del paciente salen las nubes de ejemplo (vuelven con «↺ Usar los ejemplos») */
+  const EJ=new Set(EJEMPLO.map(e=>e.id)); estado.nubes.filter(n=>EJ.has(n.id)).forEach(n=>{ delete estado.lug[n.id]; delete estado.int[n.id]; }); estado.nubes=estado.nubes.filter(n=>!EJ.has(n.id));
   L.forEach((t,i)=>{ const s=sugerir(t); estado.nubes.push({id:'p'+Date.now().toString(36)+i,t,ok:s.slice(),sugeridas:s,sug:1}); });
   ta.value=''; guardar(); pintarPrep(); pintar(); avisar(`<b>✨ ${L.length} nube${L.length>1?'s':''} lista${L.length>1?'s':''}</b>Revisa la distorsión de cada una abajo.`); };
 function pintarPrep(){
@@ -509,6 +517,7 @@ document.getElementById('quitarTodas').onclick=e=>{ const b=e.currentTarget;
   if(!b.dataset.ok){ b.dataset.ok='1'; b.textContent='¿Seguro? Toca otra vez'; setTimeout(()=>{ delete b.dataset.ok; b.textContent='Quitar todas las nubes'; },5000); return; }
   delete b.dataset.ok; b.textContent='Quitar todas las nubes'; estado.nubes=[]; estado.lug={}; estado.int={}; guardar(); pintarPrep(); pintar(); };
 document.getElementById('prep').addEventListener('toggle',pintarPrep);
+document.getElementById('irPrep').onclick=()=>{ ir(1); const d=document.getElementById('prep'); d.open=true; pintarPrep(); setTimeout(()=>{ d.scrollIntoView({block:'start'}); document.getElementById('pegar').focus({preventScroll:true}); },60); };
 
 /* ---------- Navegación ---------- */
 const cards=[...document.querySelectorAll('.card')], prog=document.getElementById('progreso');
