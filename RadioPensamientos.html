@@ -89,6 +89,11 @@ textarea{min-height:64px; resize:vertical}
 .rango{display:flex; align-items:center; gap:10px}
 .rango input{flex:1; accent-color:var(--verde)}
 .rango output{min-width:52px; text-align:center; font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--petroleo)}
+.prep{margin-top:14px; border:2px solid var(--salvia); border-radius:18px; background:#fbfdfc}
+.prep summary{cursor:pointer; padding:12px 14px; font-weight:800; color:var(--petroleo); list-style:none; text-align:center}
+.prep summary::-webkit-details-marker{display:none}
+.prep .cuerpo{padding:0 12px 14px}
+.prep .ayuda{font-size:.86rem; margin:0 0 8px}
 .ayuda{margin:-2px 0 8px; font-size:.82rem; color:var(--suave)}
 .fichas{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
 .ficha{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; text-align:center; border:2px solid color-mix(in srgb,var(--c) 30%,#fff); border-top:6px solid var(--c);
@@ -145,6 +150,15 @@ textarea{min-height:64px; resize:vertical}
       <div class="tira" id="tira"></div>
       <div id="formBox"></div>
       <div class="fila" id="filaNuevo"><button class="btn pri" id="nuevo">＋ Anotar un pensamiento</button></div>
+      <details class="prep" id="prep">
+        <summary>🧩 Pegar pensamientos</summary>
+        <div class="cuerpo">
+          <p class="ayuda">Pega una lista (uno por línea) o la tabla de «Mi semana emocional»: se toman los de la columna <b>Pensamientos</b>, con su fecha y cuánto lo cree. Cada uno queda anotado con su distorsión sugerida; tócalo en la lista para revisarlo o cambiarlo.</p>
+          <textarea id="pegar" placeholder="Pega aquí la lista o la tabla"></textarea>
+          <div class="fila"><button type="button" class="btn pri mini" id="organizar">✨ Anotar los pensamientos</button></div>
+          <p class="ayuda" id="pegAviso" style="text-align:center;margin-top:8px"></p>
+        </div>
+      </details>
       <div id="lista"></div>
     </section>
     <section class="card">
@@ -353,6 +367,58 @@ function pintarForm(){
 function cerrarForm(){ edit=null; pintarForm(); document.getElementById('filaNuevo').style.display=''; pintarTira(); pintarResumen(); pintarLista(); }
 document.getElementById('nuevo').onclick=()=>abrirForm(null);
 
+/* ---------- 🧩 Pegar pensamientos: lista o tabla de «Mi semana emocional» (mismo lector que «Mis nubes») ---------- */
+const PISTAS=[
+  ['de',/\b(debo|deberia|deberias|debi|tendria que|tengo que|tienes que|hay que)\b/],
+  ['tn',/\b(perfect[oa]s?|todo o nada|o todo|exito o|igual que fracasar)\b|\bsi no\b.*\b(no sirvo|no sirve|soy un|fracaso|nada)\b/],
+  ['af',/\b(va|van|vas|voy) a\b.*\b(mal|rechaz|fall|fracas|burl|desastre|perder|dejar|odiar|reir|criticar)|\bno (voy|vas|va) a poder\b|\bsera un desastre\b|\bseguro me\b|\bseguramente\b|\bque tal (si )?(nos|me)\b|\b(accidentar|accidente|enferm)/],
+  ['dp',/\b(suerte|cualquiera lo|no cuenta|no es para tanto|casualidad|no tiene merito|no vale)\b/],
+  ['re',/\bme siento\b.*\b(asi que|entonces|por eso|lo soy)\b|\bsiento que soy\b/],
+  ['ca',/\bsoy (un |una )?(fracaso|inutil|desastre|perdedor|perdedora|estorbo|tont[oa]|idiota|mediocre|basura|carga|fraude|cobarde|mala persona|mal[oa]|brut[oa]|lo peor|insuficiente|un asco|patetic[oa]|debil|vag[oa]|incapaz)\b|\b(es|eres) (un|una) (idiota|inutil|egoista|fracaso|desastre)\b/],
+  ['mm',/\b(arruin[oea] todo|desastre total|lo bueno no (vale|cuenta)|no significa nada|pesa mucho|lo peor que)\b/],
+  ['fm',/\b(solo me quedo|lo unico que|solo recuerdo|solo veo|solo pienso en)\b/],
+  ['lm',/\b(piensan? que|creen? que|seguro (piensa|cree)|me ven? como|se burlan?|se rien|por lastima|van a pensar|diran?)\b/],
+  ['sg',/\b(siempre|nunca|nadie|jamas|todo el mundo|cada vez|nada me sale)\b/],
+  ['pe',/\b(fue por mi|por mi culpa|es mi culpa|culpa mia|seguro hice algo|hice algo (mal|que))\b/],
+  ['vt',/\b(todo esta mal|nada bien|no hay nada bueno|todo sale mal|no hago nada bien)\b/]
+];
+function sugerir(t){ const n=norm(t); return PISTAS.filter(([,re])=>re.test(n)).map(([k])=>k).slice(0,3); }
+function frases(t){ /* un pensamiento largo → varias nubes cortas (una idea por nube) */
+  t=String(t||'').replace(/\s+/g,' ').trim(); if(t.length<=40) return [t];
+  const out=[]; let acc='';
+  t.split(/(?<=[.;:!?])\s+|,\s+|\s+(?=pero\s)/i).forEach(p=>{ p=p.trim(); if(/:$/.test(p)) return; /* «pensé:», «durante la estadía:» son rótulos, no pensamientos */
+    p=p.replace(/^(y|e|o|pero)\s+/i,'').replace(/[.;,]+$/,''); if(!p) return;
+    acc=acc?acc+', '+p:p; if(acc.split(' ').length>=3){ out.push(acc); acc=''; } });
+  if(acc){ if(out.length) out[out.length-1]+=', '+acc; else out.push(acc); }
+  return out.map(x=>x.charAt(0).toUpperCase()+x.slice(1));
+}
+function fechaTabla(c){ const m=String(c||'').match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/); if(!m) return '';
+  const hoy=hoyISO(); let y=m[3]?(+m[3]<100?2000+ +m[3]:+m[3]):+hoy.slice(0,4); const f=x=>x+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  if(+m[2]<1||+m[2]>12||+m[1]<1||+m[1]>31) return ''; if(!m[3]&&f(y)>hoy) y--; return f(y); }
+function extraerReg(txt){
+  const lineas=String(txt||'').replace(/\r/g,'').split('\n'), out=[];
+  if(lineas.some(l=>l.includes('\t'))){
+    const filas=lineas.map(l=>l.split('\t')), h=filas.findIndex(f=>f.some(c=>/pensamiento/i.test(c)));
+    if(h>=0){ const col=filas[h].findIndex(c=>/pensamiento/i.test(c)), cc=filas[h].findIndex(c=>/cu[aá]nto lo cree/i.test(c));
+      /* las celdas de emociones traen saltos de línea: solo cuenta la fila que empieza un registro (fecha llena) */
+      filas.slice(h+1).forEach(f=>{ const c=(f[col]||'').trim(); if(!(f.length>col&&(f[0]||'').trim()&&c&&!/^\d+([.,]\d+)?$/.test(c))) return;
+        const v=cc>=0?parseFloat(String(f[cc]||'').replace(',','.')):NaN, a=isNaN(v)?'':Math.max(0,Math.min(100,Math.round(v<=10?v*10:v)));
+        frases(c).forEach(t=>out.push({t,f:fechaTabla(f[0]),a})); }); }
+    else filas.forEach(f=>out.push({t:f.join(' ')}));
+  } else lineas.forEach(t=>out.push({t}));
+  const ya=new Set(estado.reg.map(r=>norm(r.t))), res=[];
+  out.forEach(o=>{ let x=String(o.t||'').trim().replace(/^(\s*[•\-*·]|\s*\d+[.)])\s*/,'').replace(/^(pensamientos?|pens[oé]|lo que pens[eé])\s*:\s*/i,'').replace(/^[«“"]|[»”"]$/g,'').trim();
+    const k=norm(x); if(x.length<3||/^(—|-|ninguno)$/i.test(x)||!k||ya.has(k)) return; ya.add(k); res.push(Object.assign({},o,{t:x})); });
+  return res;
+}
+document.getElementById('organizar').onclick=()=>{ const ta=document.getElementById('pegar'), L=extraerReg(ta.value), av=document.getElementById('pegAviso');
+  if(!L.length){ av.innerHTML='<b>No encontré pensamientos nuevos.</b> Pega uno por línea, o la tabla completa con la fila de títulos.'; return; }
+  const hoy=hoyISO();
+  L.forEach((o,i)=>{ const s=sugerir(o.t); estado.reg.push({id:'r'+Date.now().toString(36)+i,f:o.f||diaSel||hoy,t:o.t,a:vacioN(o.a)?'':o.a,k:s[0]||'',ko:'',r1:'',rp:'',d:''}); });
+  const pr=estado.reg.map(r=>r.f).filter(Boolean).sort()[0]; if(pr&&pr<estado.inicio) estado.inicio=pr;
+  semana=Math.max(0,Math.floor(difDias(estado.inicio,hoy)/7)); diaSel='';
+  ta.value=''; guardar(); pintarTira(); pintarResumen(); pintarLista();
+  av.innerHTML=`<b>✨ ${L.length} pensamiento${L.length>1?'s':''} anotado${L.length>1?'s':''}</b> con su distorsión sugerida. Tócalos en la lista para revisarlos.`; };
 /* ---------- Recordatorio diario (30 días, hora del celular) ---------- */
 const inHora=document.getElementById('hora'); inHora.value=estado.hora||'20:00';
 inHora.onchange=()=>{ if(inHora.value){ estado.hora=inHora.value; guardar(); } };

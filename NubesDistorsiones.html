@@ -308,14 +308,14 @@ const VIEJAS={e1:['ca'],e2:['tn','de'],e3:['lm'],e4:['af'],e5:['de']};
 const PISTAS=[
   ['de',/\b(debo|deberia|deberias|debi|tendria que|tengo que|tienes que|hay que)\b/],
   ['tn',/\b(perfect[oa]s?|todo o nada|o todo|exito o|igual que fracasar)\b|\bsi no\b.*\b(no sirvo|no sirve|soy un|fracaso|nada)\b/],
-  ['af',/\b(va|van|vas|voy) a\b.*\b(mal|rechaz|fall|fracas|burl|desastre|perder|dejar|odiar|reir|criticar)|\bno (voy|vas|va) a poder\b|\bsera un desastre\b|\bseguro me\b/],
+  ['af',/\b(va|van|vas|voy) a\b.*\b(mal|rechaz|fall|fracas|burl|desastre|perder|dejar|odiar|reir|criticar)|\bno (voy|vas|va) a poder\b|\bsera un desastre\b|\bseguro me\b|\bseguramente\b|\bque tal (si )?(nos|me)\b|\b(accidentar|accidente|enferm)/],
   ['dp',/\b(suerte|cualquiera lo|no cuenta|no es para tanto|casualidad|no tiene merito|no vale)\b/],
   ['re',/\bme siento\b.*\b(asi que|entonces|por eso|lo soy)\b|\bsiento que soy\b/],
-  ['ca',/\bsoy (un |una )?(fracaso|inutil|desastre|perdedor|perdedora|estorbo|tont[oa]|idiota|mediocre|basura|carga|fraude|cobarde|mala persona|mal[oa]|lo peor|insuficiente|un asco|patetic[oa]|debil|vag[oa]|incapaz)\b|\b(es|eres) (un|una) (idiota|inutil|egoista|fracaso|desastre)\b/],
+  ['ca',/\bsoy (un |una )?(fracaso|inutil|desastre|perdedor|perdedora|estorbo|tont[oa]|idiota|mediocre|basura|carga|fraude|cobarde|mala persona|mal[oa]|brut[oa]|lo peor|insuficiente|un asco|patetic[oa]|debil|vag[oa]|incapaz)\b|\b(es|eres) (un|una) (idiota|inutil|egoista|fracaso|desastre)\b/],
   ['mm',/\b(arruin[oea] todo|desastre total|lo bueno no (vale|cuenta)|no significa nada|pesa mucho|lo peor que)\b/],
   ['fm',/\b(solo me quedo|lo unico que|solo recuerdo|solo veo|solo pienso en)\b/],
   ['lm',/\b(piensan? que|creen? que|seguro (piensa|cree)|me ven? como|se burlan?|se rien|por lastima|van a pensar|diran?)\b/],
-  ['sg',/\b(siempre|nunca|nadie|jamas|todo el mundo|cada vez)\b/],
+  ['sg',/\b(siempre|nunca|nadie|jamas|todo el mundo|cada vez|nada me sale)\b/],
   ['pe',/\b(fue por mi|por mi culpa|es mi culpa|culpa mia|seguro hice algo|hice algo (mal|que))\b/],
   ['vt',/\b(todo esta mal|nada bien|no hay nada bueno|todo sale mal|no hago nada bien)\b/]
 ];
@@ -466,11 +466,22 @@ document.getElementById('otraOk').onclick=()=>{ const i=document.getElementById(
   const s=sugerir(t), n={id:'m'+Date.now().toString(36),t,mia:true,ok:s.slice(),sugeridas:s}; estado.nubes.push(n); pend=n.id; i.value=''; guardar(); pintar(); pintarConfirma(); pintarPrep(); };
 
 /* ---------- Preparar las nubes: lista pegada o tabla de «Mi semana emocional» ---------- */
+function frases(t){ /* un pensamiento largo → varias nubes cortas (una idea por nube) */
+  t=String(t||'').replace(/\s+/g,' ').trim(); if(t.length<=40) return [t];
+  const out=[]; let acc='';
+  t.split(/(?<=[.;:!?])\s+|,\s+|\s+(?=pero\s)/i).forEach(p=>{ p=p.trim(); if(/:$/.test(p)) return; /* «pensé:», «durante la estadía:» son rótulos, no pensamientos */
+    p=p.replace(/^(y|e|o|pero)\s+/i,'').replace(/[.;,]+$/,''); if(!p) return;
+    acc=acc?acc+', '+p:p; if(acc.split(' ').length>=3){ out.push(acc); acc=''; } });
+  if(acc){ if(out.length) out[out.length-1]+=', '+acc; else out.push(acc); }
+  return out.map(x=>x.charAt(0).toUpperCase()+x.slice(1));
+}
 function extraer(txt){
   const lineas=String(txt||'').replace(/\r/g,'').split('\n'); let out=[];
   if(lineas.some(l=>l.includes('\t'))){
     const filas=lineas.map(l=>l.split('\t')), h=filas.findIndex(f=>f.some(c=>/pensamiento/i.test(c)));
-    if(h>=0){ const col=filas[h].findIndex(c=>/pensamiento/i.test(c)); out=filas.slice(h+1).map(f=>f[col]||''); }
+    if(h>=0){ const col=filas[h].findIndex(c=>/pensamiento/i.test(c));
+      /* las celdas de emociones traen saltos de línea: solo cuenta la fila que empieza un registro (fecha llena) */
+      filas.slice(h+1).forEach(f=>{ const c=(f[col]||'').trim(); if(f.length>col&&(f[0]||'').trim()&&c&&!/^\d+([.,]\d+)?$/.test(c)) out.push(...frases(c)); }); }
     else out=filas.map(f=>f.join(' '));
   } else out=lineas;
   const res=[];
