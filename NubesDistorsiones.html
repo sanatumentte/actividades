@@ -105,18 +105,6 @@ textarea{min-height:90px; resize:vertical}
 .caja .dentro{display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:6px}
 .caja .dentro .cl{width:100%; max-width:230px}
 .caja.otra{background:#f7f3ec}
-/* Cajas de tamaño fijo: lo ubicado va en píldoras pequeñas con scroll propio, así ninguna caja empuja a las demás hacia abajo */
-.caja{position:relative}
-.caja .cuantas{position:absolute; top:6px; right:8px; background:var(--verde); color:#fff; border-radius:99px; font:800 .72rem Nunito,sans-serif; padding:2px 8px}
-.caja .dentro{max-height:84px; overflow-y:auto; gap:4px; padding:0 2px}
-.nube.pill{width:100%; box-sizing:border-box; background:#fff; border:1.5px solid #b9d6d2; border-radius:12px; padding:4px 8px; font:700 .74rem/1.25 Nunito,sans-serif; color:#1f4a57; text-align:left;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:none}
-.nube.pill.mia{color:#7a4a2a}
-.nube.pill.sel{border-color:#dabb81; box-shadow:0 0 0 3px rgba(218,187,129,.45)}
-/* El cielo queda fijo arriba mientras bajas a buscar la caja */
-@media (min-width:700px){ .cielo{position:sticky; top:8px; z-index:5; box-shadow:0 8px 18px rgba(22,90,108,.18); padding:30px 8px 10px; min-height:0; flex-wrap:nowrap}
-  #cielo .cl,#cielo .cl.ancha{width:calc((100% - 60px)/4); max-width:230px; min-width:150px; flex:0 1 auto}
-  .cielo .msg{font-size:.8rem!important; width:auto!important; flex:0 1 140px} }
 .encaja{display:block; text-align:center; font-size:.78rem; font-weight:800; border-radius:10px; padding:2px 8px; background:#fff; color:var(--verde); margin-bottom:4px}
 #aviso{position:fixed; left:50%; bottom:88px; transform:translate(-50%,20px); width:min(560px,calc(100% - 32px)); z-index:30; opacity:0; pointer-events:none; transition:.3s;
   background:#fffaf2; border:2px solid var(--arena); border-radius:18px; padding:12px 16px; font-size:.95rem; box-shadow:0 10px 26px rgba(22,90,108,.18)}
@@ -196,6 +184,7 @@ textarea{min-height:90px; resize:vertical}
     <h1>Lo que mi mente me dice no siempre es un hecho</h1>
     <p class="guia">Una distorsión es un pensamiento automático con un sesgo: puede tener algo de verdad, pero va más allá de los hechos. Toca cada tarjeta para darle la vuelta.</p>
     <div class="mazo" id="mazo"></div>
+    <div class="fila"><button type="button" class="btn sec mini" id="irPrep">🧩 Preparar las nubes: pegar pensamientos</button></div>
   </section>
 
   <!-- 2 · Ubicar las nubes -->
@@ -413,14 +402,13 @@ let sel=null, pend=null;
 const nubeHtml=(n,k)=>`${k&&k!=='ns'?'<span class="encaja">✓ ¡Encaja aquí!</span>':''}<div class="cl nube${n.mia?' mia':''}${sel===n.id?' sel':''}" data-id="${esc(n.id)}" data-f="${n.mia?'mia':'luz'}">${formaSvg(n.mia?'mia':'luz')}<div class="txt"><span>${esc(n.t)}</span></div></div>`;
 function pintar(){
   const L=listas(), cielo=document.getElementById('cielo');
-  const sueltas=L.filter(n=>!estado.lug[n.id]), faltan=estado.nubes.length-L.length, cupo=4, enCielo=sueltas.slice(0,cupo), esperan=sueltas.length-enCielo.length;
+  const sueltas=L.filter(n=>!estado.lug[n.id]), faltan=estado.nubes.length-L.length, cupo=innerWidth>=1024?6:4, enCielo=sueltas.slice(0,cupo), esperan=sueltas.length-enCielo.length;
   cielo.innerHTML=(L.length?`<div class="cuenta">Ubicaste ${L.length-sueltas.length} de ${L.length}</div>`:'')+enCielo.map(n=>nubeHtml(n)).join('')
     +(esperan?`<div class="msg" style="width:100%;font-size:.85rem">☁️ ${esperan} nube${esperan>1?'s más esperan':' más espera'} su turno</div>`:'')
     +(!L.length?'<div class="msg">Escribe abajo los pensamientos que quieras ubicar</div>':!sueltas.length?'<div class="msg fin">¡Ubicaste todas tus nubes!</div>':'')
     +(faltan?`<div class="msg" style="width:100%;font-size:.85rem">${faltan} nube${faltan>1?'s esperan':' espera'} su distorsión en 🧩 Preparar las nubes</div>`:'');
   document.getElementById('cajas').innerHTML=[...ORDEN,'ns'].map(k=>`<div class="caja${k==='ns'?' otra':''}" data-k="${k}"><h4><span class="ico">${TIPOS[k][1]}</span>${esc(TIPOS[k][0])}</h4>
-    ${(()=>{ const D=L.filter(n=>estado.lug[n.id]===k); return (D.length?`<span class="cuantas" title="Nubes en esta caja">${k==='ns'?'':'✓ '}${D.length}</span>`:'')
-      +`<div class="dentro">${D.map(n=>`<div class="nube pill${n.mia?' mia':''}${sel===n.id?' sel':''}" data-id="${esc(n.id)}" title="${esc(n.t)}">☁️ ${esc(n.t)}</div>`).join('')}</div>`; })()}</div>`).join('');
+    <div class="dentro">${L.filter(n=>estado.lug[n.id]===k).map(n=>nubeHtml(n,k)).join('')}</div></div>`).join('');
   document.querySelectorAll('.caja').forEach(c=>c.classList.toggle('puede', !!sel));
   ajustarNubes(cielo.parentNode);
 }
@@ -515,7 +503,7 @@ document.getElementById('organizar').onclick=()=>{ const ta=document.getElementB
   /* al pegar los del paciente salen las nubes de ejemplo (vuelven con «↺ Usar los ejemplos») */
   const EJ=new Set(EJEMPLO.map(e=>e.id)); estado.nubes.filter(n=>EJ.has(n.id)).forEach(n=>{ delete estado.lug[n.id]; delete estado.int[n.id]; }); estado.nubes=estado.nubes.filter(n=>!EJ.has(n.id));
   L.forEach((t,i)=>{ const s=sugerir(t); estado.nubes.push({id:'p'+Date.now().toString(36)+i,t,ok:s.slice(),sugeridas:s,sug:1}); });
-  ta.value=''; guardar(); pintarPrep(); pintar(); document.getElementById('prep').open=false; /* se pliega: en pantalla queda solo el juego */ avisar(`<b>✨ ${L.length} nube${L.length>1?'s':''} lista${L.length>1?'s':''}</b>Ya están en el cielo. Para revisar su distorsión, abre 🧩 Preparar las nubes.`); };
+  ta.value=''; guardar(); pintarPrep(); pintar(); avisar(`<b>✨ ${L.length} nube${L.length>1?'s':''} lista${L.length>1?'s':''}</b>Revisa la distorsión de cada una abajo.`); };
 function pintarPrep(){
   const box=document.getElementById('plista');
   box.innerHTML=estado.nubes.map(n=>`<div class="pl" data-id="${esc(n.id)}"><div class="top"><input type="text" value="${esc(n.t)}" aria-label="Pensamiento"><button type="button" class="quitar" title="Quitar">🗑</button></div>
@@ -531,6 +519,7 @@ document.getElementById('quitarTodas').onclick=e=>{ const b=e.currentTarget;
   if(!b.dataset.ok){ b.dataset.ok='1'; b.textContent='¿Seguro? Toca otra vez'; setTimeout(()=>{ delete b.dataset.ok; b.textContent='Quitar todas las nubes'; },5000); return; }
   delete b.dataset.ok; b.textContent='Quitar todas las nubes'; estado.nubes=[]; estado.lug={}; estado.int={}; guardar(); pintarPrep(); pintar(); };
 document.getElementById('prep').addEventListener('toggle',pintarPrep);
+document.getElementById('irPrep').onclick=()=>{ ir(1); const d=document.getElementById('prep'); d.open=true; pintarPrep(); setTimeout(()=>{ d.scrollIntoView({block:'start'}); document.getElementById('pegar').focus({preventScroll:true}); },60); };
 
 /* ---------- Navegación ---------- */
 const cards=[...document.querySelectorAll('.card')], prog=document.getElementById('progreso');
