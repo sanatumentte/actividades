@@ -12,8 +12,8 @@ const CUAD={ocio:[0,90],relaciones:[90,180],crecimiento:[180,270],trabajo:[270,3
 const VAL=['Amor','Familia','Fe','Honestidad','Respeto','Autenticidad','Lealtad','Compromiso','Justicia','Amabilidad','Empatía','Compasión','Gratitud','Paciencia','Perdón','Tolerancia','Generosidad','Servicio','Conexión','Confianza','Libertad','Independencia','Aventura','Curiosidad','Aprendizaje','Creatividad','Humor','Diversión','Salud','Paz','Seguridad','Coraje','Persistencia','Responsabilidad','Dedicación','Productividad','Organización','Cooperación','Igualdad','Diversidad','Tradición','Presencia','Optimismo','Fortaleza','Asumir riesgos','Ética'];
 const slug=s=>s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'');
 const e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-/* Diana: recorte de la pág. 4 (1200×1467 px): x 130–1076, y 386–1332; centro (602,860), radio 471 */
-const R={x:130,y:386,w:946,h:946,cx:602,cy:860,r:471};
+/* Diana: recorte de la pág. 4 (1200×1467 px): x 80–1130, y 344–1394 (incluye los nombres de las 4 áreas); centro (602,860), radio 471 */
+const R={x:80,y:344,w:1050,h:1050,cx:602,cy:860,r:471};
 const puntaje=([x,y])=>{ const d=Math.hypot(x-R.cx,y-R.cy); return Math.max(1,Math.min(10,Math.round(10-9*Math.min(1,d/R.r)))); };
 const areaDe=(x,y)=>{ let a=Math.atan2(x-R.cx,-(y-R.cy))*180/Math.PI; if(a<0) a+=360; return Object.keys(CUAD).find(k=>a>=CUAD[k][0]&&a<CUAD[k][1]); };
 const diana={k:'x',id:'vl_diana',
