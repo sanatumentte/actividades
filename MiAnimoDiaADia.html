@@ -467,7 +467,7 @@ if(VISTA && !ENL[3] && !estado.reg.length){
   const ej=[[0,'tristeza','Desánimo','No tengo ganas de nada','4-6'],[-1,'tristeza','Desánimo','No tengo ganas de nada','6-8'],[-2,'tristeza','Apatía','Nada va a cambiar','>8'],[-2,'tristeza','Culpa','Les estoy fallando','>8'],
     [-1,'miedo','Preocupación','No voy a poder con el trabajo','6-8'],[0,'alegria','Tranquilidad','Hoy pude salir un rato','6-8'],[0,'alegria','Gratitud','','6-8'],[1,'alegria','Entusiasmo','Tengo muchas ideas','6-8'],
     [1,'ira','Impaciencia','Todos van muy lento','4-6'],[2,'alegria','Euforia','Puedo con todo','<4'],[1,'ira','Irritación','Nadie me entiende','4-6'],[0,'alegria','Tranquilidad','','6-8'],[-1,'tristeza','Desánimo','No tengo ganas de nada','6-8']];
-  const h=new Date(); let k=0; for(let i=Math.min(h.getDate(),ej.length+2);i>=1&&k<ej.length;i--){ if(i%5===0) continue; const d=new Date(h.getFullYear(),h.getMonth(),h.getDate()-i+1), e=ej[k++];
+  const h=new Date(); let k=0; for(let i=Math.min(h.getDate(),ej.length+2);i>=1&&k<ej.length;i--){ if(i%5===0) continue; const d=new Date(h.getFullYear(),h.getMonth(),h.getDate()-i), e=ej[k++];
     const r={id:'ej'+k,f:iso(d),an:e[0],fam:e[1],em:e[2]}; if(e[3]) r.pen=e[3]; estado.reg.push(r); } }
 const fe=()=>estado.fe===undefined?FE_DEF:!!estado.fe;
 const feChk=document.getElementById('feChk'); feChk.checked=fe(); feChk.onchange=()=>{ estado.fe=feChk.checked; guardar(); pintarDia(); };
